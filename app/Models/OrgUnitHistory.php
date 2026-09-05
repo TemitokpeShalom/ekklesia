@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Une ligne = un etat passe (ou courant) d'un OrgUnit, daté (point 02/13).
+ * Une ligne = un etat passe (ou courant) d'un OrgUnit, date (point 02/13).
  * Jamais modifiee une fois valid_to renseigne : seule une nouvelle
  * transformation ferme la ligne en cours et en ouvre une autre.
  */
 class OrgUnitHistory extends Model
 {
     use HasUuid;
+
+    protected $table = 'org_unit_history';
 
     public const UPDATED_AT = null; // immuable une fois cree (sauf cloture de valid_to par le service)
 
