@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MembersController;
 use Illuminate\Support\Facades\Route;
 
 // Invitation : acceptation ouverte a une personne pas encore connectee.
@@ -30,4 +31,11 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     Route::get('/org-units/{orgUnit}/inviter', [InvitationController::class, 'create'])->name('invitations.create');
     Route::post('/org-units/{orgUnit}/inviter', [InvitationController::class, 'store'])->name('invitations.store');
+
+    Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
+    Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
+    Route::post('/org-units/{orgUnit}/membres', [MembersController::class, 'store'])->name('members.store');
+    Route::get('/org-units/{orgUnit}/membres/{member}/modifier', [MembersController::class, 'edit'])->name('members.edit');
+    Route::put('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'update'])->name('members.update');
+    Route::delete('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'destroy'])->name('members.destroy');
 });
