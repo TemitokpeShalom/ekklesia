@@ -41,6 +41,16 @@ class OrgUnitPolicy
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
 
+    /**
+     * Gestion des cultes (services) : meme regle que la gestion des
+     * membres - il faut un role habilite a gerer des personnes
+     * (can_manage_users), sur ce noeud ou un de ses ancetres.
+     */
+    public function manageCultes(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
     private function hasAffectationOverridingDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
     {
         return $user->activeAffectations()
