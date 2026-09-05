@@ -39,7 +39,7 @@ class LoginController extends Controller
         // peut rien laisser passer. On fixe ici l'identite de
         // l'utilisateur pour que la policy affectations_self_access
         // autorise la lecture de ses propres affectations.
-        DB::statement('SELECT set_config(?, ?, true)', [
+        DB::statement('SELECT set_config(?, ?, false)', [
             'app.current_user_id',
             (string) $request->user()->id,
         ]);
