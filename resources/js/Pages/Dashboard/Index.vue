@@ -21,6 +21,21 @@ defineProps({
         <main class="max-w-3xl mx-auto px-6 py-8">
             <section class="mb-8">
                 <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    Modules
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/membres`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
+                            Membres
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
                     Mes affectations actives
                 </h2>
                 <ul class="space-y-2">
@@ -47,8 +62,7 @@ defineProps({
                 </ul>
 
                 <p class="text-sm text-slate-400 mt-6">
-                    Ce tableau de bord est volontairement vide — les modules suivants (membres, cultes,
-                    finances…) y ajouteront leurs indicateurs.
+                    Ce tableau de bord est volontairement vide — les modules suivants (cultes, finances...) y ajouteront leurs indicateurs.
                 </p>
             </section>
         </main>
