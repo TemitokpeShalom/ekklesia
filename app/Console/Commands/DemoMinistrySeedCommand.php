@@ -64,6 +64,12 @@ class DemoMinistrySeedCommand extends Command
                 'status' => 'active',
             ]);
 
+            // Point 04 : la securite au niveau base (RLS) est "fail closed" et
+            // exige que app.current_ministry_id soit fixe explicitement avant
+            // toute ecriture sur les tables multi-tenant, y compris depuis une
+            // commande artisan (qui ne passe pas par le middleware web habituel).
+            DB::statement("SET LOCAL app.current_ministry_id = '{$ministry->id}'");
+
             $rootCode = 'demo_ekklesia';
             $root = OrgUnit::create([
                 'ministry_id' => $ministry->id,
