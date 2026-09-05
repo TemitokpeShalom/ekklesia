@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,6 +32,17 @@ class LoginController extends Controller
         }
 
         $request->session()->regenerate();
+
+        // Complement du point 04 : a cet instant precis, le ministere
+        // courant n'est pas encore connu (c'est justement ce qu'on cherche
+        // a determiner ci-dessous), donc la policy RLS par ministere ne
+        // peut rien laisser passer. On fixe ici l'identite de
+        // l'utilisateur pour que la policy affectations_self_access
+        // autorise la lecture de ses propres affectations.
+        DB::statement('SELECT set_config(?, ?, true)', [
+            'app.current_user_id',
+            (string) $request->user()->id,
+        ]);
 
         $firstAffectation = $request->user()->activeAffectations()->with('orgUnit')->first();
 
