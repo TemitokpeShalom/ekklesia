@@ -31,6 +31,16 @@ class OrgUnitPolicy
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
 
+    /**
+     * Gestion des membres (fideles) : meme regle que l'invitation d'un
+     * titulaire de role - il faut un role habilite a gerer des personnes
+     * (can_manage_users), sur ce noeud ou un de ses ancetres.
+     */
+    public function manageMembers(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
     private function hasAffectationOverridingDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
     {
         return $user->activeAffectations()
