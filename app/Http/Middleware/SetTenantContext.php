@@ -13,16 +13,18 @@ class SetTenantContext
     {
         $ministryId = $request->session()->get('current_ministry_id');
 
-        DB::statement('SELECT set_config(?, ?, true)', [
+        // Le "false" (au lieu de "true") fixe cette valeur pour toute la
+        // duree de la connexion a la base, donc pour toute la duree de la
+        // requete web (chaque requete obtient une connexion fraiche). Avec
+        // "true", la valeur ne durait que le temps d'une seule requete SQL
+        // et disparaissait avant que les requetes suivantes ne puissent la
+        // lire.
+        DB::statement('SELECT set_config(?, ?, false)', [
             'app.current_ministry_id',
             $ministryId ?? '',
         ]);
 
-        // Complement du point 04 : permet a un utilisateur deja connecte de
-        // toujours retrouver ses propres affectations (policy
-        // affectations_self_access), meme avant que le ministere courant
-        // ne soit choisi.
-        DB::statement('SELECT set_config(?, ?, true)', [
+        DB::statement('SELECT set_config(?, ?, false)', [
             'app.current_user_id',
             $request->user()?->id ?? '',
         ]);
