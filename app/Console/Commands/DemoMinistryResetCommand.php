@@ -41,6 +41,11 @@ class DemoMinistryResetCommand extends Command
         }
 
         DB::transaction(function () use ($ministry) {
+            // Meme raison que dans demo:seed : sans ceci, les policies RLS
+            // (point 04) bloquent silencieusement les suppressions (0 ligne
+            // affectee) au lieu de generer une erreur visible.
+            DB::statement("SET LOCAL app.current_ministry_id = '{$ministry->id}'");
+
             Affectation::where('ministry_id', $ministry->id)->delete();
             OrgUnitHistory::where('ministry_id', $ministry->id)->delete();
             OrgUnit::where('ministry_id', $ministry->id)->delete();
