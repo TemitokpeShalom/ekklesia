@@ -63,6 +63,16 @@ class OrgUnit extends Model
     }
 
     /**
+     * Les membres (fideles) directement rattaches a ce noeud (typiquement
+     * une eglise locale). Isolation par ministry_id (point 04), comme
+     * toutes les tables multi-tenant.
+     */
+    public function members(): HasMany
+    {
+        return $this->hasMany(Member::class);
+    }
+
+    /**
      * Tous les descendants (n'importe quelle profondeur), via le chemin
      * materialise - la requete qui alimente aussi bien la consolidation
      * (point 06) que la visibilite des annonces (point 07).
