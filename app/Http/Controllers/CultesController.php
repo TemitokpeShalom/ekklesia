@@ -41,7 +41,9 @@ class CultesController extends Controller
             'service_date' => ['required', 'date'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'speaker' => ['nullable', 'string', 'max:255'],
-            'attendance_count' => ['nullable', 'integer', 'min:0'],
+            'key_verses' => ['nullable', 'string'],
+            'attendance_adults' => ['nullable', 'integer', 'min:0'],
+            'attendance_children' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -74,7 +76,9 @@ class CultesController extends Controller
             'service_date' => ['required', 'date'],
             'start_time' => ['nullable', 'date_format:H:i'],
             'speaker' => ['nullable', 'string', 'max:255'],
-            'attendance_count' => ['nullable', 'integer', 'min:0'],
+            'key_verses' => ['nullable', 'string'],
+            'attendance_adults' => ['nullable', 'integer', 'min:0'],
+            'attendance_children' => ['nullable', 'integer', 'min:0'],
             'notes' => ['nullable', 'string'],
             'status' => ['required', 'string', 'in:planifie,termine,annule'],
         ]);
