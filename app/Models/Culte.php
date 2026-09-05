@@ -12,13 +12,15 @@ class Culte extends Model
 
     protected $fillable = [
         'ministry_id', 'org_unit_id', 'title', 'service_date',
-        'start_time', 'speaker', 'attendance_count', 'notes', 'status', 'metadata',
+        'start_time', 'speaker', 'key_verses', 'attendance_adults', 'attendance_children',
+        'notes', 'status', 'metadata',
     ];
 
     protected $casts = [
         'metadata' => 'array',
         'service_date' => 'date',
-        'attendance_count' => 'integer',
+        'attendance_adults' => 'integer',
+        'attendance_children' => 'integer',
     ];
 
     public function ministry(): BelongsTo
