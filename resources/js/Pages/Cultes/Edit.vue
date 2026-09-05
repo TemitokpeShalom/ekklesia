@@ -11,7 +11,8 @@ const form = useForm({
     service_date: props.culte.service_date,
     start_time: props.culte.start_time ?? '',
     speaker: props.culte.speaker ?? '',
-    attendance_count: props.culte.attendance_count ?? '',
+    attendance_adults: props.culte.attendance_adults ?? '',
+    attendance_children: props.culte.attendance_children ?? '',
     notes: props.culte.notes ?? '',
     status: props.culte.status,
 })
@@ -39,7 +40,7 @@ function destroy() {
         <main class="mx-auto max-w-2xl px-6 py-8">
             <form @submit.prevent="submit" class="space-y-5 rounded-lg border border-slate-200 bg-white p-6">
                 <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700">Titre</label>
+                    <label class="mb-1 block text-sm font-medium text-slate-700">Thème du message</label>
                     <input v-model="form.title" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
                     <p v-if="form.errors.title" class="mt-1 text-sm text-rose-600">{{ form.errors.title }}</p>
                 </div>
@@ -60,9 +61,15 @@ function destroy() {
                     <input v-model="form.speaker" type="text" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
                 </div>
 
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700">Nombre de participants</label>
-                    <input v-model="form.attendance_count" type="number" min="0" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-slate-700">Effectif adultes</label>
+                        <input v-model="form.attendance_adults" type="number" min="0" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-slate-700">Effectif enfants</label>
+                        <input v-model="form.attendance_children" type="number" min="0" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
+                    </div>
                 </div>
 
                 <div>
