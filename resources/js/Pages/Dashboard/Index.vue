@@ -65,7 +65,7 @@ defineProps({
 
             <section>
                 <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-                    {{ children.length ? 'Entités directement rattachées' : 'Aucune entité rattachée pour l'instant' }}
+                    {{ children.length ? 'Entités directement rattachées' : "Aucune entité rattachée pour l'instant" }}
                 </h2>
                 <ul class="space-y-2">
                     <li v-for="child in children" :key="child.id">
