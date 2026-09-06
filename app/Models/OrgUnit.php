@@ -102,6 +102,18 @@ class OrgUnit extends Model
     }
 
     /**
+     * Le registre des biens (immobiliers et mobiliers) directement
+     * rattaches a ce noeud - fiche d'inventaire de fin d'annee (point 19).
+     * Meme regle de consolidation « activite propre » que les effectifs
+     * (point 06) et les finances (point 18) : jamais une nouvelle table
+     * de hierarchie, seulement un nouveau registre.
+     */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    /**
      * Tous les descendants (n'importe quelle profondeur), via le chemin
      * materialise - la requete qui alimente aussi bien la consolidation
      * (point 06) que la visibilite des annonces (point 07).
