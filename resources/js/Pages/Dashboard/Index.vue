@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/vue3'
+
 defineProps({
     orgUnit: Object,
     children: Array,
@@ -38,6 +40,13 @@ defineProps({
                             Cultes
                         </a>
                     </li>
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/finances`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
+                            Finances
+                        </a>
+                    </li>
                 </ul>
             </section>
 
@@ -56,7 +65,7 @@ defineProps({
 
             <section>
                 <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-                    {{ children.length ? 'Entités directement rattachées' : 'Aucune entité rattachée pour l’instant' }}
+                    {{ children.length ? 'Entités directement rattachées' : 'Aucune entité rattachée pour l'instant' }}
                 </h2>
                 <ul class="space-y-2">
                     <li v-for="child in children" :key="child.id">
@@ -69,7 +78,7 @@ defineProps({
                 </ul>
 
                 <p class="text-sm text-slate-400 mt-6">
-                    Ce tableau de bord est volontairement vide, les modules suivants (finances...) y ajouteront leurs indicateurs.
+                    Ce tableau de bord est volontairement vide, les prochains modules y ajouteront leurs indicateurs.
                 </p>
             </section>
         </main>
