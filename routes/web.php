@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ActivityReportController;
+use App\Http\Controllers\AssetsController;
 use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
@@ -61,4 +62,12 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     Route::get('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'edit'])->name('activites.rapport');
     Route::post('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'update'])->name('activites.update');
+
+    Route::get('/org-units/{orgUnit}/inventaire', [AssetsController::class, 'index'])->name('inventaire.index');
+    Route::get('/org-units/{orgUnit}/inventaire/nouveau', [AssetsController::class, 'create'])->name('inventaire.create');
+    Route::post('/org-units/{orgUnit}/inventaire', [AssetsController::class, 'store'])->name('inventaire.store');
+    Route::get('/org-units/{orgUnit}/inventaire/{asset}/modifier', [AssetsController::class, 'edit'])->name('inventaire.edit');
+    Route::put('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'update'])->name('inventaire.update');
+    Route::delete('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'destroy'])->name('inventaire.destroy');
+    Route::get('/org-units/{orgUnit}/inventaire-rapport', [AssetsController::class, 'rapport'])->name('inventaire.rapport');
 });
