@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceReportController;
+use App\Http\Controllers\FinanceTransactionsController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use Illuminate\Support\Facades\Route;
@@ -46,4 +49,16 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/cultes/{culte}/modifier', [CultesController::class, 'edit'])->name('cultes.edit');
     Route::put('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'update'])->name('cultes.update');
     Route::delete('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'destroy'])->name('cultes.destroy');
+
+    Route::get('/org-units/{orgUnit}/finances', [FinanceTransactionsController::class, 'index'])->name('finances.index');
+    Route::get('/org-units/{orgUnit}/finances/nouveau', [FinanceTransactionsController::class, 'create'])->name('finances.create');
+    Route::post('/org-units/{orgUnit}/finances', [FinanceTransactionsController::class, 'store'])->name('finances.store');
+    Route::get('/org-units/{orgUnit}/finances/{transaction}/modifier', [FinanceTransactionsController::class, 'edit'])->name('finances.edit');
+    Route::put('/org-units/{orgUnit}/finances/{transaction}', [FinanceTransactionsController::class, 'update'])->name('finances.update');
+    Route::delete('/org-units/{orgUnit}/finances/{transaction}', [FinanceTransactionsController::class, 'destroy'])->name('finances.destroy');
+
+    Route::get('/org-units/{orgUnit}/finances-rapport', [FinanceReportController::class, 'show'])->name('finances.rapport');
+
+    Route::get('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'edit'])->name('activites.rapport');
+    Route::post('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'update'])->name('activites.update');
 });
