@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Un noeud de l'arbre hierarchique, quel que soit son rang (point 01/02).
  * Id est l'identite PERMANENTE : elle ne change jamais, meme apres une
  * transformation (point 13) - seuls name/level_rank/level_label/parent_id
  * changent, et chaque changement est trace dans OrgUnitHistory.
@@ -80,6 +79,26 @@ class OrgUnit extends Model
     public function cultes(): HasMany
     {
         return $this->hasMany(Culte::class);
+    }
+
+    /**
+     * Les mouvements financiers (dimes, offrandes, actions de grace, dons,
+     * depenses) directement rattaches a ce noeud. Isolation par
+     * ministry_id (point 04), comme toutes les tables multi-tenant.
+     */
+    public function financialTransactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
+
+    /**
+     * Les rapports d'activites mensuels (effectifs, baptemes, nouveaux
+     * convertis) de ce noeud, toujours distincts du rapport financier
+     * (point 18).
+     */
+    public function activityReports(): HasMany
+    {
+        return $this->hasMany(ActivityReport::class);
     }
 
     /**
