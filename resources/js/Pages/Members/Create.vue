@@ -13,7 +13,18 @@ const form = useForm({
     gender: '',
     birth_date: '',
     joined_at: '',
+    photo: null,
+    spouse_name: '',
+    spouse_photo: null,
 })
+
+function onPhotoChange(event) {
+    form.photo = event.target.files[0] ?? null
+}
+
+function onSpousePhotoChange(event) {
+    form.spouse_photo = event.target.files[0] ?? null
+}
 
 function submit() {
     form.post(`/org-units/${props.orgUnit.id}/membres`)
@@ -33,7 +44,7 @@ function submit() {
         <main class="max-w-lg mx-auto px-6 py-8">
             <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-6">Ajouter un membre</h2>
 
-            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6">
+            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6" enctype="multipart/form-data">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Prénom</label>
@@ -76,6 +87,26 @@ function submit() {
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Date d'adhésion</label>
                     <input v-model="form.joined_at" type="date" class="w-full rounded-md border-slate-300 text-sm" />
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo (optionnel)</label>
+                    <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
+                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
+                    <p v-if="form.errors.photo" class="text-xs text-red-600 mt-1">{{ form.errors.photo }}</p>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Conjoint(e) (optionnel)</label>
+                    <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full rounded-md border-slate-300 text-sm" />
+                    <p v-if="form.errors.spouse_name" class="text-xs text-red-600 mt-1">{{ form.errors.spouse_name }}</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo du conjoint (optionnel)</label>
+                    <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
+                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
+                    <p v-if="form.errors.spouse_photo" class="text-xs text-red-600 mt-1">{{ form.errors.spouse_photo }}</p>
                 </div>
 
                 <div class="pt-2">
