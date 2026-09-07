@@ -73,7 +73,7 @@ class HelpArticlesSeeder extends Seeder
             [
                 'slug' => 'inventaire-rapport',
                 'module' => 'Inventaire des biens',
-                'title' => 'Fiche d'inventaire consolidée',
+                'title' => "Fiche d'inventaire consolidée",
                 'order' => 8,
                 'body' => "La fiche d'inventaire consolidée liste tous les biens de ce nœud et de ses descendants, avec leur état, exactement selon le même principe de consolidation que les finances et les effectifs : chaque niveau voit ses biens propres plus ceux de tout son sous-arbre.",
             ],
