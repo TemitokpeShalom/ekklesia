@@ -114,6 +114,17 @@ class OrgUnit extends Model
     }
 
     /**
+     * Les annonces publiees depuis ce noeud (point 07), diffusees vers le
+     * bas : symetrique de la remontee des rapports (point 06). La
+     * visibilite en lecture ne passe pas par cette relation directement,
+     * voir AnnouncementsController::index pour la regle de chemin.
+     */
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
+    }
+
+    /**
      * Tous les descendants (n'importe quelle profondeur), via le chemin
      * materialise - la requete qui alimente aussi bien la consolidation
      * (point 06) que la visibilite des annonces (point 07).
