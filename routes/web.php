@@ -12,6 +12,7 @@ use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\TrombinoscopeController;
@@ -47,6 +48,11 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     Route::get('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'create'])->name('org-units.transform.create');
     Route::post('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'store'])->name('org-units.transform.store');
+
+    // Manuel d'utilisation integre (point 09) : contenu global, non lie a
+    // un OrgUnit precis, accessible depuis n'importe quel contexte connecte.
+    Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
+    Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
 
     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
