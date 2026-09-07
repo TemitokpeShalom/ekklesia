@@ -5,6 +5,7 @@ use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
 use App\Http\Controllers\AttachmentCodeController;
+use App\Http\Controllers\BibliothequeController;
 use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceReportController;
@@ -51,6 +52,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/cultes/{culte}/modifier', [CultesController::class, 'edit'])->name('cultes.edit');
     Route::put('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'update'])->name('cultes.update');
     Route::delete('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'destroy'])->name('cultes.destroy');
+
+    Route::get('/org-units/{orgUnit}/bibliotheque', [BibliothequeController::class, 'index'])->name('bibliotheque.index');
 
     Route::get('/org-units/{orgUnit}/finances', [FinanceTransactionsController::class, 'index'])->name('finances.index');
     Route::get('/org-units/{orgUnit}/finances/nouveau', [FinanceTransactionsController::class, 'create'])->name('finances.create');
