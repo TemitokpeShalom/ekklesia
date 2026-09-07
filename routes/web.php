@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ActivityReportController;
+use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
 use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\CultesController;
@@ -70,4 +71,12 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::put('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'update'])->name('inventaire.update');
     Route::delete('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'destroy'])->name('inventaire.destroy');
     Route::get('/org-units/{orgUnit}/inventaire-rapport', [AssetsController::class, 'rapport'])->name('inventaire.rapport');
+
+    Route::get('/org-units/{orgUnit}/annonces', [AnnouncementsController::class, 'index'])->name('annonces.index');
+    Route::get('/org-units/{orgUnit}/annonces/nouvelle', [AnnouncementsController::class, 'create'])->name('annonces.create');
+    Route::post('/org-units/{orgUnit}/annonces', [AnnouncementsController::class, 'store'])->name('annonces.store');
+    Route::get('/org-units/{orgUnit}/annonces/{announcement}/modifier', [AnnouncementsController::class, 'edit'])->name('annonces.edit');
+    Route::put('/org-units/{orgUnit}/annonces/{announcement}', [AnnouncementsController::class, 'update'])->name('annonces.update');
+    Route::delete('/org-units/{orgUnit}/annonces/{announcement}', [AnnouncementsController::class, 'destroy'])->name('annonces.destroy');
+    Route::post('/org-units/{orgUnit}/annonces/{announcement}/lu', [AnnouncementsController::class, 'markRead'])->name('annonces.lu');
 });
