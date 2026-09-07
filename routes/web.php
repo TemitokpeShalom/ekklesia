@@ -12,6 +12,7 @@ use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\TrombinoscopeController;
 use Illuminate\Support\Facades\Route;
 
 // Invitation : acceptation ouverte a une personne pas encore connectee.
@@ -45,6 +46,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/membres/{member}/modifier', [MembersController::class, 'edit'])->name('members.edit');
     Route::put('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'update'])->name('members.update');
     Route::delete('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'destroy'])->name('members.destroy');
+
+    Route::get('/org-units/{orgUnit}/trombinoscope', [TrombinoscopeController::class, 'index'])->name('trombinoscope.index');
 
     Route::get('/org-units/{orgUnit}/cultes', [CultesController::class, 'index'])->name('cultes.index');
     Route::get('/org-units/{orgUnit}/cultes/nouveau', [CultesController::class, 'create'])->name('cultes.create');
