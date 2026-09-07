@@ -7,6 +7,7 @@ defineProps({
     activeAffectations: Array,
     canAccessLibrary: Boolean,
     canManageAccess: Boolean,
+    canTransform: Boolean,
 });
 </script>
 
@@ -104,6 +105,21 @@ defineProps({
                             class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
                             <span class="text-xs uppercase tracking-wide text-slate-400 block">Accès</span>
                             Émettre un code de rattachement
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section v-if="canTransform" class="mb-8">
+                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    Structure organisationnelle
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/transformation`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Structure</span>
+                            Transformer cette entité
                         </a>
                     </li>
                 </ul>
