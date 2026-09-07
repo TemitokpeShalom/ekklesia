@@ -5,6 +5,10 @@ defineProps({
     orgUnit: Object,
     members: Array,
 })
+
+function initials(member) {
+    return `${member.first_name?.[0] ?? ''}${member.last_name?.[0] ?? ''}`.toUpperCase()
+}
 </script>
 
 <template>
@@ -45,14 +49,27 @@ defineProps({
                     :key="member.id"
                     class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3"
                 >
-                    <div>
-                        <p class="font-medium text-slate-900">{{ member.first_name }} {{ member.last_name }}</p>
-                        <p class="text-xs text-slate-400">
-                            <span v-if="member.phone">{{ member.phone }}</span>
-                            <span v-if="member.phone && member.email"> · </span>
-                            <span v-if="member.email">{{ member.email }}</span>
-                            <span v-if="!member.phone && !member.email">Aucun contact renseigné</span>
-                        </p>
+                    <div class="flex items-center gap-3">
+                        <img
+                            v-if="member.photo_path"
+                            :src="`/storage/${member.photo_path}`"
+                            class="h-9 w-9 rounded-full object-cover border border-slate-200"
+                        />
+                        <span
+                            v-else
+                            class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-500"
+                        >
+                            {{ initials(member) }}
+                        </span>
+                        <div>
+                            <p class="font-medium text-slate-900">{{ member.first_name }} {{ member.last_name }}</p>
+                            <p class="text-xs text-slate-400">
+                                <span v-if="member.phone">{{ member.phone }}</span>
+                                <span v-if="member.phone && member.email"> · </span>
+                                <span v-if="member.email">{{ member.email }}</span>
+                                <span v-if="!member.phone && !member.email">Aucun contact renseigné</span>
+                            </p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-3 text-sm">
                         <span
