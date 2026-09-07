@@ -86,6 +86,13 @@ defineProps({
                 </h2>
                 <ul class="space-y-2">
                     <li>
+                        <a :href="`/org-units/${orgUnit.id}/acces`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Accès</span>
+                            Gérer les accès
+                        </a>
+                    </li>
+                    <li>
                         <a :href="`/org-units/${orgUnit.id}/inviter`"
                             class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
                             <span class="text-xs uppercase tracking-wide text-slate-400 block">Accès</span>
