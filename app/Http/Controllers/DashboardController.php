@@ -28,6 +28,11 @@ class DashboardController extends Controller
                 ->activeAffectations()
                 ->with(['role:id,label', 'orgUnit:id,name'])
                 ->get(),
+            // Bibliotheque ministerielle (point 08) : lien affiche seulement
+            // a la racine (voir Dashboard/Index.vue) et seulement pour ceux
+            // qui prechent - la verification serveur dans
+            // BibliothequeController reste la garde reelle.
+            'canAccessLibrary' => $request->user()->hasPreachingAffectation(),
         ]);
     }
 }
