@@ -33,6 +33,12 @@ class DashboardController extends Controller
             // qui prechent - la verification serveur dans
             // BibliothequeController reste la garde reelle.
             'canAccessLibrary' => $request->user()->hasPreachingAffectation(),
+            // Gouvernance des acces (points 03/11/16) : emettre un code de
+            // rattachement et inviter un titulaire de role partagent la
+            // meme regle (un role habilite a gerer des personnes, sur ce
+            // noeud ou un ancetre) - verifie ici seulement pour l'affichage
+            // du lien, la garde reelle reste la policy sur chaque route.
+            'canManageAccess' => $request->user()->can('inviteTo', $orgUnit),
         ]);
     }
 }
