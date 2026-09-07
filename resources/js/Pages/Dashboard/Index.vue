@@ -6,6 +6,7 @@ defineProps({
     children: Array,
     activeAffectations: Array,
     canAccessLibrary: Boolean,
+    canManageAccess: Boolean,
 });
 </script>
 
@@ -74,6 +75,28 @@ defineProps({
                             class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
                             <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
                             Annonces
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section v-if="canManageAccess" class="mb-8">
+                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    Gouvernance des accès
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/inviter`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Accès</span>
+                            Inviter un titulaire
+                        </a>
+                    </li>
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/code-de-rattachement`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Accès</span>
+                            Émettre un code de rattachement
                         </a>
                     </li>
                 </ul>
