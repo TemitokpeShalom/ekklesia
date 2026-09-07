@@ -1,5 +1,6 @@
 <script setup>
 import { useForm, Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
 const props = defineProps({
     orgUnit: Object,
@@ -15,7 +16,33 @@ const form = useForm({
     birth_date: props.member.birth_date,
     joined_at: props.member.joined_at,
     status: props.member.status,
+    photo: null,
+    remove_photo: false,
+    spouse_name: props.member.spouse_name,
+    spouse_photo: null,
+    remove_spouse_photo: false,
 })
+
+const removePhoto = ref(false)
+const removeSpousePhoto = ref(false)
+
+function onPhotoChange(event) {
+    form.photo = event.target.files[0] ?? null
+}
+
+function onSpousePhotoChange(event) {
+    form.spouse_photo = event.target.files[0] ?? null
+}
+
+function toggleRemovePhoto() {
+    removePhoto.value = !removePhoto.value
+    form.remove_photo = removePhoto.value
+}
+
+function toggleRemoveSpousePhoto() {
+    removeSpousePhoto.value = !removeSpousePhoto.value
+    form.remove_spouse_photo = removeSpousePhoto.value
+}
 
 function submit() {
     form.put(`/org-units/${props.orgUnit.id}/membres/${props.member.id}`)
@@ -43,7 +70,7 @@ function destroy() {
                 Modifier {{ member.first_name }} {{ member.last_name }}
             </h2>
 
-            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6">
+            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6" enctype="multipart/form-data">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Prénom</label>
@@ -91,6 +118,41 @@ function destroy() {
                         <option value="active">Actif</option>
                         <option value="inactive">Inactif</option>
                     </select>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo</label>
+                    <div v-if="member.photo_path && !removePhoto" class="mb-2 flex items-center gap-3">
+                        <img :src="`/storage/${member.photo_path}`" class="h-14 w-14 rounded-full object-cover border border-slate-200" />
+                        <button type="button" @click="toggleRemovePhoto" class="text-xs text-red-600 hover:underline">Retirer la photo</button>
+                    </div>
+                    <p v-else-if="removePhoto" class="mb-2 text-xs text-slate-400">
+                        Photo retirée après enregistrement.
+                        <button type="button" @click="toggleRemovePhoto" class="text-slate-600 hover:underline">Annuler</button>
+                    </p>
+                    <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
+                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
+                    <p v-if="form.errors.photo" class="text-xs text-red-600 mt-1">{{ form.errors.photo }}</p>
+                </div>
+
+                <div class="border-t border-slate-100 pt-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Conjoint(e) (optionnel)</label>
+                    <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full rounded-md border-slate-300 text-sm" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo du conjoint</label>
+                    <div v-if="member.spouse_photo_path && !removeSpousePhoto" class="mb-2 flex items-center gap-3">
+                        <img :src="`/storage/${member.spouse_photo_path}`" class="h-14 w-14 rounded-full object-cover border border-slate-200" />
+                        <button type="button" @click="toggleRemoveSpousePhoto" class="text-xs text-red-600 hover:underline">Retirer la photo</button>
+                    </div>
+                    <p v-else-if="removeSpousePhoto" class="mb-2 text-xs text-slate-400">
+                        Photo retirée après enregistrement.
+                        <button type="button" @click="toggleRemoveSpousePhoto" class="text-slate-600 hover:underline">Annuler</button>
+                    </p>
+                    <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
+                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
+                    <p v-if="form.errors.spouse_photo" class="text-xs text-red-600 mt-1">{{ form.errors.spouse_photo }}</p>
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">
