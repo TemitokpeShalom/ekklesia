@@ -8,13 +8,25 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use RuntimeException;
 
 /**
  * Transformations organisationnelles (point 13) : renommage, promotion,
- * rattachement au sein du meme ministere, et fermeture.
+ * rattachement au sein du meme ministere.
  *
- * Scission et fusion ne sont pas traitees ici pour l'instant : voir le
- * commentaire en tete de OrgUnitTransformationService pour la raison.
+ * S'appuie sur OrgUnitTransformationService, deja present dans le socle
+ * initial de l'application : promote() n'accepte pas de rang cible, elle
+ * fait toujours avancer d'un cran suivant sa propre table de promotions
+ * autorisees, et refuse avec une RuntimeException si le rang courant n'a
+ * pas de promotion directe prevue (capturee ci-dessous et renvoyee comme
+ * message d'erreur). Scission, fusion et fermeture ne sont pas traitees
+ * ici : c'est deja le perimetre assume par le service lui-meme (voir son
+ * commentaire d'en-tete), pas une limitation ajoutee par cet ecran.
+ *
+ * Il n'existe pas encore de flux de validation a deux temps ailleurs
+ * dans l'application (chaque module agit immediatement des lors que
+ * l'auteur est habilite) : requestedBy et approvedBy sont donc tous les
+ * deux l'auteur de l'action.
  */
 class OrgUnitTransformationController extends Controller
 {
@@ -45,20 +57,23 @@ class OrgUnitTransformationController extends Controller
         $this->authorize('transform', $orgUnit);
 
         $validated = $request->validate([
-            'transformation_type' => ['required', 'in:renommage,promotion,rattachement,fermeture'],
-            'reason' => ['nullable', 'string', 'max:1000'],
+            'transformation_type' => ['required', 'in:renommage,promotion,rattachement'],
+            'reason' => ['required', 'string', 'max:1000'],
             'name' => ['required_if:transformation_type,renommage', 'string', 'max:255'],
-            'level_rank' => ['required_if:transformation_type,promotion', 'integer', 'min:0', 'max:6'],
-            'level_label' => ['required_if:transformation_type,promotion', 'string', 'max:255'],
             'new_parent_id' => ['required_if:transformation_type,rattachement', 'exists:org_units,id'],
         ]);
 
-        match ($validated['transformation_type']) {
-            'renommage' => $service->rename($orgUnit, $validated['name'], $validated['reason'] ?? null, $request->user()),
-            'promotion' => $service->promote($orgUnit, (int) $validated['level_rank'], $validated['level_label'], $validated['reason'] ?? null, $request->user()),
-            'rattachement' => $service->reattach($orgUnit, OrgUnit::findOrFail($validated['new_parent_id']), $validated['reason'] ?? null, $request->user()),
-            'fermeture' => $service->close($orgUnit, $validated['reason'] ?? null, $request->user()),
-        };
+        $actor = $request->user();
+
+        try {
+            match ($validated['transformation_type']) {
+                'renommage' => $service->rename($orgUnit, $validated['name'], $actor, $actor, $validated['reason']),
+                'promotion' => $service->promote($orgUnit, $actor, $actor, $validated['reason']),
+                'rattachement' => $service->reattach($orgUnit, OrgUnit::findOrFail($validated['new_parent_id']), $actor, $actor, $validated['reason']),
+            };
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         return redirect()->route('org-units.transform.create', $orgUnit)->with('success', 'Transformation appliquée.');
     }
