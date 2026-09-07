@@ -39,4 +39,16 @@ class User extends Authenticatable
     {
         return $this->affectations()->where('status', 'active');
     }
+
+    /**
+     * Bibliotheque ministerielle (point 08) : verification a plat, pas
+     * en cascade comme OrgUnitPolicy - un Pasteur de cellule y a acces
+     * meme si aucune affectation ne couvre l'ensemble du ministere.
+     */
+    public function hasPreachingAffectation(): bool
+    {
+        return $this->activeAffectations()
+            ->whereHas('role', fn ($q) => $q->where('can_preach', true))
+            ->exists();
+    }
 }
