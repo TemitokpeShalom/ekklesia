@@ -62,6 +62,18 @@ class OrgUnitPolicy
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
 
+    /**
+     * Publication des annonces (point 07) : meme regle que les autres
+     * modules de gestion - il faut un role habilite a gerer des personnes
+     * (can_manage_users), sur ce noeud ou un de ses ancetres. La visibilite
+     * en lecture, elle, ne passe pas par cette policy : elle suit la regle
+     * symetrique de point 06 (voir AnnouncementsController::index).
+     */
+    public function manageAnnouncements(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
     private function hasAffectationOverridingDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
     {
         return $user->activeAffectations()
