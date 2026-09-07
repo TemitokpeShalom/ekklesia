@@ -13,7 +13,7 @@ class Member extends Model
     protected $fillable = [
         'ministry_id', 'org_unit_id', 'first_name', 'last_name',
         'phone', 'email', 'gender', 'birth_date', 'joined_at',
-        'status', 'metadata',
+        'status', 'metadata', 'photo_path', 'spouse_name', 'spouse_photo_path',
     ];
 
     protected $casts = [
@@ -22,13 +22,6 @@ class Member extends Model
         'joined_at' => 'date',
     ];
 
-    public function ministry(): BelongsTo
-    {
-        return $this->belongsTo(Ministry::class);
-    }
-
-    public function orgUnit(): BelongsTo
-    {
-        return $this->belongsTo(OrgUnit::class);
-    }
+    public function ministry(): BelongsTo { return $this->belongsTo(Ministry::class); }
+    public function orgUnit(): BelongsTo { return $this->belongsTo(OrgUnit::class); }
 }
