@@ -10,8 +10,7 @@ const props = defineProps({
 
 const page = usePage()
 const success = computed(() => page.props.flash?.success)
-
-const LEVEL_NAMES = ['Ministère', 'Continent', 'Pays', 'Région', 'District', 'Église locale', 'Cellule']
+const error = computed(() => page.props.flash?.error)
 
 const TRANSFORMATION_LABELS = {
     creation: 'Création',
@@ -27,8 +26,6 @@ const form = useForm({
     transformation_type: 'renommage',
     reason: '',
     name: props.orgUnit.name,
-    level_rank: props.orgUnit.level_rank,
-    level_label: props.orgUnit.level_label,
     new_parent_id: '',
 })
 
@@ -55,6 +52,9 @@ function submit() {
             <div v-if="success" class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                 <p class="text-sm font-medium text-emerald-800">{{ success }}</p>
             </div>
+            <div v-if="error" class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                <p class="text-sm font-medium text-red-800">{{ error }}</p>
+            </div>
 
             <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6">
                 <div>
@@ -63,7 +63,6 @@ function submit() {
                         <option value="renommage">Renommer</option>
                         <option value="promotion">Changer de niveau (promotion)</option>
                         <option value="rattachement">Rattacher à une autre entité</option>
-                        <option value="fermeture">Fermer / archiver</option>
                     </select>
                 </div>
 
@@ -73,20 +72,9 @@ function submit() {
                     <p v-if="form.errors.name" class="text-xs text-red-600 mt-1">{{ form.errors.name }}</p>
                 </div>
 
-                <template v-if="form.transformation_type === 'promotion'">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nouveau niveau</label>
-                        <select v-model.number="form.level_rank" class="w-full rounded-md border-slate-300 text-sm">
-                            <option v-for="(label, rank) in LEVEL_NAMES" :key="rank" :value="rank">{{ label }}</option>
-                        </select>
-                        <p v-if="form.errors.level_rank" class="text-xs text-red-600 mt-1">{{ form.errors.level_rank }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Libellé du niveau</label>
-                        <input v-model="form.level_label" type="text" class="w-full rounded-md border-slate-300 text-sm" required />
-                        <p v-if="form.errors.level_label" class="text-xs text-red-600 mt-1">{{ form.errors.level_label }}</p>
-                    </div>
-                </template>
+                <p v-if="form.transformation_type === 'promotion'" class="text-xs text-slate-500">
+                    L'entité passera automatiquement au niveau immédiatement supérieur (par exemple Cellule → Église locale). Ce n'est possible que si un niveau supérieur existe pour le rang actuel.
+                </p>
 
                 <div v-if="form.transformation_type === 'rattachement'">
                     <label class="block text-sm font-medium text-slate-700 mb-1">Nouvelle entité parente</label>
@@ -98,17 +86,13 @@ function submit() {
                     </select>
                     <p v-if="form.errors.new_parent_id" class="text-xs text-red-600 mt-1">{{ form.errors.new_parent_id }}</p>
                     <p class="mt-1 text-xs text-slate-400">
-                        Seules les entités du même ministère apparaissent ici. Pour rejoindre un autre ministère, utilisez un code de rattachement.
+                        Seules les entités du même ministère apparaissent ici, à un rang strictement supérieur. Pour rejoindre un autre ministère, utilisez un code de rattachement.
                     </p>
                 </div>
 
-                <p v-if="form.transformation_type === 'fermeture'" class="text-xs text-slate-500">
-                    L'entité sera marquée comme archivée. Elle reste consultable dans l'historique mais n'apparaîtra plus comme active.
-                </p>
-
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Motif (optionnel)</label>
-                    <textarea v-model="form.reason" rows="2" class="w-full rounded-md border-slate-300 text-sm"></textarea>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Motif</label>
+                    <textarea v-model="form.reason" rows="2" class="w-full rounded-md border-slate-300 text-sm" required></textarea>
                     <p v-if="form.errors.reason" class="text-xs text-red-600 mt-1">{{ form.errors.reason }}</p>
                 </div>
 
@@ -124,7 +108,7 @@ function submit() {
             </form>
 
             <p class="text-xs text-slate-400 mt-4">
-                Scission et fusion d'entités ne sont pas encore disponibles depuis cet écran : ces opérations touchent souvent plusieurs entités à la fois (membres, finances, affectations) et demandent une décision explicite sur la répartition ou la combinaison des données avant d'être automatisées.
+                Scission, fusion et fermeture d'entités ne sont pas encore disponibles : ces opérations touchent souvent plusieurs entités à la fois (membres, finances, affectations) et demandent une décision explicite sur la répartition ou la combinaison des données avant d'être automatisées.
             </p>
 
             <section class="mt-10">
