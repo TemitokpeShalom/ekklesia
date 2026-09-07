@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AffectationsController;
+use App\Http\Controllers\OrgUnitTransformationController;
 use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
 use App\Http\Controllers\AttachmentCodeController;
@@ -43,6 +44,9 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     Route::get('/org-units/{orgUnit}/acces', [AffectationsController::class, 'index'])->name('affectations.index');
     Route::delete('/org-units/{orgUnit}/acces/{affectation}', [AffectationsController::class, 'destroy'])->name('affectations.destroy');
+
+    Route::get('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'create'])->name('org-units.transform.create');
+    Route::post('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'store'])->name('org-units.transform.store');
 
     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
