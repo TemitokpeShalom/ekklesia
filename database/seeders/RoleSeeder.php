@@ -32,6 +32,10 @@ class RoleSeeder extends Seeder
                 'label' => $label,
                 'is_deputy' => $isDeputy,
                 'can_manage_users' => $canManageUsers,
+                // Bibliotheque ministerielle (point 08) : seuls ceux qui
+                // prechent reellement (Pasteur, a tout rang) y ont acces,
+                // jamais l'administrateur technique malgre can_manage_users.
+                'can_preach' => in_array($code, [Role::PASTEUR, Role::PASTEUR_ADJOINT]),
                 'default_permissions' => [
                     'saisie' => true,
                     'validation' => in_array($code, [Role::PASTEUR, Role::SECRETAIRE_GENERAL]),
