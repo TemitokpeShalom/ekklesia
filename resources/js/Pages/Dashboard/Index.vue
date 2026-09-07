@@ -18,9 +18,12 @@ defineProps({
                 <p class="text-xs uppercase tracking-wide text-slate-400">{{ orgUnit.level_label }}</p>
                 <h1 class="text-lg font-semibold">{{ orgUnit.name }}</h1>
             </div>
-            <form method="post" action="/deconnexion">
-                <button class="text-sm text-slate-500 hover:text-slate-900">Se déconnecter</button>
-            </form>
+            <div class="flex items-center gap-4">
+                <Link href="/aide" class="text-sm text-slate-500 hover:text-slate-900">Aide</Link>
+                <form method="post" action="/deconnexion">
+                    <button class="text-sm text-slate-500 hover:text-slate-900">Se déconnecter</button>
+                </form>
+            </div>
         </header>
 
         <main class="max-w-3xl mx-auto px-6 py-8">
@@ -77,6 +80,28 @@ defineProps({
                             <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
                             Annonces
                         </a>
+                    </li>
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/rapport-activites`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
+                            Rapport d'activités
+                        </a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    Documentation
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <Link href="/aide"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Aide</span>
+                            Manuel d'utilisation
+                        </Link>
                     </li>
                 </ul>
             </section>
