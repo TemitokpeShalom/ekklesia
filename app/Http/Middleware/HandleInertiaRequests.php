@@ -20,6 +20,7 @@ class HandleInertiaRequests extends Middleware
             // d'invitation genere...) - lus une seule fois cote Vue.
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
                 'plain_code' => fn () => $request->session()->get('plain_code'),
                 'invitation_link' => fn () => $request->session()->get('invitation_link'),
             ],
