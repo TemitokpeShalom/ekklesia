@@ -54,6 +54,13 @@ defineProps({
                             Inventaire des biens
                         </a>
                     </li>
+                    <li>
+                        <a :href="`/org-units/${orgUnit.id}/annonces`"
+                            class="block bg-white border border-slate-200 rounded px-4 py-3 text-sm hover:border-slate-400">
+                            <span class="text-xs uppercase tracking-wide text-slate-400 block">Module</span>
+                            Annonces
+                        </a>
+                    </li>
                 </ul>
             </section>
 
