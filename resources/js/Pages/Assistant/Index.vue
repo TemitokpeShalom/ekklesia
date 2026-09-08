@@ -57,8 +57,8 @@ function askSuggestion(text) {
           Documentation
         </p>
         <h1 class="font-serif text-3xl text-white mt-2">Assistant</h1>
-        <p class="text-sm text-white/45 mt-2 max-w-xl">
-          Recherche dans le manuel d'utilisation à partir de vos mots-clés — aucune connexion externe, tout reste dans l'application.
+        <p class="text-sm text-white/55 mt-2 max-w-xl">
+          Recherche dans le manuel d'utilisation à partir de vos mots-clés : aucune connexion externe, tout reste dans l'application.
         </p>
       </div>
     </template>
