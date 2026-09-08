@@ -25,4 +25,17 @@ return [
         'https://bsc-dataseed.ninicoin.io',
     ],
 
+    // Point 15 (conversion XOF -> USDT affichee a l'ecran, et verification
+    // du montant recu - voir ExchangeRateService). API publiques, sans cle :
+    // le franc CFA etant arrime a l'euro a taux fixe (655,957 XOF = 1 EUR),
+    // seul le taux EUR/USD a besoin d'etre interroge en direct.
+    'eur_usd_endpoint' => 'https://api.frankfurter.dev/v1/latest?from=EUR&to=USD',
+
+    // BNB/USD : Binance en premier (cours de reference du marche), CoinGecko
+    // en repli si Binance est injoignable depuis ce serveur.
+    'bnb_usd_endpoints' => [
+        ['url' => 'https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT', 'path' => 'price'],
+        ['url' => 'https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd', 'path' => 'binancecoin.usd'],
+    ],
+
 ];
