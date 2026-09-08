@@ -30,3 +30,47 @@ body {
         transform: translate(2%, -3%) scale(1.06);
     }
 }
+
+/*
+ * Identite visuelle v3 "Vitrail" (2026-09-08).
+ * Reponse a la demande du ministere : l'affichage precedent (parchemin
+ * clair, cartes plates) restait "trop classique". Ce bloc ajoute les
+ * utilitaires de la nouvelle direction -- fond sombre chaleureux, cartes
+ * en verre depoli, lumiere qui respire doucement, motif discret de
+ * rosace/vitrail en arriere-plan -- sans toucher aux regles existantes
+ * ci-dessus : les ecrans pas encore migres continuent de fonctionner a
+ * l'identique. La migration se fait ecran par ecran (voir AppLayout.vue).
+ */
+
+@keyframes shimmerPulse {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.glass-panel {
+    background: rgba(29, 23, 33, 0.62);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(241, 228, 200, 0.09);
+}
+
+.glass-panel-light {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+/* Rosace/vitrail : meme motif d'arche deja utilise en filigrane sur les
+   en-tetes v2 (Login, Dashboard), repris et densifie pour porter, seul,
+   l'evocation "eglise" sur les fonds sombres v3 -- jamais une photo, un
+   simple trait de lumiere. */
+.bg-vitrail {
+    background-image: radial-gradient(circle at 50% 42%, rgba(185, 138, 62, 0.16) 0%, rgba(185, 138, 62, 0) 60%);
+}
+
