@@ -1,7 +1,12 @@
 <script setup>
-import { useForm, usePage, Link } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel.
+ */
 const props = defineProps({
     orgUnit: Object,
     candidateParents: Array,
@@ -37,98 +42,98 @@ function submit() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400">{{ orgUnit.level_label }}</p>
-                <h1 class="text-lg font-semibold">{{ orgUnit.name }}</h1>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Transformation
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">Transformer cette entité</h1>
             </div>
-            <Link :href="`/org-units/${orgUnit.id}`" class="text-sm text-slate-500 hover:text-slate-900">Retour au tableau de bord</Link>
-        </header>
+        </template>
 
-        <main class="max-w-2xl mx-auto px-6 py-8">
-            <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-6">Transformer cette entité</h2>
-
-            <div v-if="success" class="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                <p class="text-sm font-medium text-emerald-800">{{ success }}</p>
+        <div class="max-w-2xl mx-auto space-y-8">
+            <div v-if="success" class="glass-panel rounded-2xl p-5 border-forest/40 animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-sm font-medium text-forest">{{ success }}</p>
             </div>
-            <div v-if="error" class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-                <p class="text-sm font-medium text-red-800">{{ error }}</p>
+            <div v-if="error" class="glass-panel rounded-2xl p-5 border-sanctuary/40 animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-sm font-medium text-sanctuary-light">{{ error }}</p>
             </div>
 
-            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6">
+            <form @submit.prevent="submit" class="space-y-4 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Type de transformation</label>
-                    <select v-model="form.transformation_type" class="w-full rounded-md border-slate-300 text-sm">
-                        <option value="renommage">Renommer</option>
-                        <option value="promotion">Changer de niveau (promotion)</option>
-                        <option value="rattachement">Rattacher à une autre entité</option>
+                    <label class="mb-1 block text-sm font-medium text-white/80">Type de transformation</label>
+                    <select v-model="form.transformation_type" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                        <option value="renommage" class="bg-night text-white">Renommer</option>
+                        <option value="promotion" class="bg-night text-white">Changer de niveau (promotion)</option>
+                        <option value="rattachement" class="bg-night text-white">Rattacher à une autre entité</option>
                     </select>
                 </div>
 
                 <div v-if="form.transformation_type === 'renommage'">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nouveau nom</label>
-                    <input v-model="form.name" type="text" class="w-full rounded-md border-slate-300 text-sm" required />
-                    <p v-if="form.errors.name" class="text-xs text-red-600 mt-1">{{ form.errors.name }}</p>
+                    <label class="mb-1 block text-sm font-medium text-white/80">Nouveau nom</label>
+                    <input v-model="form.name" type="text" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                    <p v-if="form.errors.name" class="mt-1 text-sm text-rose-400">{{ form.errors.name }}</p>
                 </div>
 
-                <p v-if="form.transformation_type === 'promotion'" class="text-xs text-slate-500">
+                <p v-if="form.transformation_type === 'promotion'" class="text-xs text-white/45">
                     L'entité passera automatiquement au niveau immédiatement supérieur (par exemple Cellule → Église locale). Ce n'est possible que si un niveau supérieur existe pour le rang actuel.
                 </p>
 
                 <div v-if="form.transformation_type === 'rattachement'">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nouvelle entité parente</label>
-                    <select v-model="form.new_parent_id" class="w-full rounded-md border-slate-300 text-sm" required>
-                        <option value="" disabled>Choisir une entité</option>
-                        <option v-for="candidate in candidateParents" :key="candidate.id" :value="candidate.id">
+                    <label class="mb-1 block text-sm font-medium text-white/80">Nouvelle entité parente</label>
+                    <select v-model="form.new_parent_id" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                        <option value="" disabled class="bg-night text-white">Choisir une entité</option>
+                        <option v-for="candidate in candidateParents" :key="candidate.id" :value="candidate.id" class="bg-night text-white">
                             {{ candidate.name }} ({{ candidate.level_label }})
                         </option>
                     </select>
-                    <p v-if="form.errors.new_parent_id" class="text-xs text-red-600 mt-1">{{ form.errors.new_parent_id }}</p>
-                    <p class="mt-1 text-xs text-slate-400">
+                    <p v-if="form.errors.new_parent_id" class="mt-1 text-sm text-rose-400">{{ form.errors.new_parent_id }}</p>
+                    <p class="mt-1 text-xs text-white/35">
                         Seules les entités du même ministère apparaissent ici, à un rang strictement supérieur. Pour rejoindre un autre ministère, utilisez un code de rattachement.
                     </p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Motif</label>
-                    <textarea v-model="form.reason" rows="2" class="w-full rounded-md border-slate-300 text-sm" required></textarea>
-                    <p v-if="form.errors.reason" class="text-xs text-red-600 mt-1">{{ form.errors.reason }}</p>
+                    <label class="mb-1 block text-sm font-medium text-white/80">Motif</label>
+                    <textarea v-model="form.reason" rows="2" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
+                    <p v-if="form.errors.reason" class="mt-1 text-sm text-rose-400">{{ form.errors.reason }}</p>
                 </div>
 
                 <div class="pt-2">
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
                     >
                         Appliquer la transformation
                     </button>
                 </div>
             </form>
 
-            <p class="text-xs text-slate-400 mt-4">
+            <p class="text-xs text-white/35">
                 Scission, fusion et fermeture d'entités ne sont pas encore disponibles : ces opérations touchent souvent plusieurs entités à la fois (membres, finances, affectations) et demandent une décision explicite sur la répartition ou la combinaison des données avant d'être automatisées.
             </p>
 
-            <section class="mt-10">
-                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">Historique</h2>
-                <div v-if="history.length === 0" class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-400">
+            <section>
+                <h2 class="mb-3 text-xs font-semibold text-gold-soft/80 uppercase tracking-widest">Historique</h2>
+                <div v-if="history.length === 0" class="glass-panel rounded-2xl px-4 py-6 text-center text-sm text-white/40">
                     Aucune transformation enregistrée pour l'instant.
                 </div>
                 <ul v-else class="space-y-2">
-                    <li v-for="entry in history" :key="entry.id" class="bg-white border border-slate-200 rounded-lg p-4">
+                    <li v-for="entry in history" :key="entry.id" class="glass-panel rounded-2xl p-4">
                         <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-slate-900">{{ TRANSFORMATION_LABELS[entry.transformation_type] || entry.transformation_type }}</span>
-                            <span class="text-xs text-slate-400">
+                            <span class="text-sm font-semibold text-white">{{ TRANSFORMATION_LABELS[entry.transformation_type] || entry.transformation_type }}</span>
+                            <span class="text-xs text-white/40">
                                 {{ entry.valid_from }}<span v-if="entry.valid_to"> → {{ entry.valid_to }}</span>
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">{{ entry.name }} · {{ entry.level_label }}</p>
-                        <p v-if="entry.reason" class="text-xs text-slate-400 mt-1">{{ entry.reason }}</p>
+                        <p class="mt-1 text-xs text-white/45">{{ entry.name }} · {{ entry.level_label }}</p>
+                        <p v-if="entry.reason" class="mt-1 text-xs text-white/35">{{ entry.reason }}</p>
                     </li>
                 </ul>
             </section>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>

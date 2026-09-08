@@ -1,7 +1,12 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel.
+ */
 const props = defineProps({
     orgUnit: Object,
     affectations: Array,
@@ -33,61 +38,72 @@ function confirmRevoke(affectationId) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400">{{ orgUnit.level_label }}</p>
-                <h1 class="text-lg font-semibold">{{ orgUnit.name }}</h1>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Accès et postes
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">Titulaires actuels</h1>
             </div>
-            <Link :href="`/org-units/${orgUnit.id}`" class="text-sm text-slate-500 hover:text-slate-900">Retour au tableau de bord</Link>
-        </header>
+        </template>
 
-        <main class="max-w-2xl mx-auto px-6 py-8">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Titulaires actuels</h2>
-                <Link :href="`/org-units/${orgUnit.id}/inviter`" class="text-sm text-slate-900 font-medium hover:underline">Inviter un titulaire</Link>
+        <div class="max-w-2xl mx-auto space-y-8">
+            <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
+                <Link
+                    :href="`/org-units/${orgUnit.id}/inviter`"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                >
+                    Inviter un titulaire
+                </Link>
             </div>
 
-            <div v-if="affectations.length === 0" class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-400">
-                Aucun titulaire actif pour ce noeud pour l'instant.
+            <div v-if="affectations.length === 0" class="glass-panel flex flex-col items-center rounded-3xl px-8 py-14 text-center animate-[fadeInUp_0.55s_ease-out_both]">
+                <p class="text-sm font-medium text-white/70">Aucun titulaire actif pour ce noeud pour l'instant.</p>
             </div>
 
             <ul v-else class="space-y-3">
-                <li v-for="a in affectations" :key="a.id" class="bg-white border border-slate-200 rounded-lg p-4">
+                <li
+                    v-for="(a, i) in affectations"
+                    :key="a.id"
+                    class="glass-panel rounded-2xl p-5 animate-[fadeInUp_0.5s_ease-out_both]"
+                    :style="{ animationDelay: `${Math.min(i, 10) * 40}ms` }"
+                >
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-slate-900">{{ a.user.name }}</p>
-                            <p class="text-xs text-slate-400">{{ a.role.label }}</p>
-                            <p v-if="a.user.phone || a.user.email" class="text-xs text-slate-400">{{ a.user.phone || a.user.email }}</p>
+                            <p class="text-sm font-semibold text-white">{{ a.user.name }}</p>
+                            <p class="text-xs text-white/40">{{ a.role.label }}</p>
+                            <p v-if="a.user.phone || a.user.email" class="text-xs text-white/40">{{ a.user.phone || a.user.email }}</p>
                         </div>
                         <button
                             v-if="revokingId !== a.id"
                             @click="startRevoke(a.id)"
-                            class="text-sm text-red-600 hover:text-red-800 font-medium"
+                            class="text-sm font-medium text-rose-400 hover:text-rose-300"
                         >
                             Révoquer
                         </button>
                     </div>
 
-                    <div v-if="revokingId === a.id" class="mt-3 border-t border-slate-100 pt-3">
-                        <label class="block text-xs font-medium text-slate-700 mb-1">Motif (optionnel)</label>
-                        <textarea v-model="reason" rows="2" class="w-full rounded-md border-slate-300 text-sm" placeholder="Décès, perte d'accès, remplacement..."></textarea>
-                        <div class="flex items-center gap-3 mt-2">
+                    <div v-if="revokingId === a.id" class="mt-3 border-t border-white/10 pt-3">
+                        <label class="mb-1 block text-xs font-medium text-white/70">Motif (optionnel)</label>
+                        <textarea v-model="reason" rows="2" placeholder="Décès, perte d'accès, remplacement..." class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
+                        <div class="mt-2 flex items-center gap-3">
                             <button
                                 @click="confirmRevoke(a.id)"
-                                class="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-red-700"
+                                class="rounded-xl bg-rose-500/90 px-4 py-1.5 text-sm font-medium text-white hover:bg-rose-500"
                             >
                                 Confirmer la révocation
                             </button>
-                            <button @click="cancelRevoke" class="text-sm text-slate-500 hover:text-slate-900">Annuler</button>
+                            <button @click="cancelRevoke" class="text-sm text-white/50 hover:text-white">Annuler</button>
                         </div>
                     </div>
                 </li>
             </ul>
 
-            <p class="text-xs text-slate-400 mt-6">
+            <p class="text-xs text-white/35">
                 Une affectation révoquée n'est jamais supprimée : elle reste dans l'historique. La personne conserve son compte et pourra recevoir une nouvelle affectation plus tard si besoin.
             </p>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>
