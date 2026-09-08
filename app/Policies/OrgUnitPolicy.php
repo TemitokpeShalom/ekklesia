@@ -1,4 +1,4 @@
-Page_Down<?php
+<?php
 
 namespace App\Policies;
 
