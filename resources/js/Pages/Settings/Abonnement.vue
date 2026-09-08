@@ -1,15 +1,22 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
- * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
- * partagee AppLayout, sans aucun changement fonctionnel.
+ * v3 "Vitrail" (2026-09-09), puis point 15 (passerelle de paiement,
+ * 10/09/2026) : la mise a jour directe d'origine (form/choose) reste le
+ * traitement d'un paiement recu hors ligne (virement, especes). FedaPay et
+ * crypto s'y ajoutent comme deux moyens de paiement en ligne verifies,
+ * chacun affiche seulement s'il est reellement configure sur ce serveur
+ * (voir payment.fedapay_available / payment.crypto_wallet_address).
  */
 const props = defineProps({
   orgUnit: Object,
   plans: Array,
   subscription: Object,
+  payment: Object,
+  paymentHistory: Array,
 })
 
 const form = useForm({
@@ -21,10 +28,33 @@ function choose(planId) {
   form.put(`/org-units/${props.orgUnit.id}/abonnement`)
 }
 
-function formatPrice(price) {
+function payWithFedapay(planId) {
+  router.post(`/org-units/${props.orgUnit.id}/abonnement/fedapay`, { plan_id: planId })
+}
+
+const cryptoOpenFor = ref(null)
+const cryptoForm = useForm({
+  plan_id: '',
+  tx_hash: '',
+})
+
+function openCrypto(planId) {
+  cryptoOpenFor.value = planId
+  cryptoForm.plan_id = planId
+  cryptoForm.tx_hash = ''
+}
+
+function submitCrypto() {
+  cryptoForm.post(`/org-units/${props.orgUnit.id}/abonnement/crypto`, {
+    preserveScroll: true,
+    onSuccess: () => { cryptoOpenFor.value = null },
+  })
+}
+
+function formatPrice(price, currency) {
   const n = Number(price)
   if (n === 0) return 'Gratuit'
-  return new Intl.NumberFormat('fr-FR').format(n) + ' FCFA / mois'
+  return new Intl.NumberFormat('fr-FR').format(n) + ' ' + (currency || 'FCFA') + ' / mois'
 }
 
 function formatMembers(max) {
@@ -34,6 +64,14 @@ function formatMembers(max) {
 function formatDate(iso) {
   if (!iso) return null
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function providerLabel(provider) {
+  return { fedapay: 'FedaPay', crypto: 'Crypto (USDT/BNB)' }[provider] ?? provider
+}
+
+function statusLabel(status) {
+  return { pending: 'En attente', success: 'Réussi', failed: 'Échoué' }[status] ?? status
 }
 </script>
 
@@ -79,7 +117,7 @@ function formatDate(iso) {
           class="glass-panel rounded-3xl p-6 flex flex-col"
           :class="plan.id === subscription.plan_id ? 'border-forest/50 ring-1 ring-forest/30' : ''">
           <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold mb-1">{{ plan.name }}</p>
-          <p class="font-serif text-2xl text-white mb-1">{{ formatPrice(plan.price_monthly) }}</p>
+          <p class="font-serif text-2xl text-white mb-1">{{ formatPrice(plan.price_monthly, plan.currency) }}</p>
           <p class="text-sm text-white/45 mb-4">{{ formatMembers(plan.max_members) }}</p>
 
           <ul class="space-y-2 text-sm text-white/75 mb-6 flex-1">
@@ -91,16 +129,67 @@ function formatDate(iso) {
             </li>
           </ul>
 
-          <button v-if="plan.id === subscription.plan_id" type="button" disabled
-            class="w-full bg-forest/15 text-forest rounded-xl py-2.5 font-medium text-sm text-center">
-            Plan actuel
-          </button>
-          <button v-else type="button" :disabled="form.processing" @click="choose(plan.id)"
-            class="w-full inline-flex items-center justify-center bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2.5 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
-            Choisir ce plan
-          </button>
+          <div v-if="plan.id === subscription.plan_id" class="space-y-2">
+            <button type="button" disabled
+              class="w-full bg-forest/15 text-forest rounded-xl py-2.5 font-medium text-sm text-center">
+              Plan actuel
+            </button>
+          </div>
+          <div v-else class="space-y-2">
+            <button v-if="payment.fedapay_available && Number(plan.price_monthly) > 0" type="button"
+              @click="payWithFedapay(plan.id)"
+              class="w-full inline-flex items-center justify-center bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2.5 font-semibold shadow-lg shadow-gold/20">
+              Payer avec FedaPay
+            </button>
+            <button v-if="payment.crypto_wallet_address && Number(plan.price_monthly) > 0" type="button"
+              @click="openCrypto(plan.id)"
+              class="w-full glass-panel-light rounded-xl py-2.5 font-medium text-sm text-white/80 hover:border-gold/40 hover:text-gold-soft transition">
+              Payer en crypto (USDT/BNB)
+            </button>
+            <button type="button" :disabled="form.processing" @click="choose(plan.id)"
+              class="w-full rounded-xl py-2.5 text-sm font-medium text-white/50 transition hover:bg-white/10 hover:text-white">
+              Marquer comme payé hors ligne
+            </button>
+
+            <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs text-white/55">
+                Envoyez le montant en USDT (BEP-20) ou BNB, sur BNB Smart Chain, à l'adresse :
+                <span class="block mt-1 break-all font-mono text-white/80">{{ payment.crypto_wallet_address }}</span>
+                Puis collez ici le hash de la transaction pour vérification.
+              </p>
+              <input v-model="cryptoForm.tx_hash" type="text" placeholder="0x..."
+                class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm font-mono transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+              <p v-if="cryptoForm.errors.tx_hash" class="text-sm text-rose-400">{{ cryptoForm.errors.tx_hash }}</p>
+              <div class="flex items-center gap-2">
+                <button type="button" :disabled="cryptoForm.processing || !cryptoForm.tx_hash" @click="submitCrypto"
+                  class="flex-1 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2 text-sm font-semibold disabled:opacity-60">
+                  Vérifier et activer
+                </button>
+                <button type="button" @click="cryptoOpenFor = null" class="rounded-xl px-3 py-2 text-sm text-white/50 hover:text-white">
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <section v-if="paymentHistory.length > 0" class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.65s_ease-out_both]">
+        <h3 class="mb-4 text-xs font-semibold text-gold-soft/80 uppercase tracking-widest">Historique des paiements</h3>
+        <table class="w-full text-sm">
+          <tbody>
+            <tr v-for="entry in paymentHistory" :key="entry.id" class="border-b border-white/10 last:border-0">
+              <td class="py-2 text-white/45">{{ formatDate(entry.created_at) }}</td>
+              <td class="py-2 text-white/80">{{ entry.plan?.name ?? '-' }}</td>
+              <td class="py-2 text-white/60">{{ providerLabel(entry.provider) }}</td>
+              <td class="py-2 text-right text-white/80">{{ entry.amount ? formatPrice(entry.amount, entry.currency) : '-' }}</td>
+              <td class="py-2 text-right" :class="entry.status === 'success' ? 'text-forest' : entry.status === 'failed' ? 'text-rose-400' : 'text-gold-soft'">
+                {{ statusLabel(entry.status) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </div>
   </AppLayout>
 </template>
