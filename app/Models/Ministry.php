@@ -14,7 +14,19 @@ class Ministry extends Model
 {
     use HasUuid;
 
-    protected $fillable = ['name', 'short_code', 'status'];
+    // Titres proposes par defaut tant qu'aucune liste n'a ete configuree :
+    // les cinq offices d'Ephesiens 4.11 puis les civilites courantes.
+    // Reglage global au ministere (point 08, restant a l'architecture) -
+    // voir HonorificTitlesController, reserve a la racine de l'arbre.
+    public const DEFAULT_HONORIFIC_TITLES = [
+        'Apôtre', 'Prophète', 'Évangéliste', 'Pasteur', 'Docteur', 'M.', 'Mme',
+    ];
+
+    protected $fillable = ['name', 'short_code', 'status', 'settings'];
+
+    protected $casts = [
+        'settings' => 'array',
+    ];
 
     public function orgUnits(): HasMany
     {
@@ -24,5 +36,14 @@ class Ministry extends Model
     public function root(): ?OrgUnit
     {
         return $this->orgUnits()->whereNull('parent_id')->first();
+    }
+
+    public function honorificTitles(): array
+    {
+        $configured = $this->settings['honorific_titles'] ?? null;
+
+        return is_array($configured) && $configured !== []
+            ? array_values($configured)
+            : self::DEFAULT_HONORIFIC_TITLES;
     }
 }
