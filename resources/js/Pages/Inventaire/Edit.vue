@@ -5,6 +5,7 @@ const props = defineProps({
     orgUnit: Object,
     asset: Object,
     depenses: Array,
+    currency: String,
 })
 
 const form = useForm({
@@ -113,7 +114,7 @@ function destroy() {
                             <p v-if="form.errors.acquisition_date" class="mt-1 text-sm text-rose-600">{{ form.errors.acquisition_date }}</p>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-slate-700">Valeur (FCFA)</label>
+                            <label class="mb-1 block text-sm font-medium text-slate-700">Valeur ({{ currency }})</label>
                             <input v-model="form.acquisition_value" type="number" min="0" step="0.01" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-100" />
                             <p v-if="form.errors.acquisition_value" class="mt-1 text-sm text-rose-600">{{ form.errors.acquisition_value }}</p>
                         </div>

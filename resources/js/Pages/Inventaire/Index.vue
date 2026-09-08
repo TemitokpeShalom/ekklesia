@@ -6,6 +6,7 @@ const props = defineProps({
     assets: Array,
     categorie: String,
     totaux: Object,
+    currency: String,
 })
 
 function categoryLabel(category) {
@@ -41,7 +42,7 @@ function conditionClass(value) {
 
 function formatAmount(value) {
     if (value === null || value === undefined) return '-'
-    return new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'
+    return new Intl.NumberFormat('fr-FR').format(value) + ' ' + props.currency
 }
 
 function formatDate(value) {

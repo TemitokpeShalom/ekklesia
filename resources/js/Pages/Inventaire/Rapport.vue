@@ -6,6 +6,7 @@ const props = defineProps({
     orgUnit: Object,
     date: String,
     parCategorie: Object,
+    currency: String,
 })
 
 const categories = [
@@ -41,7 +42,7 @@ function conditionLabel(value) {
 }
 
 function formatAmount(value) {
-    return new Intl.NumberFormat('fr-FR').format(value || 0) + ' FCFA'
+    return new Intl.NumberFormat('fr-FR').format(value || 0) + ' ' + props.currency
 }
 
 function formatDate(value) {
