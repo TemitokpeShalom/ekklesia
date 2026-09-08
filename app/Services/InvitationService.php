@@ -38,6 +38,47 @@ class InvitationService
     }
 
     /**
+     * Retrouve l'invitation correspondant a un jeton en clair, quel que
+     * soit son etat, et indique pourquoi elle n'est pas utilisable le cas
+     * echeant. token_hash est hache avec un sel different a chaque fois
+     * (Hash::make), donc impossible de retrouver la ligne par une requete
+     * directe sur le hash : on doit comparer le jeton a chaque candidate.
+     * Utilisee a la fois par acceptShow() (pour ne pas montrer un
+     * formulaire voue a l'echec) et par accept() (pour le message exact).
+     *
+     * @return array{invitation: ?Invitation, reason: string}
+     */
+    public function resolve(string $plainToken): array
+    {
+        $candidate = Invitation::all()->first(
+            fn (Invitation $candidate) => Hash::check($plainToken, $candidate->token_hash)
+        );
+
+        if (! $candidate) {
+            return ['invitation' => null, 'reason' => 'introuvable'];
+        }
+
+        if ($candidate->status !== 'pending') {
+            return ['invitation' => null, 'reason' => 'utilisee'];
+        }
+
+        if ($candidate->expires_at->isPast()) {
+            return ['invitation' => null, 'reason' => 'expiree'];
+        }
+
+        return ['invitation' => $candidate, 'reason' => 'ok'];
+    }
+
+    public static function reasonMessage(string $reason): string
+    {
+        return match ($reason) {
+            'utilisee' => 'Cette invitation a déjà été utilisée. Demandez-en une nouvelle à la personne qui vous a invité.',
+            'expiree' => 'Cette invitation a expiré. Demandez-en une nouvelle à la personne qui vous a invité.',
+            default => "Ce lien d'invitation est introuvable ou invalide. Vérifiez que vous avez copié l'adresse complète.",
+        };
+    }
+
+    /**
      * Accepte une invitation. Si la personne n'a pas encore de compte, il
      * est cree ici ; si elle en a deja un (meme email), on lui ajoute
      * simplement une nouvelle affectation - jamais un second compte
@@ -45,16 +86,10 @@ class InvitationService
      */
     public function accept(string $plainToken, array $userAttributes): Affectation
     {
-        $candidates = Invitation::where('status', 'pending')
-            ->where('expires_at', '>', now())
-            ->get();
-
-        $invitation = $candidates->first(
-            fn (Invitation $candidate) => Hash::check($plainToken, $candidate->token_hash)
-        );
+        ['invitation' => $invitation, 'reason' => $reason] = $this->resolve($plainToken);
 
         if (! $invitation) {
-            throw new RuntimeException("Invitation invalide, déjà utilisée ou expirée.");
+            throw new RuntimeException(self::reasonMessage($reason));
         }
 
         return DB::transaction(function () use ($invitation, $userAttributes) {
