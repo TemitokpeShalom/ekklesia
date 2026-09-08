@@ -15,13 +15,33 @@ use Illuminate\Support\Facades\Log;
  * Le destinataire est TOUJOURS verifie contre l'adresse du ministere
  * (config('crypto.wallet_address')) : une transaction confirmee mais
  * envoyee ailleurs n'est jamais retenue comme un paiement valide.
+ *
+ * Depuis la demande explicite du 08/09/2026, le montant recu est aussi
+ * confronte au prix du plan (converti en USD via ExchangeRateService) :
+ * avant cette evolution, n'importe quel montant confirme et envoye a la
+ * bonne adresse etait accepte, l'administrateur choisissant lui-meme quel
+ * abonnement le paiement couvrait. Une marge de tolerance subsiste
+ * (MARGE_USDT / MARGE_BNB) parce que le cours affiche a l'ecran au moment
+ * du choix du plan et le cours au moment de l'envoi effectif du paiement
+ * peuvent legerement diverger - seul un montant significativement
+ * insuffisant est rejete, jamais un ecart de quelques pourcents.
  */
 class CryptoPaymentVerifier
 {
+    /** USDT est une monnaie stable : une petite marge suffit. */
+    private const MARGE_USDT = 0.95;
+
+    /** BNB fluctue davantage : marge plus large que pour l'USDT. */
+    private const MARGE_BNB = 0.90;
+
+    public function __construct(private ExchangeRateService $exchangeRates = new ExchangeRateService)
+    {
+    }
+
     /**
      * @return array{confirmed: bool, to: ?string, amount: ?string, token: ?string, reason: ?string}
      */
-    public function verify(string $txHash): array
+    public function verify(string $txHash, float $expectedUsdAmount): array
     {
         $walletAddress = strtolower((string) config('crypto.wallet_address'));
 
@@ -57,6 +77,11 @@ class CryptoPaymentVerifier
 
                 $rawValue = $this->hexToNumber($log['data'] ?? '0x0');
                 $decimals = $this->usdtDecimals();
+                $amount = $rawValue / (10 ** $decimals);
+
+                if ($amount < $expectedUsdAmount * self::MARGE_USDT) {
+                    return $this->rejected('montant_insuffisant');
+                }
 
                 return [
                     'confirmed' => true,
@@ -77,6 +102,19 @@ class CryptoPaymentVerifier
 
         $transaction = $this->rpcCall('eth_getTransactionByHash', [$txHash]);
         $rawValue = $this->hexToNumber($transaction['value'] ?? '0x0');
+        $amount = $rawValue / (10 ** 18);
+
+        try {
+            $expectedBnb = $this->exchangeRates->usdToBnb($expectedUsdAmount);
+        } catch (\Throwable $e) {
+            Log::warning('CryptoPaymentVerifier: cours BNB/USD indisponible, verification du montant impossible.', ['message' => $e->getMessage()]);
+
+            return $this->rejected('cours_indisponible');
+        }
+
+        if ($amount < $expectedBnb * self::MARGE_BNB) {
+            return $this->rejected('montant_insuffisant');
+        }
 
         return [
             'confirmed' => true,
@@ -106,9 +144,9 @@ class CryptoPaymentVerifier
 
     /**
      * Simple division flottante (pas de bcmath, disponibilite non garantie
-     * sur le serveur) : suffisant ici, ce montant n'est qu'un repere affiche
-     * a l'administrateur et conserve pour memoire, jamais une valeur
-     * recalculee ou comparee au centime pres.
+     * sur le serveur) : suffisant ici, ce montant sert a la fois d'affichage
+     * pour l'administrateur et de comparaison au prix attendu (voir verify())
+     * avec une marge de tolerance - jamais une comparaison au centime pres.
      */
     private function formatAmount(int|float $rawValue, int $decimals): string
     {
