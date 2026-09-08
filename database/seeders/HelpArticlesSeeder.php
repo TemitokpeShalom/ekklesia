@@ -82,7 +82,7 @@ class HelpArticlesSeeder extends Seeder
                 'module' => 'Finances',
                 'title' => 'Rapport financier mensuel',
                 'order' => 9,
-                'body' => "Le rapport financier compile, pour le mois choisi, tous les encaissements et décaissements de ce nœud et de ses descendants (vue consolidée), organisés par compte comptable. Il ne se ressaisit jamais : il se recompile à la demande depuis les mouvements déjà enregistrés (voir l'article \"Enregistrer un mouvement financier\").\n\nUne fois validé par le Trésorier, ce rapport devient la référence officielle du mois pour ce nœud et remonte à son tour dans la consolidation du niveau supérieur.",
+                'body' => "Le rapport financier compile, pour le mois choisi, tous les encaissements et décaissements de ce nœud et de ses descendants (vue consolidée), organisés par compte comptable. Il ne se ressaisit jamais : il se recompile à la demande depuis les mouvements déjà enregistrés (voir l'article \"Enregistrer un mouvement financier\").\n\nQuand la consolidation réunit des niveaux situés dans des pays à devises différentes, le rapport ne mélange jamais deux devises dans un même total : chaque devise rencontrée obtient son propre bloc, avec son propre détail et son propre solde, puisqu'aucune conversion de change n'existe dans l'application.\n\nUne fois validé par le Trésorier, ce rapport devient la référence officielle du mois pour ce nœud et remonte à son tour dans la consolidation du niveau supérieur.",
             ],
             [
                 'slug' => 'inventaire',
