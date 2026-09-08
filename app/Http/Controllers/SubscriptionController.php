@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrgUnit;
 use App\Models\Plan;
+use App\Services\ExchangeRateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,9 +31,30 @@ class SubscriptionController extends Controller
 
         $ministry = $orgUnit->ministry;
 
+        $cryptoWalletAddress = config('crypto.wallet_address');
+        // Point 15 (08/09/2026) : estimation USDT affichee a cote du bouton
+        // crypto, pour que la personne qui paie sache exactement combien
+        // envoyer sans avoir a faire la conversion elle-meme. Recalculee a
+        // chaque chargement de cette page (pas de flux temps reel cote
+        // navigateur) via ExchangeRateService - absente (null) si le cours
+        // n'a pas pu etre recupere, jamais une valeur inventee.
+        $exchangeRates = filled($cryptoWalletAddress) ? new ExchangeRateService : null;
+
+        $plans = Plan::orderBy('sort_order')
+            ->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_members', 'features'])
+            ->map(function (Plan $plan) use ($exchangeRates) {
+                $data = $plan->only(['id', 'code', 'name', 'price_monthly', 'currency', 'max_members', 'features']);
+
+                $data['usdt_estimate'] = ($exchangeRates && $plan->currency === 'XOF' && (float) $plan->price_monthly > 0)
+                    ? $exchangeRates->usdtEstimateForXof((float) $plan->price_monthly)
+                    : null;
+
+                return $data;
+            });
+
         return Inertia::render('Settings/Abonnement', [
             'orgUnit' => $orgUnit->only(['id', 'name', 'level_label']),
-            'plans' => Plan::orderBy('sort_order')->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_members', 'features']),
+            'plans' => $plans,
             'subscription' => [
                 'plan_id' => $ministry->plan_id,
                 'status' => $ministry->subscription_status,
@@ -45,7 +67,7 @@ class SubscriptionController extends Controller
             // bouton qui echouerait faute de cles.
             'payment' => [
                 'fedapay_available' => filled(config('fedapay.public_key')) && filled(config('fedapay.secret_key')),
-                'crypto_wallet_address' => config('crypto.wallet_address'),
+                'crypto_wallet_address' => $cryptoWalletAddress,
             ],
             'paymentHistory' => $ministry->subscriptionPayments()
                 ->with('plan:id,name')

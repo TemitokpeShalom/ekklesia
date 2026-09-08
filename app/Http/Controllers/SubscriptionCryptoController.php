@@ -6,20 +6,26 @@ use App\Models\OrgUnit;
 use App\Models\Plan;
 use App\Models\SubscriptionPayment;
 use App\Services\CryptoPaymentVerifier;
+use App\Services\ExchangeRateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 /**
  * Point 15 (passerelle de paiement, diaspora) : reglement direct
  * portefeuille-a-portefeuille (USDT ou BNB, BNB Smart Chain), verifie par
  * hash on-chain (voir CryptoPaymentVerifier) plutot qu'accepte a l'aveugle.
- * Aucune conversion de change n'existant dans l'application (meme regle
- * que les Finances, point 18), le montant exact du plan n'est pas
- * confronte a la somme recue : c'est l'administrateur, qui vient lui-meme
- * d'effectuer le paiement, qui choisit quel abonnement ce paiement couvre -
- * la verification on-chain garantit seulement que le paiement est reel,
- * confirme, et envoye a l'adresse du ministere.
+ *
+ * Depuis le 08/09/2026, le montant recu est aussi confronte au prix du plan
+ * (converti en USD via ExchangeRateService, le franc CFA n'ayant pas de
+ * cours flottant propre - voir cette classe) : avant cette evolution,
+ * n'importe quel montant confirme et envoye a la bonne adresse etait
+ * accepte, l'administrateur choisissant lui-meme quel abonnement le
+ * paiement couvrait. Cette confrontation utilise une marge de tolerance
+ * (voir CryptoPaymentVerifier::MARGE_USDT / MARGE_BNB) : le cours au moment
+ * de l'affichage du prix et celui au moment de l'envoi effectif du paiement
+ * peuvent legerement diverger.
  */
 class SubscriptionCryptoController extends Controller
 {
@@ -41,13 +47,22 @@ class SubscriptionCryptoController extends Controller
             ]);
         }
 
-        $result = (new CryptoPaymentVerifier)->verify($data['tx_hash']);
+        $plan = Plan::findOrFail($data['plan_id']);
+
+        try {
+            // Seul XOF est utilise pour les plans a ce jour (voir
+            // PlanSeeder) : la conversion ne sait faire que XOF -> USD.
+            $expectedUsd = (new ExchangeRateService)->xofToUsd((float) $plan->price_monthly);
+        } catch (RuntimeException $e) {
+            return back()->with('error', 'Impossible de vérifier le montant pour le moment (cours de change indisponible) : réessayez dans quelques instants.');
+        }
+
+        $result = (new CryptoPaymentVerifier)->verify($data['tx_hash'], $expectedUsd);
 
         if (! $result['confirmed']) {
             return back()->with('error', $this->explainRejection($result['reason']));
         }
 
-        $plan = Plan::findOrFail($data['plan_id']);
         $ministry = $orgUnit->ministry;
 
         $payment = SubscriptionPayment::create([
@@ -78,6 +93,8 @@ class SubscriptionCryptoController extends Controller
             'echouee_on_chain' => 'Cette transaction a échoué sur la chaîne : aucun fonds ne semble avoir été transféré.',
             'destinataire_incorrect' => "Cette transaction n'a pas été envoyée à l'adresse du ministère.",
             'transfert_usdt_illisible' => "Le transfert USDT n'a pas pu être lu dans cette transaction.",
+            'montant_insuffisant' => "Le montant reçu est insuffisant par rapport au prix du plan au cours actuel. Envoyez le complément, ou renvoyez le montant exact affiché sur la page.",
+            'cours_indisponible' => 'Impossible de vérifier le montant pour le moment (cours de change indisponible) : réessayez dans quelques instants.',
             default => 'Cette transaction ne peut pas être vérifiée pour le moment.',
         };
     }
