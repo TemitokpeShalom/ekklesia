@@ -108,7 +108,7 @@ const modules = [
 
             <section>
                 <h2 class="font-serif text-2xl text-white mb-1">Modules</h2>
-                <p class="text-sm text-white/45 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
+                <p class="text-sm text-white/55 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <template v-for="(m, i) in modules" :key="m.key">
                         <a v-if="!m.requiresRoot || (orgUnit.level_rank === 0 && (!m.requiresLibrary || canAccessLibrary))"
@@ -124,7 +124,7 @@ const modules = [
                                 </svg>
                             </span>
                             <p class="font-semibold text-white text-[15px]">{{ m.label }}</p>
-                            <p class="text-xs text-white/45 mt-1">{{ m.desc }}</p>
+                            <p class="text-xs text-white/55 mt-1">{{ m.desc }}</p>
                             <svg class="absolute top-6 right-6 w-4 h-4 text-white/40 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
@@ -138,7 +138,7 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 00-3.5 10.9V16a1 1 0 001 1h5a1 1 0 001-1v-2.1A6 6 0 0012 3z" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Assistant</p>
-                        <p class="text-xs text-white/45 mt-1">Recherche rapide dans le manuel</p>
+                        <p class="text-xs text-white/55 mt-1">Recherche rapide dans le manuel</p>
                     </Link>
 
                     <Link href="/aide"
@@ -148,14 +148,14 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a2.5 2.5 0 115 0c0 1.5-2.5 1.8-2.5 3.5M12 17h.01M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H8l-4 3V6a1 1 0 011-1z" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Manuel d'utilisation</p>
-                        <p class="text-xs text-white/45 mt-1">Aide écran par écran</p>
+                        <p class="text-xs text-white/55 mt-1">Aide écran par écran</p>
                     </Link>
                 </div>
             </section>
 
             <section v-if="canManageAccess">
                 <h2 class="font-serif text-2xl text-white mb-1">Gouvernance des accès</h2>
-                <p class="text-sm text-white/45 mb-6">Inviter, révoquer, rattacher de nouvelles entités.</p>
+                <p class="text-sm text-white/55 mb-6">Inviter, révoquer, rattacher de nouvelles entités.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <a :href="`/org-units/${orgUnit.id}/acces`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
@@ -163,7 +163,7 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 11-4 0 2 2 0 014 0zM6 21v-2a4 4 0 014-4h1m9-3l-3 3m0 0l-3-3m3 3V4" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Gérer les accès</p>
-                        <p class="text-xs text-white/45 mt-1">Lister, révoquer, réaffecter</p>
+                        <p class="text-xs text-white/55 mt-1">Lister, révoquer, réaffecter</p>
                     </a>
                     <a :href="`/org-units/${orgUnit.id}/inviter`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
@@ -171,7 +171,7 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Inviter un titulaire</p>
-                        <p class="text-xs text-white/45 mt-1">Un nouveau responsable</p>
+                        <p class="text-xs text-white/55 mt-1">Un nouveau responsable</p>
                     </a>
                     <a :href="`/org-units/${orgUnit.id}/code-de-rattachement`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
@@ -179,7 +179,7 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a3 3 0 11-6 0 3 3 0 016 0zM4 20a5 5 0 0110 0M14 12l6 6m0 0v-4m0 4h-4" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Code de rattachement</p>
-                        <p class="text-xs text-white/45 mt-1">Créer une entité rattachée</p>
+                        <p class="text-xs text-white/55 mt-1">Créer une entité rattachée</p>
                     </a>
                     <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/titres-honorifiques`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
@@ -187,7 +187,7 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4l1.8 4.2L18 10l-4.2 1.8L12 16l-1.8-4.2L6 10l4.2-1.8L12 4zM5 18l.8 1.8L7.5 20l-1.7.8L5 22.5l-.8-1.7L2.5 20l1.7-.2L5 18z" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Titres honorifiques</p>
-                        <p class="text-xs text-white/45 mt-1">Liste utilisée sur les fiches membres</p>
+                        <p class="text-xs text-white/55 mt-1">Liste utilisée sur les fiches membres</p>
                     </a>
                     <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/abonnement`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
@@ -195,14 +195,14 @@ const modules = [
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
                         </span>
                         <p class="font-semibold text-white text-[15px]">Abonnement</p>
-                        <p class="text-xs text-white/45 mt-1">Offre, essai, facturation</p>
+                        <p class="text-xs text-white/55 mt-1">Offre, essai, facturation</p>
                     </a>
                 </div>
             </section>
 
             <section v-if="canTransform">
                 <h2 class="font-serif text-2xl text-white mb-1">Structure organisationnelle</h2>
-                <p class="text-sm text-white/45 mb-6">Faire évoluer cette entité sans perdre son historique.</p>
+                <p class="text-sm text-white/55 mb-6">Faire évoluer cette entité sans perdre son historique.</p>
                 <a :href="`/org-units/${orgUnit.id}/transformation`"
                     class="group inline-flex items-center glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-sanctuary hover:-translate-y-1 transition-all duration-300 max-w-sm w-full">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mr-4 shrink-0 bg-gradient-to-br from-sanctuary to-sanctuary-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
@@ -210,7 +210,7 @@ const modules = [
                     </span>
                     <span>
                         <p class="font-semibold text-white text-[15px]">Transformer cette entité</p>
-                        <p class="text-xs text-white/45 mt-1">Renommer, promouvoir, rattacher</p>
+                        <p class="text-xs text-white/55 mt-1">Renommer, promouvoir, rattacher</p>
                     </span>
                 </a>
             </section>
@@ -219,7 +219,7 @@ const modules = [
                 <h2 class="font-serif text-2xl text-white mb-1">
                     {{ children.length ? 'Entités directement rattachées' : "Aucune entité rattachée pour l'instant" }}
                 </h2>
-                <p v-if="children.length" class="text-sm text-white/45 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
+                <p v-if="children.length" class="text-sm text-white/55 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
                 <div v-if="children.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <a v-for="child in children" :key="child.id" :href="`/org-units/${child.id}`"
                         class="group glass-panel rounded-3xl p-6 hover:border-white/20 hover:-translate-y-1 transition-all duration-300">
@@ -227,7 +227,7 @@ const modules = [
                         <p class="font-semibold text-white text-[15px]">{{ child.name }}</p>
                     </a>
                 </div>
-                <p v-else class="text-sm text-white/45">
+                <p v-else class="text-sm text-white/55">
                     Les prochaines entités rattachées à {{ orgUnit.name }} apparaîtront ici.
                 </p>
             </section>
