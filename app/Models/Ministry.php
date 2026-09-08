@@ -42,6 +42,14 @@ class Ministry extends Model
         return $this->hasMany(OrgUnit::class);
     }
 
+    // Point 15 : seule voie de lecture pour subscription_payments (table
+    // volontairement sans RLS, voir sa migration) - toujours en passant par
+    // ce ministere, jamais une requete libre sur la table.
+    public function subscriptionPayments(): HasMany
+    {
+        return $this->hasMany(SubscriptionPayment::class);
+    }
+
     public function root(): ?OrgUnit
     {
         return $this->orgUnits()->whereNull('parent_id')->first();
