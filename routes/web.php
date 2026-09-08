@@ -11,6 +11,7 @@ use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\BibliothequeController;
 use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DiscipleshipController;
 use App\Http\Controllers\DocumentGeneratorController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
@@ -93,6 +94,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/cultes/{culte}/modifier', [CultesController::class, 'edit'])->name('cultes.edit');
     Route::put('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'update'])->name('cultes.update');
     Route::delete('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'destroy'])->name('cultes.destroy');
+
+    Route::get('/org-units/{orgUnit}/parcours', [DiscipleshipController::class, 'index'])->name('discipleship.index');
+    Route::get('/org-units/{orgUnit}/parcours/nouveau', [DiscipleshipController::class, 'create'])->name('discipleship.create');
+    Route::post('/org-units/{orgUnit}/parcours', [DiscipleshipController::class, 'store'])->name('discipleship.store');
+    Route::get('/org-units/{orgUnit}/parcours/{etape}/modifier', [DiscipleshipController::class, 'edit'])->name('discipleship.edit');
+    Route::put('/org-units/{orgUnit}/parcours/{etape}', [DiscipleshipController::class, 'update'])->name('discipleship.update');
+    Route::delete('/org-units/{orgUnit}/parcours/{etape}', [DiscipleshipController::class, 'destroy'])->name('discipleship.destroy');
 
     Route::get('/org-units/{orgUnit}/sacrements', [SacramentsController::class, 'index'])->name('sacrements.index');
     Route::get('/org-units/{orgUnit}/sacrements/nouveau', [SacramentsController::class, 'create'])->name('sacrements.create');
