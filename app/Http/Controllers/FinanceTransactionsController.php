@@ -15,6 +15,12 @@ class FinanceTransactionsController extends Controller
 {
     private const INCOME_TYPES = ['dime', 'offrande', 'action_de_grace', 'don'];
 
+    /**
+     * Point 08 (mobile money) : simple mode de reglement declaratif, saisi
+     * manuellement comme les autres modes, sans passerelle automatique.
+     */
+    public const PAYMENT_METHODS = ['especes', 'cheque', 'virement', 'mobile_money', 'autre'];
+
     public function index(Request $request, OrgUnit $orgUnit): Response
     {
         $this->authorize('view', $orgUnit);
@@ -42,6 +48,7 @@ class FinanceTransactionsController extends Controller
             ],
             'currency' => AccountingStandardResolver::currencyFor($orgUnit),
             'accountingStandardLabel' => $standard['label'] ?? null,
+            'paymentMethods' => self::PAYMENT_METHODS,
         ]);
     }
 
@@ -56,6 +63,7 @@ class FinanceTransactionsController extends Controller
             'accounts' => $standard ? $this->accountsForFrontend($standard) : null,
             'accountingStandardLabel' => $standard['label'] ?? null,
             'currency' => AccountingStandardResolver::currencyFor($orgUnit),
+            'paymentMethods' => self::PAYMENT_METHODS,
         ]);
     }
 
@@ -86,6 +94,7 @@ class FinanceTransactionsController extends Controller
             'accounts' => $standard ? $this->accountsForFrontend($standard) : null,
             'accountingStandardLabel' => $standard['label'] ?? null,
             'currency' => AccountingStandardResolver::currencyFor($orgUnit),
+            'paymentMethods' => self::PAYMENT_METHODS,
         ]);
     }
 
@@ -133,6 +142,7 @@ class FinanceTransactionsController extends Controller
             'account_code' => [$standard ? 'required' : 'nullable', 'string', 'max:20'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency' => ['nullable', 'string', 'max:8'],
+            'payment_method' => ['nullable', Rule::in(self::PAYMENT_METHODS)],
             'transaction_date' => ['required', 'date'],
             'counterparty' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
