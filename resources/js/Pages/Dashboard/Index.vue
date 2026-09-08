@@ -52,6 +52,12 @@ const modules = [
         icon: 'M12 21a9 9 0 100-18 9 9 0 000 18zm0-13.5v6l3.75 2.25',
     },
     {
+        key: 'parcours', label: 'Parcours de disciple', desc: 'Étapes de croissance, par membre',
+        path: 'parcours', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue',
+        icon: 'M4.26 10.15a60 60 0 00-.49 6.34A48.6 48.6 0 0012 20.9a48.6 48.6 0 008.23-4.41 60 60 0 00-.49-6.34M4.03 9.33A50.7 50.7 0 0112 3.5a50.7 50.7 0 0110.4 5.84',
+        icon2: 'M4.03 9.33A50.7 50.7 0 0112 13.49a50.7 50.7 0 007.74-3.34',
+    },
+    {
         key: 'bibliotheque', label: 'Bibliothèque ministérielle', desc: 'Prédications, thèmes, résumés',
         path: 'bibliotheque', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue', requiresRoot: true, requiresLibrary: true,
         icon: 'M12 6.25C10.5 5 8.5 4.5 6 4.5c-1 0-2 .1-3 .4v13.6c1-.3 2-.4 3-.4 2.5 0 4.5.5 6 1.75m0-13.6c1.5-1.25 3.5-1.75 6-1.75 1 0 2 .1 3 .4v13.6c-1-.3-2-.4-3-.4-2.5 0-4.5.5-6 1.75m0-13.6v13.6',
