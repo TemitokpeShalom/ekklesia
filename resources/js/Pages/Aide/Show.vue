@@ -1,6 +1,13 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel. Le texte reçoit
+ * des surcharges print:* pour rester lisible (noir sur blanc) une fois
+ * imprimé, malgré l'habillage sombre a l'ecran.
+ */
 defineProps({
     article: Object,
     modules: Object,
@@ -12,33 +19,36 @@ function goBack() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between print:hidden">
-            <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400">{{ article.module }}</p>
-                <h1 class="text-lg font-semibold">{{ article.title }}</h1>
+    <AppLayout>
+        <template #actions>
+            <button type="button" @click="window.print()" class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors print:hidden">
+                Imprimer
+            </button>
+            <button type="button" @click="goBack" class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors print:hidden">
+                Retour
+            </button>
+        </template>
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both] print:hidden">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    {{ article.module }}
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">{{ article.title }}</h1>
             </div>
-            <div class="flex items-center gap-4">
-                <button type="button" @click="window.print()" class="text-sm text-slate-500 hover:text-slate-900">
-                    Imprimer
-                </button>
-                <button type="button" @click="goBack" class="text-sm text-slate-500 hover:text-slate-900">
-                    Retour
-                </button>
-            </div>
-        </header>
+        </template>
 
-        <div class="max-w-5xl mx-auto px-6 py-8 grid md:grid-cols-[240px_minmax(0,1fr)] gap-10">
+        <div class="max-w-5xl mx-auto grid md:grid-cols-[240px_minmax(0,1fr)] gap-10">
             <nav class="print:hidden">
-                <Link href="/aide" class="text-sm font-medium text-slate-900 hover:underline">Manuel complet</Link>
+                <Link href="/aide" class="text-sm font-medium text-gold-soft hover:text-gold">Manuel complet</Link>
                 <div v-for="(items, moduleName) in modules" :key="moduleName" class="mt-5">
-                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">{{ moduleName }}</h2>
+                    <h2 class="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">{{ moduleName }}</h2>
                     <ul class="space-y-1">
                         <li v-for="item in items" :key="item.slug">
                             <Link
                                 :href="`/aide/${item.slug}`"
                                 class="text-sm block"
-                                :class="item.slug === article.slug ? 'text-slate-900 font-medium' : 'text-slate-500 hover:text-slate-900'"
+                                :class="item.slug === article.slug ? 'text-white font-medium' : 'text-white/50 hover:text-white'"
                             >
                                 {{ item.title }}
                             </Link>
@@ -47,11 +57,11 @@ function goBack() {
                 </div>
             </nav>
 
-            <article class="max-w-2xl">
-                <p v-for="(paragraph, i) in article.body.split('\n\n')" :key="i" class="text-sm text-slate-700 mb-4">
+            <article class="max-w-2xl glass-panel rounded-3xl p-6 print:bg-transparent print:border-0 print:p-0 animate-[fadeInUp_0.55s_ease-out_both]">
+                <p v-for="(paragraph, i) in article.body.split('\n\n')" :key="i" class="text-sm text-white/70 mb-4 print:text-slate-700">
                     {{ paragraph }}
                 </p>
             </article>
         </div>
-    </div>
+    </AppLayout>
 </template>
