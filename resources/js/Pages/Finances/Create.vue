@@ -12,12 +12,14 @@ const props = defineProps({
     accounts: Object,
     accountingStandardLabel: String,
     currency: String,
+    paymentMethods: Array,
 })
 
 const form = useForm({
     type: 'dime',
     account_code: '',
     amount: '',
+    payment_method: '',
     transaction_date: '',
     counterparty: '',
     description: '',
@@ -30,6 +32,14 @@ const typeOptions = [
     { value: 'don', label: 'Don' },
     { value: 'depense', label: 'Dépense' },
 ]
+
+const paymentMethodLabels = {
+    especes: 'Espèces',
+    cheque: 'Chèque',
+    virement: 'Virement bancaire',
+    mobile_money: 'Mobile Money',
+    autre: 'Autre',
+}
 
 const availableAccounts = computed(() => {
     if (!props.accounts) {
@@ -104,6 +114,15 @@ function submit() {
                             <p v-if="form.errors.transaction_date" class="mt-1 text-sm text-rose-400">{{ form.errors.transaction_date }}</p>
                         </div>
                     </div>
+                </section>
+
+                <section class="border-t border-white/10 pt-6">
+                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Mode de règlement (optionnel)</h2>
+                    <select v-model="form.payment_method" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                        <option value="" class="bg-night text-white">Non précisé</option>
+                        <option v-for="method in paymentMethods" :key="method" :value="method" class="bg-night text-white">{{ paymentMethodLabels[method] ?? method }}</option>
+                    </select>
+                    <p v-if="form.errors.payment_method" class="mt-1 text-sm text-rose-400">{{ form.errors.payment_method }}</p>
                 </section>
 
                 <section class="border-t border-white/10 pt-6">

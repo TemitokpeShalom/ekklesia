@@ -27,6 +27,16 @@ function typeLabel(type) {
     }[type] ?? type
 }
 
+function paymentMethodLabel(method) {
+    return {
+        especes: 'Espèces',
+        cheque: 'Chèque',
+        virement: 'Virement bancaire',
+        mobile_money: 'Mobile Money',
+        autre: 'Autre',
+    }[method] ?? method
+}
+
 // Point 18 : la devise vient du pays de l'entite (via le controleur), plus
 // jamais un "FCFA" fige quel que soit le pays reel du mouvement.
 function formatAmount(value, currency) {
@@ -150,6 +160,7 @@ function changeMonth(event) {
                         <p class="mt-1 text-sm text-white/45">
                             {{ formatDate(transaction.transaction_date) }}
                             <span v-if="transaction.counterparty"> · {{ transaction.counterparty }}</span>
+                            <span v-if="transaction.payment_method"> · {{ paymentMethodLabel(transaction.payment_method) }}</span>
                         </p>
                     </div>
 
