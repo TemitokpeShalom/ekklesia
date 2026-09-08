@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FinancialTransaction;
 use App\Models\OrgUnit;
 use App\Services\AccountingStandardResolver;
 use Illuminate\Http\Request;
@@ -20,6 +21,17 @@ class FinanceReportController extends Controller
         'depense' => 'Dépenses',
     ];
 
+    /**
+     * Point 08 (rapports consolidés multidevises) : vue consolidée = les
+     * mouvements propres a ce noeud, plus ceux de tous ses descendants
+     * (meme regle « activite propre » que les effectifs/l'inventaire),
+     * jamais uniquement ce seul noeud. Comme le ministere pilote est reparti
+     * sur plusieurs pays a devises differentes, et qu'aucune conversion de
+     * change n'existe dans l'application (meme principe deja applique a
+     * l'inventaire, point 19), le rapport ne totalise jamais deux devises
+     * ensemble : chaque devise rencontree obtient son propre bloc, avec son
+     * propre detail et son propre solde.
+     */
     public function show(Request $request, OrgUnit $orgUnit): Response
     {
         $this->authorize('view', $orgUnit);
@@ -32,35 +44,57 @@ class FinanceReportController extends Controller
         $start = $month.'-01';
         $end = date('Y-m-t', strtotime($start));
 
-        $transactions = $orgUnit->financialTransactions()
+        $orgUnitIds = OrgUnit::descendantsOf($orgUnit)->pluck('id');
+
+        $transactions = FinancialTransaction::whereIn('org_unit_id', $orgUnitIds)
             ->whereBetween('transaction_date', [$start, $end])
+            ->with('orgUnit')
             ->orderBy('transaction_date')
             ->get();
 
-        // Point 18 : avec une norme documentee, le detail se lit par
-        // compte code (le plan de comptes du pays) ; sans norme, seule la
-        // nature universelle du mouvement (type) reste disponible pour
-        // regrouper les lignes - jamais un compte code invente.
-        $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
-        $groupKey = $standard ? 'account_code' : 'type';
-
-        $encaissements = $this->groupLines($transactions->where('nature', 'encaissement'), $groupKey, (bool) $standard);
-        $decaissements = $this->groupLines($transactions->where('nature', 'decaissement'), $groupKey, (bool) $standard);
-
-        $totalEncaissements = $encaissements->sum('total');
-        $totalDecaissements = $decaissements->sum('total');
+        $devises = $transactions
+            ->groupBy('currency')
+            ->map(fn ($group, $currency) => $this->buildDeviseBlock($currency, $group))
+            ->sortKeys()
+            ->values();
 
         return Inertia::render('Finances/Rapport', [
             'orgUnit' => $orgUnit,
             'month' => $month,
+            'devises' => $devises,
+        ]);
+    }
+
+    /**
+     * Le detail par compte comptable n'a de sens que si TOUTES les lignes
+     * de cette devise viennent du meme plan de comptes (account_code deja
+     * renseigne a la saisie, voir FinanceTransactionsController) - des que
+     * la devise melange des mouvements avec et sans compte comptable, on
+     * retombe sur la seule nature universelle (type), jamais un compte
+     * invente ou mélangé entre deux normes.
+     */
+    private function buildDeviseBlock(string $currency, Collection $group): array
+    {
+        $hasStandard = $group->every(fn ($t) => $t->account_code !== null);
+        $groupKey = $hasStandard ? 'account_code' : 'type';
+
+        $encaissements = $this->groupLines($group->where('nature', 'encaissement'), $groupKey, $hasStandard);
+        $decaissements = $this->groupLines($group->where('nature', 'decaissement'), $groupKey, $hasStandard);
+
+        $totalEncaissements = $encaissements->sum('total');
+        $totalDecaissements = $decaissements->sum('total');
+
+        $standard = $hasStandard ? AccountingStandardResolver::forOrgUnit($group->first()->orgUnit) : null;
+
+        return [
+            'currency' => $currency,
+            'accountingStandardLabel' => $standard['label'] ?? null,
             'encaissements' => $encaissements,
             'decaissements' => $decaissements,
             'totalEncaissements' => $totalEncaissements,
             'totalDecaissements' => $totalDecaissements,
             'solde' => $totalEncaissements - $totalDecaissements,
-            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
-            'accountingStandardLabel' => $standard['label'] ?? null,
-        ]);
+        ];
     }
 
     private function groupLines(Collection $transactions, string $groupKey, bool $hasStandard): Collection
