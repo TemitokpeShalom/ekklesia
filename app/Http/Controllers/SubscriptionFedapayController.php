@@ -73,8 +73,13 @@ class SubscriptionFedapayController extends Controller
             Log::error('FedaPay: echec du demarrage du paiement.', ['payment_id' => $payment->id, 'message' => $e->getMessage()]);
             $payment->update(['status' => SubscriptionPayment::STATUS_FAILED]);
 
+            // Le motif precis (ex. plafond de transaction du compte FedaPay
+            // depasse) vient directement de FedaPayClient - utile a
+            // l'administrateur qui configure le paiement, jamais montre a
+            // un visiteur non authentifie puisque cette page exige deja
+            // manageMembers.
             return redirect()->route('subscription.edit', ['orgUnit' => $orgUnit->id])
-                ->with('error', "Le paiement FedaPay n'a pas pu démarrer. Réessayez dans un instant, ou contactez le support si cela persiste.");
+                ->with('error', "Le paiement FedaPay n'a pas pu démarrer : {$e->getMessage()}");
         }
 
         return Inertia::location($token['url']);
