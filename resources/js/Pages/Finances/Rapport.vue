@@ -1,6 +1,11 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3'
+import { router } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel.
+ */
 const props = defineProps({
     orgUnit: Object,
     month: String,
@@ -28,83 +33,74 @@ function changeMonth(event) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                        {{ orgUnit.level_label }}
-                    </p>
-                    <h1 class="text-xl font-semibold text-slate-900">{{ orgUnit.name }}</h1>
-                </div>
-                <nav class="flex items-center gap-4 text-sm text-slate-500">
-                    <Link :href="`/org-units/${orgUnit.id}/finances`" class="hover:text-slate-900">Retour aux finances</Link>
-                    <Link href="/deconnexion" method="post" as="button" class="hover:text-slate-900">Se déconnecter</Link>
-                </nav>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/finances`" back-label="Retour aux finances">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Finances
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2 capitalize">Rapport financier · {{ monthLabel(month) }}</h1>
+                <p class="text-sm text-white/55 mt-2 max-w-2xl">
+                    {{ accountingStandardLabel ? `Détail par compte comptable (${accountingStandardLabel}).` : "Norme comptable non encore configurée pour ce pays : détail par nature de mouvement." }}
+                </p>
             </div>
-        </header>
+        </template>
 
-        <main class="mx-auto max-w-3xl px-6 py-8">
-            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Rapport financier</h2>
-                    <p class="mt-1 text-sm capitalize text-slate-500">{{ monthLabel(month) }}</p>
-                    <p class="mt-1 text-xs text-slate-400">
-                        {{ accountingStandardLabel ? `Détail par compte comptable (${accountingStandardLabel}).` : "Norme comptable non encore configurée pour ce pays : détail par nature de mouvement." }}
-                    </p>
-                </div>
+        <div class="max-w-3xl mx-auto space-y-8">
+            <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <input
                     type="month"
                     :value="month"
                     @change="changeMonth"
-                    class="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-100"
+                    class="bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"
                 />
             </div>
 
-            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-emerald-600">Total encaissements</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(totalEncaissements) }}</p>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 animate-[fadeInUp_0.55s_ease-out_both]">
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-forest/90">Total encaissements</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totalEncaissements) }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-rose-600">Total décaissements</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(totalDecaissements) }}</p>
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-sanctuary-light">Total décaissements</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totalDecaissements) }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Solde de trésorerie</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(solde) }}</p>
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-white/50">Solde de trésorerie</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(solde) }}</p>
                 </div>
             </div>
 
-            <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 class="mb-4 text-sm font-semibold text-slate-700">Encaissements</h3>
-                <div v-if="encaissements.length === 0" class="text-sm text-slate-400">Aucun encaissement ce mois-ci.</div>
+            <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.6s_ease-out_both]">
+                <h3 class="mb-4 text-xs font-semibold text-gold-soft/80 uppercase tracking-widest">Encaissements</h3>
+                <div v-if="encaissements.length === 0" class="text-sm text-white/40">Aucun encaissement ce mois-ci.</div>
                 <table v-else class="w-full text-sm">
                     <tbody>
-                        <tr v-for="line in encaissements" :key="line.account_code || line.account_label" class="border-b border-slate-100 last:border-0">
-                            <td v-if="accountingStandardLabel" class="py-2 text-slate-500">{{ line.account_code }}</td>
-                            <td class="py-2 text-slate-700">{{ line.account_label }}</td>
-                            <td class="py-2 text-right font-medium text-slate-900">{{ formatAmount(line.total) }}</td>
+                        <tr v-for="line in encaissements" :key="line.account_code || line.account_label" class="border-b border-white/10 last:border-0">
+                            <td v-if="accountingStandardLabel" class="py-2 text-white/45">{{ line.account_code }}</td>
+                            <td class="py-2 text-white/80">{{ line.account_label }}</td>
+                            <td class="py-2 text-right font-medium text-white">{{ formatAmount(line.total) }}</td>
                         </tr>
                     </tbody>
                 </table>
             </section>
 
-            <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 class="mb-4 text-sm font-semibold text-slate-700">Décaissements</h3>
-                <div v-if="decaissements.length === 0" class="text-sm text-slate-400">Aucun décaissement ce mois-ci.</div>
+            <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.65s_ease-out_both]">
+                <h3 class="mb-4 text-xs font-semibold text-gold-soft/80 uppercase tracking-widest">Décaissements</h3>
+                <div v-if="decaissements.length === 0" class="text-sm text-white/40">Aucun décaissement ce mois-ci.</div>
                 <table v-else class="w-full text-sm">
                     <tbody>
-                        <tr v-for="line in decaissements" :key="line.account_code || line.account_label" class="border-b border-slate-100 last:border-0">
-                            <td v-if="accountingStandardLabel" class="py-2 text-slate-500">{{ line.account_code }}</td>
-                            <td class="py-2 text-slate-700">{{ line.account_label }}</td>
-                            <td class="py-2 text-right font-medium text-slate-900">{{ formatAmount(line.total) }}</td>
+                        <tr v-for="line in decaissements" :key="line.account_code || line.account_label" class="border-b border-white/10 last:border-0">
+                            <td v-if="accountingStandardLabel" class="py-2 text-white/45">{{ line.account_code }}</td>
+                            <td class="py-2 text-white/80">{{ line.account_label }}</td>
+                            <td class="py-2 text-right font-medium text-white">{{ formatAmount(line.total) }}</td>
                         </tr>
                     </tbody>
                 </table>
             </section>
 
-            <p class="text-xs text-slate-400">Ce rapport est calculé automatiquement depuis les mouvements enregistrés, jamais ressaisi séparément.</p>
-        </main>
-    </div>
+            <p class="text-xs text-white/35">Ce rapport est calculé automatiquement depuis les mouvements enregistrés, jamais ressaisi séparément.</p>
+        </div>
+    </AppLayout>
 </template>

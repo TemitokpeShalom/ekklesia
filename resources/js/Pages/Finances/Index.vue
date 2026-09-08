@@ -1,6 +1,13 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel (memes props,
+ * memes routes, meme logique) - seul l'habillage passe du blanc/ardoise
+ * a la coquille sombre en verre depoli.
+ */
 const props = defineProps({
     orgUnit: Object,
     transactions: Array,
@@ -36,100 +43,91 @@ function changeMonth(event) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white">
-            <div class="mx-auto flex max-w-4xl items-center justify-between px-6 py-5">
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                        {{ orgUnit.level_label }}
-                    </p>
-                    <h1 class="text-xl font-semibold text-slate-900">{{ orgUnit.name }}</h1>
-                </div>
-                <nav class="flex items-center gap-4 text-sm text-slate-500">
-                    <Link :href="`/org-units/${orgUnit.id}`" class="hover:text-slate-900">Retour au tableau de bord</Link>
-                    <Link href="/deconnexion" method="post" as="button" class="hover:text-slate-900">Se déconnecter</Link>
-                </nav>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Finances
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">Dîmes, offrandes et dépenses</h1>
+                <p class="text-sm text-white/55 mt-2 max-w-2xl">Enregistrées et consultables mois par mois, sans jamais être ressaisies ailleurs.</p>
+                <p v-if="!accountingStandardLabel" class="mt-2 text-xs text-gold-soft/90">
+                    Aucune norme comptable n'est encore configurée pour ce pays : les mouvements sont enregistrés sans compte comptable, ce qui n'empêche pas leur saisie.
+                </p>
             </div>
-        </header>
+        </template>
 
-        <main class="mx-auto max-w-4xl px-6 py-8">
-            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-semibold text-slate-900">Finances</h2>
-                    <p class="mt-1 text-sm text-slate-500">Dîmes, offrandes, actions de grâce, dons et dépenses.</p>
-                    <p v-if="!accountingStandardLabel" class="mt-1 text-xs text-amber-600">
-                        Aucune norme comptable n'est encore configurée pour ce pays : les mouvements sont enregistrés sans compte comptable, ce qui n'empêche pas leur saisie.
-                    </p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <input
-                        type="month"
-                        :value="month"
-                        @change="changeMonth"
-                        class="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-100"
-                    />
-                    <Link
-                        :href="`/org-units/${orgUnit.id}/finances/nouveau`"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-700 hover:shadow"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                        Ajouter un mouvement
-                    </Link>
-                </div>
+        <div class="space-y-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 animate-[fadeInUp_0.55s_ease-out_both]">
+                <input
+                    type="month"
+                    :value="month"
+                    @change="changeMonth"
+                    class="bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"
+                />
+                <Link
+                    :href="`/org-units/${orgUnit.id}/finances/nouveau`"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Ajouter un mouvement
+                </Link>
             </div>
 
-            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-emerald-600">Encaissements</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(totals.encaissements) }}</p>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 animate-[fadeInUp_0.6s_ease-out_both]">
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-forest/90">Encaissements</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totals.encaissements) }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-rose-600">Décaissements</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(totals.decaissements) }}</p>
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-sanctuary-light">Décaissements</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totals.decaissements) }}</p>
                 </div>
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Solde du mois</p>
-                    <p class="mt-2 text-2xl font-semibold text-slate-900">{{ formatAmount(totals.solde) }}</p>
+                <div class="glass-panel rounded-2xl p-5">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-white/50">Solde du mois</p>
+                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totals.solde) }}</p>
                 </div>
             </div>
 
-            <div class="mb-6 flex flex-wrap gap-3 text-sm">
+            <div class="flex flex-wrap gap-3 text-sm animate-[fadeInUp_0.65s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/finances-rapport?mois=${month}`"
-                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 font-medium text-white/80 hover:border-gold/40 hover:text-gold-soft transition"
                 >
                     Rapport financier du mois
                 </Link>
                 <Link
                     :href="`/org-units/${orgUnit.id}/rapport-activites?mois=${month}`"
-                    class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 font-medium text-white/80 hover:border-gold/40 hover:text-gold-soft transition"
                 >
                     Rapport d'activités du mois
                 </Link>
             </div>
 
-            <div v-if="transactions.length === 0" class="flex flex-col items-center rounded-2xl border border-dashed border-slate-300 bg-white px-8 py-14 text-center">
-                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <div v-if="transactions.length === 0" class="glass-panel flex flex-col items-center rounded-3xl px-8 py-14 text-center">
+                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-white/40">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                 </span>
-                <p class="mt-4 text-sm font-medium text-slate-600">Aucun mouvement enregistré ce mois-ci.</p>
-                <p class="mt-1 text-sm text-slate-400">Ajoute une dîme, une offrande ou une dépense pour commencer.</p>
+                <p class="mt-4 text-sm font-medium text-white/70">Aucun mouvement enregistré ce mois-ci.</p>
+                <p class="mt-1 text-sm text-white/40">Ajoute une dîme, une offrande ou une dépense pour commencer.</p>
             </div>
 
             <div v-else class="space-y-3">
                 <div
-                    v-for="transaction in transactions"
+                    v-for="(transaction, i) in transactions"
                     :key="transaction.id"
-                    class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+                    class="flex items-center gap-4 glass-panel rounded-2xl p-5 hover:border-white/20 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+                    :style="{ animationDelay: `${Math.min(i, 10) * 40}ms` }"
                 >
                     <span
                         :class="[
                             'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl',
-                            transaction.nature === 'encaissement' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600',
+                            transaction.nature === 'encaissement' ? 'bg-forest/15 text-forest' : 'bg-sanctuary/15 text-sanctuary-light',
                         ]"
                     >
                         <svg v-if="transaction.nature === 'encaissement'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
@@ -142,14 +140,14 @@ function changeMonth(event) {
 
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-3">
-                            <p class="truncate font-medium text-slate-900">
+                            <p class="truncate font-semibold text-white text-[15px]">
                                 {{ typeLabel(transaction.type) }}<span v-if="transaction.account_label"> · {{ transaction.account_label }}</span>
                             </p>
-                            <p :class="['flex-shrink-0 font-semibold', transaction.nature === 'encaissement' ? 'text-emerald-600' : 'text-rose-600']">
+                            <p :class="['flex-shrink-0 font-semibold', transaction.nature === 'encaissement' ? 'text-forest' : 'text-sanctuary-light']">
                                 {{ transaction.nature === 'encaissement' ? '+' : '-' }}{{ formatAmount(transaction.amount, transaction.currency) }}
                             </p>
                         </div>
-                        <p class="mt-1 text-sm text-slate-500">
+                        <p class="mt-1 text-sm text-white/45">
                             {{ formatDate(transaction.transaction_date) }}
                             <span v-if="transaction.counterparty"> · {{ transaction.counterparty }}</span>
                         </p>
@@ -157,12 +155,12 @@ function changeMonth(event) {
 
                     <Link
                         :href="`/org-units/${orgUnit.id}/finances/${transaction.id}/modifier`"
-                        class="flex-shrink-0 self-center rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                        class="flex-shrink-0 self-center rounded-lg px-3 py-1.5 text-sm font-medium text-white/50 transition hover:bg-white/10 hover:text-white"
                     >
                         Modifier
                     </Link>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>
