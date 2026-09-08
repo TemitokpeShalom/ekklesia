@@ -82,6 +82,17 @@ class OrgUnit extends Model
     }
 
     /**
+     * Les sacrements individuels (baptemes, mariages) directement
+     * rattaches a ce noeud, chacun lie a un membre precis (point 08).
+     * Isolation par ministry_id (point 04), comme toutes les tables
+     * multi-tenant.
+     */
+    public function sacraments(): HasMany
+    {
+        return $this->hasMany(Sacrament::class);
+    }
+
+    /**
      * Les mouvements financiers (dimes, offrandes, actions de grace, dons,
      * depenses) directement rattaches a ce noeud. Isolation par
      * ministry_id (point 04), comme toutes les tables multi-tenant.
