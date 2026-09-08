@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -22,10 +23,18 @@ class Ministry extends Model
         'Apôtre', 'Prophète', 'Évangéliste', 'Pasteur', 'Docteur', 'M.', 'Mme',
     ];
 
-    protected $fillable = ['name', 'short_code', 'status', 'settings'];
+    // Duree de l'essai gratuit a la creation du ministere (point 15).
+    public const TRIAL_DAYS = 30;
+
+    protected $fillable = [
+        'name', 'short_code', 'status', 'settings',
+        'plan_id', 'subscription_status', 'trial_ends_at', 'current_period_ends_at',
+    ];
 
     protected $casts = [
         'settings' => 'array',
+        'trial_ends_at' => 'datetime',
+        'current_period_ends_at' => 'datetime',
     ];
 
     public function orgUnits(): HasMany
@@ -45,5 +54,27 @@ class Ministry extends Model
         return is_array($configured) && $configured !== []
             ? array_values($configured)
             : self::DEFAULT_HONORIFIC_TITLES;
+    }
+
+    public function plan(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
+    // Point 15 : tant que l'essai n'est pas expire, l'acces reste complet
+    // meme sans offre payante choisie - c'est onTrial() qui l'autorise,
+    // pas la presence d'un plan_id.
+    public function onTrial(): bool
+    {
+        return $this->subscription_status === 'essai'
+            && $this->trial_ends_at !== null
+            && $this->trial_ends_at->isFuture();
+    }
+
+    public function subscriptionActive(): bool
+    {
+        return $this->onTrial()
+            || ($this->subscription_status === 'active'
+                && ($this->current_period_ends_at === null || $this->current_period_ends_at->isFuture()));
     }
 }
