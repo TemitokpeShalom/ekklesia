@@ -59,7 +59,7 @@ function formatDate(iso) {
 
       <div v-else-if="subscription.status === 'active'" class="mb-8 bg-sanctuary/5 border border-sanctuary/20 rounded-2xl px-5 py-4">
         <p class="text-sm text-ink">
-          Abonnement actif — renouvellement le <span class="font-semibold">{{ formatDate(subscription.current_period_ends_at) }}</span>.
+          Abonnement actif : renouvellement le <span class="font-semibold">{{ formatDate(subscription.current_period_ends_at) }}</span>.
         </p>
       </div>
 
