@@ -81,6 +81,13 @@ function providerLabel(provider) {
 function statusLabel(status) {
   return { pending: 'En attente', success: 'Réussi', failed: 'Échoué' }[status] ?? status
 }
+
+// Point 15 (08/09/2026) : conversion XOF -> USDT calculee cote serveur
+// (voir SubscriptionController::edit(), ExchangeRateService) - jamais
+// recalculee ici, uniquement mise en forme pour l'affichage.
+function formatUsdt(value) {
+  return new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)
+}
 </script>
 
 <template>
@@ -156,7 +163,8 @@ function statusLabel(status) {
             <button v-if="payment.crypto_wallet_address && Number(plan.price_monthly) > 0" type="button"
               @click="openCrypto(plan.id)"
               class="w-full glass-panel-light rounded-xl py-2.5 font-medium text-sm text-white/80 hover:border-gold/40 hover:text-gold-soft transition">
-              Payer en crypto (USDT/BNB)
+              <template v-if="plan.usdt_estimate != null">Payer en crypto (≈ {{ formatUsdt(plan.usdt_estimate) }} USDT)</template>
+              <template v-else>Payer en crypto (USDT/BNB)</template>
             </button>
             <button type="button" :disabled="form.processing" @click="choose(plan.id)"
               class="w-full rounded-xl py-2.5 text-sm font-medium text-white/50 transition hover:bg-white/10 hover:text-white">
@@ -164,10 +172,13 @@ function statusLabel(status) {
             </button>
 
             <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+              <p v-if="plan.usdt_estimate != null" class="text-sm text-gold-soft font-semibold">
+                Montant à envoyer : ≈ {{ formatUsdt(plan.usdt_estimate) }} USDT (ou l'équivalent en BNB au cours du jour)
+              </p>
               <p class="text-xs text-white/55">
-                Envoyez le montant en USDT (BEP-20) ou BNB, sur BNB Smart Chain, à l'adresse :
+                Envoyez ce montant en USDT (BEP-20) ou BNB, sur BNB Smart Chain, à l'adresse :
                 <span class="block mt-1 break-all font-mono text-white/80">{{ payment.crypto_wallet_address }}</span>
-                Puis collez ici le hash de la transaction pour vérification.
+                Puis collez ici le hash de la transaction pour vérification. Le montant reçu est vérifié automatiquement par rapport au prix du plan (une petite marge est tolérée en cas de légère variation du cours entre l'affichage et l'envoi).
               </p>
               <input v-model="cryptoForm.tx_hash" type="text" placeholder="0x..."
                 class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm font-mono transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
