@@ -63,6 +63,17 @@ class OrgUnitPolicy
     }
 
     /**
+     * Gestion du parcours de disciple (etapes de croissance spirituelle,
+     * point 08) : meme regle que la gestion des membres et des cultes - il
+     * faut un role habilite a gerer des personnes (can_manage_users), sur
+     * ce noeud ou un de ses ancetres.
+     */
+    public function manageDiscipleship(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
+    /**
      * Gestion des finances (mouvements et rapport d'activites) : meme
      * regle que la gestion des membres et des cultes - il faut un role
      * habilite a gerer des personnes (can_manage_users), sur ce noeud ou
