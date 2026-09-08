@@ -19,23 +19,29 @@ function print() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-parchment print:bg-white">
-        <header class="border-b border-coffee/10 bg-white px-6 py-5 flex items-center justify-between print:hidden">
+    <div class="min-h-screen bg-night print:bg-white">
+        <!--
+            v3 "Vitrail" (2026-09-09) : seule cette barre de navigation (masquee
+            a l'impression) reprend l'habillage sombre commun. Le contenu
+            imprimable ci-dessous reste volontairement en parchemin clair : ce
+            n'est pas un ecran d'application mais un gabarit destine au papier.
+        -->
+        <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
-                <p class="text-xs uppercase tracking-widest text-gold-dark font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-ink">{{ orgUnit.name }}</h1>
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
+                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
-                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-coffee-light hover:text-ink transition">Retour au générateur</Link>
+                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour au générateur</Link>
                 <button @click="print"
-                    class="rounded-full bg-gradient-to-r from-sanctuary to-sanctuary-dark hover:from-sanctuary-dark hover:to-sanctuary-dark transition-all duration-300 text-white px-5 py-2 text-sm font-medium shadow-md shadow-sanctuary/30">
+                    class="rounded-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night px-5 py-2 text-sm font-semibold shadow-md shadow-gold/20">
                     Imprimer
                 </button>
             </nav>
         </header>
 
         <main class="max-w-3xl mx-auto px-6 py-10 print:max-w-none print:px-0 print:py-0">
-            <p class="text-sm text-coffee-light mb-6 print:hidden">{{ titles[template] }} · {{ orgUnit.name }}</p>
+            <p class="text-sm text-white/50 mb-6 print:hidden">{{ titles[template] }} · {{ orgUnit.name }}</p>
 
             <!-- Affiche : une page unique, identite de l'entite. -->
             <section v-if="template === 'affiche'"

@@ -1,7 +1,11 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
-const props = defineProps({
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel.
+ */
+defineProps({
     orgUnit: Object,
 })
 
@@ -29,32 +33,30 @@ const templates = [
 </script>
 
 <template>
-    <div class="min-h-screen bg-parchment">
-        <header class="border-b border-coffee/10 bg-white px-6 py-5 flex items-center justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-widest text-gold-dark font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-ink">{{ orgUnit.name }}</h1>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Documents
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">Générateur de documents</h1>
+                <p class="text-sm text-white/55 mt-2 max-w-2xl">Trois gabarits imprimables, alimentés par les mêmes fiches membres.</p>
             </div>
-            <Link :href="`/org-units/${orgUnit.id}`" class="text-sm text-coffee-light hover:text-ink transition">Retour au tableau de bord</Link>
-        </header>
+        </template>
 
-        <main class="max-w-4xl mx-auto px-6 py-10">
-            <h2 class="font-serif text-2xl text-ink mb-1">Générateur de documents</h2>
-            <p class="text-sm text-coffee-light mb-8">Trois gabarits imprimables, alimentés par les mêmes fiches membres.</p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <a v-for="t in templates" :key="t.key" :href="t.href(orgUnit.id)"
-                    class="group bg-white border border-coffee/10 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:shadow-coffee/10 hover:-translate-y-1 transition-all duration-300">
-                    <span :class="t.badge" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                            <path stroke-linecap="round" stroke-linejoin="round" :d="t.icon" />
-                            <path v-if="t.icon2" stroke-linecap="round" stroke-linejoin="round" :d="t.icon2" />
-                        </svg>
-                    </span>
-                    <p class="font-semibold text-ink text-[15px]">{{ t.label }}</p>
-                    <p class="text-xs text-coffee-light mt-1">{{ t.desc }}</p>
-                </a>
-            </div>
-        </main>
-    </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 animate-[fadeInUp_0.55s_ease-out_both]">
+            <a v-for="t in templates" :key="t.key" :href="t.href(orgUnit.id)"
+                class="group glass-panel rounded-3xl p-6 hover:border-white/20 hover:-translate-y-1 transition-all duration-300">
+                <span :class="t.badge" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" :d="t.icon" />
+                        <path v-if="t.icon2" stroke-linecap="round" stroke-linejoin="round" :d="t.icon2" />
+                    </svg>
+                </span>
+                <p class="font-semibold text-white text-[15px]">{{ t.label }}</p>
+                <p class="text-xs text-white/45 mt-1">{{ t.desc }}</p>
+            </a>
+        </div>
+    </AppLayout>
 </template>
