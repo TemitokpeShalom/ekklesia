@@ -220,6 +220,7 @@ const modules = [
                 </div>
                 <p v-else class="text-sm text-coffee-light">
                     Les prochaines entités rattachées à {{ orgUnit.name }} apparaîtront ici.
+                                    </p>
             </section>
         </main>
     </div>
