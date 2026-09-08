@@ -16,15 +16,21 @@ function print() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50 print:bg-white">
-        <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between print:hidden">
+    <div class="min-h-screen bg-night print:bg-white">
+        <!--
+            v3 "Vitrail" (2026-09-09) : seule cette barre de navigation (masquee
+            a l'impression) reprend l'habillage sombre commun. La grille
+            imprimable ci-dessous reste volontairement en clair : c'est un
+            gabarit destine au papier, pas un ecran d'application.
+        -->
+        <header class="border-b border-white/10 glass-panel px-6 py-4 flex items-center justify-between print:hidden">
             <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400">{{ orgUnit.level_label }}</p>
-                <h1 class="text-lg font-semibold">{{ orgUnit.name }}</h1>
+                <p class="text-xs uppercase tracking-wide text-gold-soft/80">{{ orgUnit.level_label }}</p>
+                <h1 class="text-lg font-semibold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
-                <Link :href="`/org-units/${orgUnit.id}`" class="text-slate-500 hover:text-slate-900">Retour au tableau de bord</Link>
-                <button @click="print" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+                <Link :href="`/org-units/${orgUnit.id}`" class="text-white/60 hover:text-white">Retour au tableau de bord</Link>
+                <button @click="print" class="rounded-lg bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 px-4 py-2 text-sm font-semibold text-night">
                     Imprimer
                 </button>
             </nav>
@@ -32,11 +38,11 @@ function print() {
 
         <main class="max-w-4xl mx-auto px-6 py-8 print:max-w-none print:px-0 print:py-0">
             <div class="mb-6 print:mb-4">
-                <h2 class="text-lg font-semibold text-slate-900">Trombinoscope</h2>
-                <p class="text-sm text-slate-500">{{ orgUnit.name }} · {{ members.length }} membre(s)</p>
+                <h2 class="text-lg font-semibold text-white print:text-slate-900">Trombinoscope</h2>
+                <p class="text-sm text-white/50 print:text-slate-500">{{ orgUnit.name }} · {{ members.length }} membre(s)</p>
             </div>
 
-            <div v-if="members.length === 0" class="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-8 text-center text-sm text-slate-400 print:hidden">
+            <div v-if="members.length === 0" class="glass-panel rounded-2xl px-4 py-8 text-center text-sm text-white/40 print:hidden">
                 Aucun membre actif avec fiche enregistrée pour l'instant.
             </div>
 
