@@ -58,6 +58,11 @@ const modules = [
         icon2: 'M4.03 9.33A50.7 50.7 0 0112 13.49a50.7 50.7 0 007.74-3.34',
     },
     {
+        key: 'equipes', label: 'Équipes et bénévolat', desc: 'Accueil, louange, enfants, technique...',
+        path: 'equipes', badge: 'from-coffee to-coffee-dark', glow: 'hover:shadow-glow-gold',
+        icon: 'M18 18.72a9.09 9.09 0 003.74-.48 3 3 0 00-4.68-2.72M12 12.75a5.99 5.99 0 015.06 2.77m0 0a3 3 0 014.68 2.72 8.99 8.99 0 01-3.74.48M12 12.75a5.99 5.99 0 00-5.06 2.77m0 0a3 3 0 00-4.68 2.72 8.99 8.99 0 003.74.48m5.99-3.2A5.97 5.97 0 006 18.72M15 6.75a3 3 0 11-6 0 3 3 0 016 0z',
+    },
+    {
         key: 'bibliotheque', label: 'Bibliothèque ministérielle', desc: 'Prédications, thèmes, résumés',
         path: 'bibliotheque', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue', requiresRoot: true, requiresLibrary: true,
         icon: 'M12 6.25C10.5 5 8.5 4.5 6 4.5c-1 0-2 .1-3 .4v13.6c1-.3 2-.4 3-.4 2.5 0 4.5.5 6 1.75m0-13.6c1.5-1.25 3.5-1.75 6-1.75 1 0 2 .1 3 .4v13.6c-1-.3-2-.4-3-.4-2.5 0-4.5.5-6 1.75m0-13.6v13.6',
