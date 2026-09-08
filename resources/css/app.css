@@ -52,25 +52,31 @@ body {
     50% { transform: translateY(-8px); }
 }
 
+/* Eclairci le 2026-09-09 (retour "trop sombre, beaucoup de noir") : fond de
+   carte plus clair et vire du gris-violet vers un gris-vert, bordure plus
+   visible -- meme principe de verre depoli, execution plus legere. */
 .glass-panel {
-    background: rgba(29, 23, 33, 0.62);
+    background: rgba(50, 60, 51, 0.58);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(241, 228, 200, 0.09);
+    border: 1px solid rgba(241, 228, 200, 0.12);
 }
 
 .glass-panel-light {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.09);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /* Rosace/vitrail : meme motif d'arche deja utilise en filigrane sur les
    en-tetes v2 (Login, Dashboard), repris et densifie pour porter, seul,
    l'evocation "eglise" sur les fonds sombres v3 -- jamais une photo, un
-   simple trait de lumiere. */
+   simple trait de lumiere. Un souffle vert rejoint l'or le 2026-09-09, a la
+   demande du ministere. */
 .bg-vitrail {
-    background-image: radial-gradient(circle at 50% 42%, rgba(185, 138, 62, 0.16) 0%, rgba(185, 138, 62, 0) 60%);
+    background-image:
+        radial-gradient(circle at 50% 38%, rgba(185, 138, 62, 0.18) 0%, rgba(185, 138, 62, 0) 58%),
+        radial-gradient(circle at 62% 66%, rgba(47, 107, 79, 0.14) 0%, rgba(47, 107, 79, 0) 60%);
 }
 
