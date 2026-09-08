@@ -13,7 +13,7 @@ class FinancialTransaction extends Model
     protected $fillable = [
         'ministry_id', 'org_unit_id', 'type', 'nature',
         'account_code', 'account_label', 'amount', 'currency',
-        'transaction_date', 'counterparty', 'description',
+        'payment_method', 'transaction_date', 'counterparty', 'description',
         'recorded_by', 'metadata',
     ];
 
