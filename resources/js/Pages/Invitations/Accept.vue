@@ -6,7 +6,7 @@ import { useForm } from '@inertiajs/vue3';
  * (fond nuit, rosace en filigrane, carte en verre depoli), sans aucun
  * changement fonctionnel.
  */
-const props = defineProps({ token: String });
+const props = defineProps({ token: String, valid: Boolean, error: String });
 
 const form = useForm({
     name: '',
@@ -39,13 +39,28 @@ function submit() {
             </g>
         </svg>
 
-        <form @submit.prevent="submit"
+        <div v-if="!valid"
+            class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-rose-400/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
+            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-rose-400/15 text-rose-300 mb-5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+            </span>
+            <h1 class="font-serif text-2xl text-white mb-2">Invitation invalide</h1>
+            <p class="text-sm text-white/60">{{ error }}</p>
+        </div>
+
+        <form v-else @submit.prevent="submit"
             class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
             <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">Bienvenue</p>
             <h1 class="font-serif text-2xl text-white mb-1">Créer votre compte</h1>
             <p class="text-sm text-white/60 mb-7">
                 Ce compte est personnel : il vous appartient, même si votre poste change plus tard.
+            </p>
+
+            <p v-if="form.errors.invitation" class="text-sm text-rose-400 mb-4 rounded-xl bg-rose-400/10 border border-rose-400/30 px-3.5 py-2.5">
+                {{ form.errors.invitation }}
             </p>
 
             <label class="block text-sm font-medium text-white/80 mb-1">Nom complet</label>
