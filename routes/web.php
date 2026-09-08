@@ -17,6 +17,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TrombinoscopeController;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,12 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // unique par ministere, ecran reserve a la racine de l'arbre.
     Route::get('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'edit'])->name('honorific-titles.edit');
     Route::put('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'update'])->name('honorific-titles.update');
+
+    // Abonnement et facturation (point 15) : reglage unique par ministere,
+    // ecran reserve a la racine de l'arbre - meme droit que les titres
+    // honorifiques et la gouvernance des acces ci-dessus.
+    Route::get('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+    Route::put('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'update'])->name('subscription.update');
 
     Route::get('/org-units/{orgUnit}/trombinoscope', [TrombinoscopeController::class, 'index'])->name('trombinoscope.index');
 
