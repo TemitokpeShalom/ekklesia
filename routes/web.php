@@ -10,9 +10,11 @@ use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\BibliothequeController;
 use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentGeneratorController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\TrombinoscopeController;
@@ -61,7 +63,18 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::put('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'update'])->name('members.update');
     Route::delete('/org-units/{orgUnit}/membres/{member}', [MembersController::class, 'destroy'])->name('members.destroy');
 
+    // Titres honorifiques configurables (reliquat du point 08) : reglage
+    // unique par ministere, ecran reserve a la racine de l'arbre.
+    Route::get('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'edit'])->name('honorific-titles.edit');
+    Route::put('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'update'])->name('honorific-titles.update');
+
     Route::get('/org-units/{orgUnit}/trombinoscope', [TrombinoscopeController::class, 'index'])->name('trombinoscope.index');
+
+    // Generateur de documents (reliquat du point 08) : hub + gabarits
+    // affiche/calendrier, le trombinoscope ci-dessus restant sur sa propre
+    // route deja en place.
+    Route::get('/org-units/{orgUnit}/documents', [DocumentGeneratorController::class, 'index'])->name('documents.index');
+    Route::get('/org-units/{orgUnit}/documents/{template}', [DocumentGeneratorController::class, 'show'])->name('documents.show');
 
     Route::get('/org-units/{orgUnit}/cultes', [CultesController::class, 'index'])->name('cultes.index');
     Route::get('/org-units/{orgUnit}/cultes/nouveau', [CultesController::class, 'create'])->name('cultes.create');
