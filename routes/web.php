@@ -22,6 +22,8 @@ use App\Http\Controllers\MembersController;
 use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionCryptoController;
+use App\Http\Controllers\SubscriptionFedapayController;
 use App\Http\Controllers\TeamMembersController;
 use App\Http\Controllers\TeamsController;
 use App\Http\Controllers\TrombinoscopeController;
@@ -38,6 +40,14 @@ Route::post('/rattachement', [AttachmentCodeController::class, 'redeem'])->name(
 
 Route::get('/connexion', [LoginController::class, 'create'])->name('login');
 Route::post('/connexion', [LoginController::class, 'store']);
+
+// Point 15 : notification serveur-a-serveur envoyee par FedaPay lui-meme,
+// jamais par un navigateur authentifie - forcement hors du groupe
+// auth/tenant.context, et exclue de la verification CSRF (voir
+// bootstrap/app.php) puisque FedaPay ne peut fournir aucun jeton CSRF. La
+// signature (X-FEDAPAY-SIGNATURE) en tient lieu, verifiee dans le
+// controleur lui-meme avant toute ecriture.
+Route::post('/webhooks/fedapay', [SubscriptionFedapayController::class, 'webhook'])->name('webhooks.fedapay');
 
 Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::post('/deconnexion', [LoginController::class, 'destroy'])->name('logout');
@@ -81,6 +91,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // honorifiques et la gouvernance des acces ci-dessus.
     Route::get('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'edit'])->name('subscription.edit');
     Route::put('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'update'])->name('subscription.update');
+    Route::post('/org-units/{orgUnit}/abonnement/fedapay', [SubscriptionFedapayController::class, 'checkout'])->name('subscription.fedapay.checkout');
+    Route::post('/org-units/{orgUnit}/abonnement/crypto', [SubscriptionCryptoController::class, 'store'])->name('subscription.crypto.store');
 
     Route::get('/org-units/{orgUnit}/trombinoscope', [TrombinoscopeController::class, 'index'])->name('trombinoscope.index');
 
