@@ -1,4 +1,4 @@
-<?php
+Page_Down<?php
 
 namespace App\Policies;
 
@@ -61,7 +61,6 @@ class OrgUnitPolicy
     {
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
-
     /**
      * Publication des annonces (point 07) : meme regle que les autres
      * modules de gestion - il faut un role habilite a gerer des personnes
@@ -70,6 +69,19 @@ class OrgUnitPolicy
      * suit la regle symetrique de point 06 (voir AnnouncementsController::index).
      */
     public function manageAnnouncements(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
+    /**
+     * Traitement des signalements (point 17) : changer le statut d'une
+     * preoccupation remontee necessite le meme role habilite a gerer des
+     * personnes que les autres modules de gestion, sur ce noeud ou un de
+     * ses ancetres. Le depot d'un signalement, lui, suit la regle plus
+     * large de view() - n'importe quel titulaire voyant ce noeud peut y
+     * signaler une preoccupation (voir SignalementsController::store).
+     */
+    public function manageSignalements(User $user, OrgUnit $orgUnit): bool
     {
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
