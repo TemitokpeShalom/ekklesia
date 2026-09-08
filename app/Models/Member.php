@@ -11,7 +11,7 @@ class Member extends Model
     use HasUuid;
 
     protected $fillable = [
-        'ministry_id', 'org_unit_id', 'first_name', 'last_name',
+        'ministry_id', 'org_unit_id', 'first_name', 'last_name', 'title',
         'phone', 'email', 'gender', 'birth_date', 'joined_at',
         'status', 'metadata', 'photo_path', 'spouse_name', 'spouse_photo_path',
     ];
