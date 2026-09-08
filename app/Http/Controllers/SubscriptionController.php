@@ -10,14 +10,16 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Abonnement et facturation (point 15). Aucune passerelle de paiement
- * n'est branchee ici : changer d'offre met a jour l'etat de l'abonnement
- * immediatement (periode d'un mois), comme le ferait un administrateur
- * traitant un paiement recu hors ligne (virement, especes - frequent pour
- * ce type d'organisation). Brancher un vrai prestataire (Stripe, CinetPay,
- * etc.) remplacera cette mise a jour directe sans toucher a l'ecran cote
- * utilisateur. Reserve a la racine de l'arbre (rang 0), meme droit que la
- * gouvernance des acces.
+ * Abonnement et facturation (point 15). update() reste la mise a jour
+ * directe d'origine (aucune preuve de paiement exigee) : elle sert
+ * desormais au traitement d'un paiement recu hors ligne (virement, especes
+ * - frequent pour ce type d'organisation), exactement comme avant. Les deux
+ * moyens de paiement en ligne (FedaPay pour l'Afrique de l'Ouest/Centrale,
+ * crypto pour la diaspora) sont branches separement - voir
+ * SubscriptionFedapayController et SubscriptionCryptoController - et
+ * mettent a jour le meme etat sur Ministry une fois le paiement verifie.
+ * Reserve a la racine de l'arbre (rang 0), meme droit que la gouvernance
+ * des acces.
  */
 class SubscriptionController extends Controller
 {
@@ -38,6 +40,18 @@ class SubscriptionController extends Controller
                 'trial_ends_at' => optional($ministry->trial_ends_at)->toIso8601String(),
                 'current_period_ends_at' => optional($ministry->current_period_ends_at)->toIso8601String(),
             ],
+            // Point 15 : chaque moyen de paiement ne s'affiche que s'il est
+            // reellement configure sur ce serveur (voir .env) - jamais un
+            // bouton qui echouerait faute de cles.
+            'payment' => [
+                'fedapay_available' => filled(config('fedapay.public_key')) && filled(config('fedapay.secret_key')),
+                'crypto_wallet_address' => config('crypto.wallet_address'),
+            ],
+            'paymentHistory' => $ministry->subscriptionPayments()
+                ->with('plan:id,name')
+                ->latest()
+                ->limit(10)
+                ->get(['id', 'plan_id', 'provider', 'status', 'amount', 'currency', 'created_at']),
         ]);
     }
 
