@@ -27,6 +27,11 @@ const modules = [
         icon2: 'M12 13m-3.2 0a3.2 3.2 0 106.4 0a3.2 3.2 0 10-6.4 0',
     },
     {
+        key: 'documents', label: 'Documents', desc: 'Affiche, calendrier, trombinoscope',
+        path: 'documents', badge: 'from-sanctuary to-sanctuary-dark',
+        icon: 'M4 4h16v16H4V4zM4 9h16M9 4v16',
+    },
+    {
         key: 'cultes', label: 'Cultes et effectifs', desc: 'Présences, thème, versets',
         path: 'cultes', badge: 'from-sanctuary to-sanctuary-dark',
         icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
@@ -175,6 +180,14 @@ const modules = [
                         <p class="font-semibold text-ink text-[15px]">Code de rattachement</p>
                         <p class="text-xs text-coffee-light mt-1">Créer une entité rattachée</p>
                     </a>
+                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/titres-honorifiques`"
+                        class="group bg-white border border-gold-soft rounded-3xl p-6 shadow-sm hover:shadow-xl hover:shadow-gold/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4l1.8 4.2L18 10l-4.2 1.8L12 16l-1.8-4.2L6 10l4.2-1.8L12 4zM5 18l.8 1.8L7.5 20l-1.7.8L5 22.5l-.8-1.7L2.5 20l1.7-.2L5 18z" /></svg>
+                        </span>
+                        <p class="font-semibold text-ink text-[15px]">Titres honorifiques</p>
+                        <p class="text-xs text-coffee-light mt-1">Liste utilisée sur les fiches membres</p>
+                    </a>
                 </div>
             </section>
 
@@ -207,7 +220,6 @@ const modules = [
                 </div>
                 <p v-else class="text-sm text-coffee-light">
                     Les prochaines entités rattachées à {{ orgUnit.name }} apparaîtront ici.
-                </p>
             </section>
         </main>
     </div>
