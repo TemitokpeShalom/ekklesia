@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\OrgUnit;
+use App\Services\AccountingStandardResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -44,6 +45,8 @@ class AssetsController extends Controller
                 'immobilier' => (float) $orgUnit->assets()->where('category', 'immobilier')->sum('acquisition_value'),
                 'mobilier' => (float) $orgUnit->assets()->where('category', 'mobilier')->sum('acquisition_value'),
             ],
+            // Point 18 : meme devise par pays que les mouvements financiers, jamais un "FCFA" fige.
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -54,6 +57,7 @@ class AssetsController extends Controller
         return Inertia::render('Inventaire/Create', [
             'orgUnit' => $orgUnit,
             'depenses' => $this->depensesDisponibles($orgUnit),
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -80,6 +84,7 @@ class AssetsController extends Controller
             'orgUnit' => $orgUnit,
             'asset' => $asset,
             'depenses' => $this->depensesDisponibles($orgUnit),
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -136,6 +141,11 @@ class AssetsController extends Controller
             'orgUnit' => $orgUnit,
             'date' => $date,
             'parCategorie' => $parCategorie,
+            // Devise du pays du noeud consulte - une consolidation qui remonte
+            // au-dela d'un seul pays melange donc des devises differentes dans
+            // ce total, comme deja le cas avant le point 18 (aucune conversion
+            // de change n'existe dans l'application).
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -163,7 +173,7 @@ class AssetsController extends Controller
         }
 
         $data['quantity'] = $data['quantity'] ?: 1;
-        $data['currency'] = $data['currency'] ?: config('finance.default_currency');
+        $data['currency'] = $data['currency'] ?: AccountingStandardResolver::currencyFor($orgUnit);
 
         return $data;
     }

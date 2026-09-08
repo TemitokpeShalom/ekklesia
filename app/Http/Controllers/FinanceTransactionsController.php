@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FinancialTransaction;
 use App\Models\OrgUnit;
+use App\Services\AccountingStandardResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,6 +29,8 @@ class FinanceTransactionsController extends Controller
         $totalEncaissements = $transactions->where('nature', 'encaissement')->sum('amount');
         $totalDecaissements = $transactions->where('nature', 'decaissement')->sum('amount');
 
+        $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
+
         return Inertia::render('Finances/Index', [
             'orgUnit' => $orgUnit,
             'transactions' => $transactions,
@@ -37,6 +40,8 @@ class FinanceTransactionsController extends Controller
                 'decaissements' => $totalDecaissements,
                 'solde' => $totalEncaissements - $totalDecaissements,
             ],
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
+            'accountingStandardLabel' => $standard['label'] ?? null,
         ]);
     }
 
@@ -44,9 +49,13 @@ class FinanceTransactionsController extends Controller
     {
         $this->authorize('manageFinances', $orgUnit);
 
+        $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
+
         return Inertia::render('Finances/Create', [
             'orgUnit' => $orgUnit,
-            'accounts' => $this->accountsForFrontend(),
+            'accounts' => $standard ? $this->accountsForFrontend($standard) : null,
+            'accountingStandardLabel' => $standard['label'] ?? null,
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -54,7 +63,7 @@ class FinanceTransactionsController extends Controller
     {
         $this->authorize('manageFinances', $orgUnit);
 
-        $data = $this->validateTransaction($request);
+        $data = $this->validateTransaction($request, $orgUnit);
 
         $orgUnit->financialTransactions()->create($data + [
             'ministry_id' => $orgUnit->ministry_id,
@@ -69,10 +78,14 @@ class FinanceTransactionsController extends Controller
         $this->authorize('manageFinances', $orgUnit);
         abort_unless($transaction->org_unit_id === $orgUnit->id, 404);
 
+        $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
+
         return Inertia::render('Finances/Edit', [
             'orgUnit' => $orgUnit,
             'transaction' => $transaction,
-            'accounts' => $this->accountsForFrontend(),
+            'accounts' => $standard ? $this->accountsForFrontend($standard) : null,
+            'accountingStandardLabel' => $standard['label'] ?? null,
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 
@@ -81,7 +94,7 @@ class FinanceTransactionsController extends Controller
         $this->authorize('manageFinances', $orgUnit);
         abort_unless($transaction->org_unit_id === $orgUnit->id, 404);
 
-        $data = $this->validateTransaction($request);
+        $data = $this->validateTransaction($request, $orgUnit);
 
         $transaction->update($data);
 
@@ -105,11 +118,19 @@ class FinanceTransactionsController extends Controller
         return preg_match('/^\d{4}-\d{2}$/', $month) ? $month : now()->format('Y-m');
     }
 
-    private function validateTransaction(Request $request): array
+    /**
+     * Point 18 : le champ "compte comptable" n'est exige que si le pays
+     * de cet org_unit a une norme documentee (voir
+     * AccountingStandardResolver) - sinon, le mouvement s'enregistre avec
+     * sa seule nature universelle, jamais avec un code invente.
+     */
+    private function validateTransaction(Request $request, OrgUnit $orgUnit): array
     {
+        $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
+
         $data = $request->validate([
             'type' => ['required', 'string', Rule::in(['dime', 'offrande', 'action_de_grace', 'don', 'depense'])],
-            'account_code' => ['required', 'string', 'max:20'],
+            'account_code' => [$standard ? 'required' : 'nullable', 'string', 'max:20'],
             'amount' => ['required', 'numeric', 'min:0.01'],
             'currency' => ['nullable', 'string', 'max:8'],
             'transaction_date' => ['required', 'date'],
@@ -117,31 +138,37 @@ class FinanceTransactionsController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
-        $matched = collect($this->flatAccounts())->firstWhere('code', $data['account_code']);
-        abort_unless($matched, 422, 'Compte comptable inconnu.');
-
         $data['nature'] = in_array($data['type'], self::INCOME_TYPES, true) ? 'encaissement' : 'decaissement';
-        $data['account_label'] = $matched['label'];
-        $data['currency'] = $data['currency'] ?: config('finance.default_currency');
+
+        if ($standard) {
+            $matched = collect($this->flatAccounts($standard))->firstWhere('code', $data['account_code']);
+            abort_unless($matched, 422, 'Compte comptable inconnu.');
+            $data['account_label'] = $matched['label'];
+        } else {
+            $data['account_code'] = null;
+            $data['account_label'] = null;
+        }
+
+        $data['currency'] = $data['currency'] ?: AccountingStandardResolver::currencyFor($orgUnit);
 
         return $data;
     }
 
-    private function accountsForFrontend(): array
+    private function accountsForFrontend(array $standard): array
     {
         return [
-            'income' => config('finance.income_accounts'),
-            'expense' => config('finance.expense_accounts'),
+            'income' => $standard['income_accounts'],
+            'expense' => $standard['expense_accounts'],
         ];
     }
 
-    private function flatAccounts(): array
+    private function flatAccounts(array $standard): array
     {
-        $income = collect(config('finance.income_accounts'))
+        $income = collect($standard['income_accounts'])
             ->flatMap(fn ($group) => $group)
             ->values()
             ->all();
 
-        return array_merge($income, config('finance.expense_accounts'));
+        return array_merge($income, $standard['expense_accounts']);
     }
 }
