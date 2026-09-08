@@ -1,6 +1,6 @@
 <script setup>
-import { useForm, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { useForm, router, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
@@ -18,6 +18,14 @@ const props = defineProps({
   payment: Object,
   paymentHistory: Array,
 })
+
+const page = usePage()
+// Point 15 : le controleur flashe 'error' quand FedaPay ou la verification
+// crypto echoue (voir SubscriptionFedapayController/SubscriptionCryptoController)
+// - jusqu'ici jamais affiche nulle part sur cette page, l'administrateur ne
+// voyait donc aucun message et ne pouvait s'en apercevoir qu'en relisant
+// l'historique des paiements plus bas.
+const flashError = computed(() => page.props.flash?.error)
 
 const form = useForm({
   plan_id: props.subscription.plan_id,
@@ -91,6 +99,10 @@ function statusLabel(status) {
     </template>
 
     <div class="space-y-8">
+      <div v-if="flashError" class="glass-panel rounded-2xl px-5 py-4 border-rose-400/40 animate-[fadeInUp_0.5s_ease-out_both]">
+        <p class="text-sm text-rose-300">{{ flashError }}</p>
+      </div>
+
       <div v-if="subscription.on_trial" class="glass-panel rounded-2xl px-5 py-4 flex items-center gap-3 border-gold/30 animate-[fadeInUp_0.55s_ease-out_both]">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gold-soft shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
