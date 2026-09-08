@@ -60,8 +60,8 @@ function formatDate(iso) {
           Canal de signalement
         </p>
         <h1 class="font-serif text-3xl text-white mt-2">Une préoccupation à remonter ?</h1>
-        <p class="text-sm text-white/45 mt-2 max-w-2xl">
-          Visible depuis {{ orgUnit.name }} et tout niveau au-dessus, jamais ailleurs — exactement l'inverse du chemin suivi par les annonces.
+        <p class="text-sm text-white/55 mt-2 max-w-2xl">
+          Visible depuis {{ orgUnit.name }} et tout niveau au-dessus, jamais ailleurs (exactement l'inverse du chemin suivi par les annonces).
         </p>
       </div>
     </template>
