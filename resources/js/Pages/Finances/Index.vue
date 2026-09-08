@@ -6,6 +6,8 @@ const props = defineProps({
     transactions: Array,
     month: String,
     totals: Object,
+    currency: String,
+    accountingStandardLabel: String,
 })
 
 function typeLabel(type) {
@@ -18,8 +20,10 @@ function typeLabel(type) {
     }[type] ?? type
 }
 
-function formatAmount(value) {
-    return new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'
+// Point 18 : la devise vient du pays de l'entite (via le controleur), plus
+// jamais un "FCFA" fige quel que soit le pays reel du mouvement.
+function formatAmount(value, currency) {
+    return new Intl.NumberFormat('fr-FR').format(value) + ' ' + (currency || props.currency)
 }
 
 function formatDate(value) {
@@ -53,6 +57,9 @@ function changeMonth(event) {
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900">Finances</h2>
                     <p class="mt-1 text-sm text-slate-500">Dîmes, offrandes, actions de grâce, dons et dépenses.</p>
+                    <p v-if="!accountingStandardLabel" class="mt-1 text-xs text-amber-600">
+                        Aucune norme comptable n'est encore configurée pour ce pays : les mouvements sont enregistrés sans compte comptable, ce qui n'empêche pas leur saisie.
+                    </p>
                 </div>
                 <div class="flex items-center gap-3">
                     <input
@@ -135,9 +142,11 @@ function changeMonth(event) {
 
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-3">
-                            <p class="truncate font-medium text-slate-900">{{ typeLabel(transaction.type) }} · {{ transaction.account_label }}</p>
+                            <p class="truncate font-medium text-slate-900">
+                                {{ typeLabel(transaction.type) }}<span v-if="transaction.account_label"> · {{ transaction.account_label }}</span>
+                            </p>
                             <p :class="['flex-shrink-0 font-semibold', transaction.nature === 'encaissement' ? 'text-emerald-600' : 'text-rose-600']">
-                                {{ transaction.nature === 'encaissement' ? '+' : '-' }}{{ formatAmount(transaction.amount) }}
+                                {{ transaction.nature === 'encaissement' ? '+' : '-' }}{{ formatAmount(transaction.amount, transaction.currency) }}
                             </p>
                         </div>
                         <p class="mt-1 text-sm text-slate-500">

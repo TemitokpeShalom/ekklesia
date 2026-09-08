@@ -5,6 +5,8 @@ import { computed } from 'vue'
 const props = defineProps({
     orgUnit: Object,
     accounts: Object,
+    accountingStandardLabel: String,
+    currency: String,
 })
 
 const form = useForm({
@@ -25,6 +27,9 @@ const typeOptions = [
 ]
 
 const availableAccounts = computed(() => {
+    if (!props.accounts) {
+        return []
+    }
     if (form.type === 'depense') {
         return props.accounts.expense
     }
@@ -68,8 +73,8 @@ function submit() {
                             </select>
                             <p v-if="form.errors.type" class="mt-1 text-sm text-rose-600">{{ form.errors.type }}</p>
                         </div>
-                        <div>
-                            <label class="mb-1 block text-sm font-medium text-slate-700">Compte comptable (SYSCOHADA)</label>
+                        <div v-if="accounts">
+                            <label class="mb-1 block text-sm font-medium text-slate-700">Compte comptable ({{ accountingStandardLabel }})</label>
                             <select v-model="form.account_code" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-100">
                                 <option value="" disabled>Choisir un compte</option>
                                 <option v-for="account in availableAccounts" :key="account.code" :value="account.code">
@@ -78,6 +83,9 @@ function submit() {
                             </select>
                             <p v-if="form.errors.account_code" class="mt-1 text-sm text-rose-600">{{ form.errors.account_code }}</p>
                         </div>
+                        <p v-else class="text-sm text-amber-600">
+                            Aucune norme comptable n'est encore configurée pour ce pays : ce mouvement sera enregistré sans compte comptable (nature universelle seule).
+                        </p>
                     </div>
                 </section>
 
@@ -92,7 +100,7 @@ function submit() {
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-slate-700">Montant (FCFA)</label>
+                            <label class="mb-1 block text-sm font-medium text-slate-700">Montant ({{ currency }})</label>
                             <input v-model="form.amount" type="number" min="0" step="0.01" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-100" />
                             <p v-if="form.errors.amount" class="mt-1 text-sm text-rose-600">{{ form.errors.amount }}</p>
                         </div>

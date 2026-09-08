@@ -9,10 +9,12 @@ const props = defineProps({
     totalEncaissements: [Number, String],
     totalDecaissements: [Number, String],
     solde: [Number, String],
+    currency: String,
+    accountingStandardLabel: String,
 })
 
 function formatAmount(value) {
-    return new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'
+    return new Intl.NumberFormat('fr-FR').format(value) + ' ' + props.currency
 }
 
 function monthLabel(value) {
@@ -47,6 +49,9 @@ function changeMonth(event) {
                 <div>
                     <h2 class="text-lg font-semibold text-slate-900">Rapport financier</h2>
                     <p class="mt-1 text-sm capitalize text-slate-500">{{ monthLabel(month) }}</p>
+                    <p class="mt-1 text-xs text-slate-400">
+                        {{ accountingStandardLabel ? `Détail par compte comptable (${accountingStandardLabel}).` : "Norme comptable non encore configurée pour ce pays : détail par nature de mouvement." }}
+                    </p>
                 </div>
                 <input
                     type="month"
@@ -76,8 +81,8 @@ function changeMonth(event) {
                 <div v-if="encaissements.length === 0" class="text-sm text-slate-400">Aucun encaissement ce mois-ci.</div>
                 <table v-else class="w-full text-sm">
                     <tbody>
-                        <tr v-for="line in encaissements" :key="line.account_code" class="border-b border-slate-100 last:border-0">
-                            <td class="py-2 text-slate-500">{{ line.account_code }}</td>
+                        <tr v-for="line in encaissements" :key="line.account_code || line.account_label" class="border-b border-slate-100 last:border-0">
+                            <td v-if="accountingStandardLabel" class="py-2 text-slate-500">{{ line.account_code }}</td>
                             <td class="py-2 text-slate-700">{{ line.account_label }}</td>
                             <td class="py-2 text-right font-medium text-slate-900">{{ formatAmount(line.total) }}</td>
                         </tr>
@@ -90,8 +95,8 @@ function changeMonth(event) {
                 <div v-if="decaissements.length === 0" class="text-sm text-slate-400">Aucun décaissement ce mois-ci.</div>
                 <table v-else class="w-full text-sm">
                     <tbody>
-                        <tr v-for="line in decaissements" :key="line.account_code" class="border-b border-slate-100 last:border-0">
-                            <td class="py-2 text-slate-500">{{ line.account_code }}</td>
+                        <tr v-for="line in decaissements" :key="line.account_code || line.account_label" class="border-b border-slate-100 last:border-0">
+                            <td v-if="accountingStandardLabel" class="py-2 text-slate-500">{{ line.account_code }}</td>
                             <td class="py-2 text-slate-700">{{ line.account_label }}</td>
                             <td class="py-2 text-right font-medium text-slate-900">{{ formatAmount(line.total) }}</td>
                         </tr>
