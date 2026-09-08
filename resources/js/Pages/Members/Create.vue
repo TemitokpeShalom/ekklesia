@@ -3,11 +3,13 @@ import { useForm, Link } from '@inertiajs/vue3'
 
 const props = defineProps({
     orgUnit: Object,
+    honorificTitles: Array,
 })
 
 const form = useForm({
     first_name: '',
     last_name: '',
+    title: '',
     phone: '',
     email: '',
     gender: '',
@@ -56,6 +58,15 @@ function submit() {
                         <input v-model="form.last_name" type="text" class="w-full rounded-md border-slate-300 text-sm" required />
                         <p v-if="form.errors.last_name" class="text-xs text-red-600 mt-1">{{ form.errors.last_name }}</p>
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Titre honorifique</label>
+                    <select v-model="form.title" class="w-full rounded-md border-slate-300 text-sm">
+                        <option value="">Aucun</option>
+                        <option v-for="t in honorificTitles" :key="t" :value="t">{{ t }}</option>
+                    </select>
+                    <p v-if="form.errors.title" class="text-xs text-red-600 mt-1">{{ form.errors.title }}</p>
                 </div>
 
                 <div>
