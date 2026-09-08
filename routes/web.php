@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AffectationsController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\OrgUnitTransformationController;
 use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TrombinoscopeController;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +58,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // un OrgUnit precis, accessible depuis n'importe quel contexte connecte.
     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
+    Route::get('/assistant', [AssistantController::class, 'index'])->name('assistant.index');
 
     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
@@ -119,4 +122,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::put('/org-units/{orgUnit}/annonces/{announcement}', [AnnouncementsController::class, 'update'])->name('annonces.update');
     Route::delete('/org-units/{orgUnit}/annonces/{announcement}', [AnnouncementsController::class, 'destroy'])->name('annonces.destroy');
     Route::post('/org-units/{orgUnit}/annonces/{announcement}/lu', [AnnouncementsController::class, 'markRead'])->name('annonces.lu');
+
+    Route::get('/org-units/{orgUnit}/signalements', [SignalementsController::class, 'index'])->name('signalements.index');
+    Route::post('/org-units/{orgUnit}/signalements', [SignalementsController::class, 'store'])->name('signalements.store');
+    Route::put('/org-units/{orgUnit}/signalements/{signalement}', [SignalementsController::class, 'updateStatus'])->name('signalements.update');
 });
