@@ -1,8 +1,16 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
+    resolve: {
+        alias: {
+            // Utilise par les composants partages (Layouts/AppLayout.vue...)
+            // introduits avec l'identite visuelle v3 (2026-09-08).
+            '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
+        },
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
