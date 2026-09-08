@@ -24,10 +24,10 @@ function submit() {
 
 <template>
     <div class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-night">
-        <!-- Halos qui derivent tres lentement -->
-        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/30 rounded-full blur-[100px]" style="animation: driftGlow 14s ease-in-out infinite;" aria-hidden="true"></div>
-        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/15 rounded-full blur-[100px]" style="animation: driftGlow 18s ease-in-out infinite reverse;" aria-hidden="true"></div>
-        <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-forest/12 rounded-full blur-[100px]" aria-hidden="true"></div>
+        <!-- Halos qui derivent tres lentement (eclaircis, plus verts le 2026-09-09) -->
+        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/26 rounded-full blur-[100px]" style="animation: driftGlow 14s ease-in-out infinite;" aria-hidden="true"></div>
+        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/18 rounded-full blur-[100px]" style="animation: driftGlow 18s ease-in-out infinite reverse;" aria-hidden="true"></div>
+        <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-forest/22 rounded-full blur-[100px]" aria-hidden="true"></div>
         <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
 
         <!-- Rosace : mullions rayonnants + arche, motif "vitrail" en filigrane -->
@@ -59,7 +59,7 @@ function submit() {
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
             <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">Bienvenue</p>
             <h1 class="font-serif text-3xl text-white mb-1">Ekklesia</h1>
-            <p class="text-sm text-white/50 mb-7">Plateforme de gestion de ministère — connectez-vous à votre espace.</p>
+            <p class="text-sm text-white/60 mb-7">Plateforme de gestion de ministère : connectez-vous à votre espace.</p>
 
             <label class="block text-sm font-medium text-white/80 mb-1" for="email">Adresse e-mail</label>
             <input id="email" v-model="form.email" type="email" required autofocus
