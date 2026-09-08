@@ -1,6 +1,11 @@
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
+import AppLayout from '@/Layouts/AppLayout.vue'
 
+/**
+ * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+ * partagee AppLayout, sans aucun changement fonctionnel.
+ */
 const props = defineProps({
     orgUnit: Object,
     honorificTitles: Array,
@@ -34,102 +39,120 @@ function submit() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-slate-50">
-        <header class="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-wide text-slate-400">{{ orgUnit.level_label }}</p>
-                <h1 class="text-lg font-semibold">{{ orgUnit.name }}</h1>
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/membres`" back-label="Annuler">
+        <template #title>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Membres
+                </p>
+                <h1 class="font-serif text-3xl text-white mt-2">Ajouter un membre</h1>
             </div>
-            <Link :href="`/org-units/${orgUnit.id}/membres`" class="text-sm text-slate-500 hover:text-slate-900">Annuler</Link>
-        </header>
+        </template>
 
-        <main class="max-w-lg mx-auto px-6 py-8">
-            <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-6">Ajouter un membre</h2>
-
-            <form @submit.prevent="submit" class="space-y-4 bg-white border border-slate-200 rounded-lg p-6" enctype="multipart/form-data">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Prénom</label>
-                        <input v-model="form.first_name" type="text" class="w-full rounded-md border-slate-300 text-sm" required />
-                        <p v-if="form.errors.first_name" class="text-xs text-red-600 mt-1">{{ form.errors.first_name }}</p>
+        <div class="max-w-2xl mx-auto">
+            <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]" enctype="multipart/form-data">
+                <section>
+                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Identité</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="mb-1 block text-sm font-medium text-white/80">Prénom</label>
+                                <input v-model="form.first_name" type="text" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                                <p v-if="form.errors.first_name" class="mt-1 text-sm text-rose-400">{{ form.errors.first_name }}</p>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-sm font-medium text-white/80">Nom</label>
+                                <input v-model="form.last_name" type="text" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                                <p v-if="form.errors.last_name" class="mt-1 text-sm text-rose-400">{{ form.errors.last_name }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Titre honorifique</label>
+                            <select v-model="form.title" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                <option value="" class="bg-night text-white">Aucun</option>
+                                <option v-for="t in honorificTitles" :key="t" :value="t" class="bg-night text-white">{{ t }}</option>
+                            </select>
+                            <p v-if="form.errors.title" class="mt-1 text-sm text-rose-400">{{ form.errors.title }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nom</label>
-                        <input v-model="form.last_name" type="text" class="w-full rounded-md border-slate-300 text-sm" required />
-                        <p v-if="form.errors.last_name" class="text-xs text-red-600 mt-1">{{ form.errors.last_name }}</p>
+                </section>
+
+                <section class="border-t border-white/10 pt-6">
+                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Contact</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Téléphone</label>
+                            <input v-model="form.phone" type="text" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Email</label>
+                            <input v-model="form.email" type="email" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p v-if="form.errors.email" class="mt-1 text-sm text-rose-400">{{ form.errors.email }}</p>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Titre honorifique</label>
-                    <select v-model="form.title" class="w-full rounded-md border-slate-300 text-sm">
-                        <option value="">Aucun</option>
-                        <option v-for="t in honorificTitles" :key="t" :value="t">{{ t }}</option>
-                    </select>
-                    <p v-if="form.errors.title" class="text-xs text-red-600 mt-1">{{ form.errors.title }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Téléphone</label>
-                    <input v-model="form.phone" type="text" class="w-full rounded-md border-slate-300 text-sm" />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                    <input v-model="form.email" type="email" class="w-full rounded-md border-slate-300 text-sm" />
-                    <p v-if="form.errors.email" class="text-xs text-red-600 mt-1">{{ form.errors.email }}</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Genre</label>
-                        <select v-model="form.gender" class="w-full rounded-md border-slate-300 text-sm">
-                            <option value="">Non précisé</option>
-                            <option value="M">Homme</option>
-                            <option value="F">Femme</option>
-                        </select>
+                <section class="border-t border-white/10 pt-6">
+                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Détails</h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="mb-1 block text-sm font-medium text-white/80">Genre</label>
+                                <select v-model="form.gender" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                    <option value="" class="bg-night text-white">Non précisé</option>
+                                    <option value="M" class="bg-night text-white">Homme</option>
+                                    <option value="F" class="bg-night text-white">Femme</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-sm font-medium text-white/80">Date de naissance</label>
+                                <input v-model="form.birth_date" type="date" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Date d'adhésion</label>
+                            <input v-model="form.joined_at" type="date" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Date de naissance</label>
-                        <input v-model="form.birth_date" type="date" class="w-full rounded-md border-slate-300 text-sm" />
+                </section>
+
+                <section class="border-t border-white/10 pt-6">
+                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Photos et conjoint(e)</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Photo (optionnel)</label>
+                            <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white/80 hover:file:bg-white/20" />
+                            <p class="mt-1 text-xs text-white/35">Image, 5 Mo maximum.</p>
+                            <p v-if="form.errors.photo" class="mt-1 text-sm text-rose-400">{{ form.errors.photo }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Conjoint(e) (optionnel)</label>
+                            <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p v-if="form.errors.spouse_name" class="mt-1 text-sm text-rose-400">{{ form.errors.spouse_name }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-white/80">Photo du conjoint (optionnel)</label>
+                            <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white/80 hover:file:bg-white/20" />
+                            <p class="mt-1 text-xs text-white/35">Image, 5 Mo maximum.</p>
+                            <p v-if="form.errors.spouse_photo" class="mt-1 text-sm text-rose-400">{{ form.errors.spouse_photo }}</p>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Date d'adhésion</label>
-                    <input v-model="form.joined_at" type="date" class="w-full rounded-md border-slate-300 text-sm" />
-                </div>
-
-                <div class="border-t border-slate-100 pt-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo (optionnel)</label>
-                    <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
-                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
-                    <p v-if="form.errors.photo" class="text-xs text-red-600 mt-1">{{ form.errors.photo }}</p>
-                </div>
-
-                <div class="border-t border-slate-100 pt-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Conjoint(e) (optionnel)</label>
-                    <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full rounded-md border-slate-300 text-sm" />
-                    <p v-if="form.errors.spouse_name" class="text-xs text-red-600 mt-1">{{ form.errors.spouse_name }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Photo du conjoint (optionnel)</label>
-                    <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
-                    <p class="mt-1 text-xs text-slate-400">Image, 5 Mo maximum.</p>
-                    <p v-if="form.errors.spouse_photo" class="text-xs text-red-600 mt-1">{{ form.errors.spouse_photo }}</p>
-                </div>
-
-                <div class="pt-2">
+                <div class="border-t border-white/10 pt-6">
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
                     >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
                         Enregistrer
                     </button>
                 </div>
             </form>
-        </main>
-    </div>
+        </div>
+    </AppLayout>
 </template>
