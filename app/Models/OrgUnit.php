@@ -103,6 +103,16 @@ class OrgUnit extends Model
     }
 
     /**
+     * Les equipes de service (accueil, louange, enfants, technique...,
+     * point 08) directement rattachees a ce noeud. Isolation par
+     * ministry_id (point 04), comme toutes les tables multi-tenant.
+     */
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
+    }
+
+    /**
      * Les mouvements financiers (dimes, offrandes, actions de grace, dons,
      * depenses) directement rattaches a ce noeud. Isolation par
      * ministry_id (point 04), comme toutes les tables multi-tenant.
