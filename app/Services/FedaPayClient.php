@@ -4,6 +4,7 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
@@ -108,8 +109,7 @@ class FedaPayClient
         try {
             $response = $this->http->post($path, ['json' => $payload]);
         } catch (GuzzleException $e) {
-            Log::error("FedaPay: echec de l'appel POST $path.", ['message' => $e->getMessage()]);
-            throw new RuntimeException("Echec de l'appel a FedaPay ($path) : ".$e->getMessage(), previous: $e);
+            throw $this->toRuntimeException($path, $e);
         }
 
         $decoded = json_decode((string) $response->getBody(), true);
@@ -123,14 +123,71 @@ class FedaPayClient
         try {
             $response = $this->http->get($path);
         } catch (GuzzleException $e) {
-            Log::error("FedaPay: echec de l'appel GET $path.", ['message' => $e->getMessage()]);
-            throw new RuntimeException("Echec de l'appel a FedaPay ($path) : ".$e->getMessage(), previous: $e);
+            throw $this->toRuntimeException($path, $e);
         }
 
         $decoded = json_decode((string) $response->getBody(), true);
         Log::info("FedaPay: reponse GET $path.", ['response' => $decoded]);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * $e->getMessage() sur une RequestException (401, 400, 422...) tronque
+     * le corps de la reponse a ~120 caracteres ("(truncated...)"), ce qui a
+     * deja masque le detail utile en pratique (ex. le motif exact d'un rejet
+     * FedaPay). On relit ici le corps complet de la reponse quand elle
+     * existe, pour le journaliser en entier et remonter le vrai motif
+     * FedaPay jusqu'a l'ecran de l'administrateur plutot qu'un message
+     * generique.
+     */
+    private function toRuntimeException(string $path, GuzzleException $e): RuntimeException
+    {
+        if ($e instanceof RequestException && $e->hasResponse()) {
+            $body = (string) $e->getResponse()->getBody();
+            $decoded = json_decode($body, true);
+
+            Log::error("FedaPay: echec de l'appel $path.", [
+                'status' => $e->getResponse()->getStatusCode(),
+                'body' => $decoded ?? $body,
+            ]);
+
+            $reason = is_array($decoded) ? $this->describeError($decoded) : null;
+
+            return new RuntimeException(
+                $reason ?? "Echec de l'appel a FedaPay ($path), reponse HTTP {$e->getResponse()->getStatusCode()}.",
+                previous: $e,
+            );
+        }
+
+        // Pas de reponse du tout (reseau, DNS, delai depasse...).
+        Log::error("FedaPay: echec de l'appel $path (pas de reponse).", ['message' => $e->getMessage()]);
+
+        return new RuntimeException("Echec de l'appel a FedaPay ($path) : ".$e->getMessage(), previous: $e);
+    }
+
+    /**
+     * FedaPay renvoie {"message": "...", "errors": {"champ": ["raison"]}}
+     * sur un rejet de validation (ex. montant au-dessus du plafond du
+     * compte). On combine le message general et la premiere raison par
+     * champ, pour un message exploitable sans avoir a rouvrir les journaux.
+     */
+    private function describeError(array $decoded): ?string
+    {
+        $parts = [];
+
+        if (! empty($decoded['message']) && is_string($decoded['message'])) {
+            $parts[] = $decoded['message'];
+        }
+
+        foreach ((array) ($decoded['errors'] ?? []) as $field => $reasons) {
+            $first = is_array($reasons) ? reset($reasons) : $reasons;
+            if (is_string($first) && $first !== '') {
+                $parts[] = "$field : $first";
+            }
+        }
+
+        return $parts === [] ? null : implode(' - ', $parts);
     }
 
     /**
