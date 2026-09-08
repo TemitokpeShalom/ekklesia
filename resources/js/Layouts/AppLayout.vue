@@ -26,12 +26,13 @@ defineProps({
     <div class="min-h-screen bg-night text-white/90 relative overflow-x-hidden">
         <!-- Fond : halos qui derivent tres lentement + rosace en filigrane -->
         <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-            <div class="absolute -top-40 -right-24 w-[34rem] h-[34rem] bg-sanctuary/25 rounded-full blur-[110px]" style="animation: driftGlow 19s ease-in-out infinite;"></div>
-            <div class="absolute top-1/3 -left-32 w-[30rem] h-[30rem] bg-gold/10 rounded-full blur-[110px]" style="animation: driftGlow 23s ease-in-out infinite reverse;"></div>
-            <div class="absolute bottom-[-10rem] right-1/4 w-[26rem] h-[26rem] bg-forest/12 rounded-full blur-[110px]" style="animation: driftGlow 27s ease-in-out infinite;"></div>
+            <!-- Halos eclaircis et un peu plus verts le 2026-09-09 (retour "trop sombre"). -->
+            <div class="absolute -top-40 -right-24 w-[34rem] h-[34rem] bg-sanctuary/22 rounded-full blur-[110px]" style="animation: driftGlow 19s ease-in-out infinite;"></div>
+            <div class="absolute top-1/3 -left-32 w-[30rem] h-[30rem] bg-gold/14 rounded-full blur-[110px]" style="animation: driftGlow 23s ease-in-out infinite reverse;"></div>
+            <div class="absolute bottom-[-10rem] right-1/4 w-[28rem] h-[28rem] bg-forest/22 rounded-full blur-[110px]" style="animation: driftGlow 27s ease-in-out infinite;"></div>
             <div class="absolute inset-0 bg-vitrail"></div>
 
-            <svg class="absolute left-1/2 top-24 -translate-x-1/2 w-[46rem] h-[46rem] opacity-[0.05] hidden md:block"
+            <svg class="absolute left-1/2 top-24 -translate-x-1/2 w-[46rem] h-[46rem] opacity-[0.07] hidden md:block"
                 viewBox="0 0 200 200" fill="none" stroke="#f1e4c8" stroke-width="0.6">
                 <circle cx="100" cy="100" r="70" />
                 <circle cx="100" cy="100" r="52" />
@@ -71,7 +72,7 @@ defineProps({
         </main>
 
         <footer class="relative z-10 max-w-6xl mx-auto px-6 pb-10 pt-4">
-            <p class="text-xs text-white/30 text-center">Ekklesia — plateforme de gestion de ministère</p>
+            <p class="text-xs text-white/30 text-center">Ekklesia, plateforme de gestion de ministère</p>
         </footer>
     </div>
 </template>
