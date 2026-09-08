@@ -32,6 +32,14 @@ return Application::configure(basePath: dirname(__DIR__))
             after: \Illuminate\Session\Middleware\StartSession::class,
             append: SetTenantContext::class,
         );
+
+        // Point 15 : le webhook FedaPay est appele par les serveurs de
+        // FedaPay eux-memes, qui ne peuvent fournir aucun jeton CSRF -
+        // sa propre signature (verifiee dans SubscriptionFedapayController)
+        // en tient lieu.
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/fedapay',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
