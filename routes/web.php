@@ -22,6 +22,8 @@ use App\Http\Controllers\MembersController;
 use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TeamMembersController;
+use App\Http\Controllers\TeamsController;
 use App\Http\Controllers\TrombinoscopeController;
 use Illuminate\Support\Facades\Route;
 
@@ -108,6 +110,15 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/sacrements/{sacrement}/modifier', [SacramentsController::class, 'edit'])->name('sacrements.edit');
     Route::put('/org-units/{orgUnit}/sacrements/{sacrement}', [SacramentsController::class, 'update'])->name('sacrements.update');
     Route::delete('/org-units/{orgUnit}/sacrements/{sacrement}', [SacramentsController::class, 'destroy'])->name('sacrements.destroy');
+
+    Route::get('/org-units/{orgUnit}/equipes', [TeamsController::class, 'index'])->name('teams.index');
+    Route::get('/org-units/{orgUnit}/equipes/nouvelle', [TeamsController::class, 'create'])->name('teams.create');
+    Route::post('/org-units/{orgUnit}/equipes', [TeamsController::class, 'store'])->name('teams.store');
+    Route::get('/org-units/{orgUnit}/equipes/{equipe}/modifier', [TeamsController::class, 'edit'])->name('teams.edit');
+    Route::put('/org-units/{orgUnit}/equipes/{equipe}', [TeamsController::class, 'update'])->name('teams.update');
+    Route::delete('/org-units/{orgUnit}/equipes/{equipe}', [TeamsController::class, 'destroy'])->name('teams.destroy');
+    Route::post('/org-units/{orgUnit}/equipes/{equipe}/membres', [TeamMembersController::class, 'store'])->name('team-members.store');
+    Route::delete('/org-units/{orgUnit}/equipes/{equipe}/membres/{membre}', [TeamMembersController::class, 'destroy'])->name('team-members.destroy');
 
     Route::get('/org-units/{orgUnit}/bibliotheque', [BibliothequeController::class, 'index'])->name('bibliotheque.index');
 
