@@ -19,12 +19,20 @@ export default {
             // classique". On garde la meme famille de couleurs (vin, or, brun,
             // vert, bleu ardoise -- rien de ce qui a ete valide n'est jete) mais
             // on la fait vivre sur des surfaces sombres et translucides plutot
-            // que sur du papier clair : "night" est la nouvelle toile de fond
-            // (proche du noir suggere), le vin et l'or y gagnent en profondeur et
-            // en lumiere, a la maniere d'un vitrail dans une nef sombre. Les
-            // anciens tokens (parchment, ink...) restent utilises tels quels par
-            // les pages pas encore migrees : rien ne casse, la migration se fait
-            // ecran par ecran.
+            // que sur du papier clair : "night" est la nouvelle toile de fond,
+            // le vin et l'or y gagnent en profondeur et en lumiere, a la maniere
+            // d'un vitrail dans une nef sombre. Les anciens tokens (parchment,
+            // ink...) restent utilises tels quels par les pages pas encore
+            // migrees : rien ne casse, la migration se fait ecran par ecran.
+            //
+            // Ajustement (2026-09-09) : retour du ministere apres publication --
+            // la v3 etait jugee trop sombre ("beaucoup de noir"). "night" est
+            // donc eclairci sensiblement (environ deux fois plus lumineux) et
+            // vire du gris-violet vers un gris-vert discret, pour a la fois
+            // apporter plus de legerete ET introduire un peu de vert dans
+            // l'identite, sans quitter le registre "nuit". Meme principe que
+            // pour la refonte initiale : on garde l'identite, on affine son
+            // execution.
             colors: {
                 sanctuary: {
                     light: '#8f3049',
@@ -45,13 +53,14 @@ export default {
                 ink: '#241a16',
                 slateblue: '#2e4c6d',
                 forest: '#2f6b4f',
-                // v3 : toile de fond sombre chaleureuse (jamais un noir pur/froid).
+                // v3 : toile de fond sombre chaleureuse, teintee de vert plutot
+                // que grise ou violette (jamais un noir pur/froid).
                 night: {
-                    DEFAULT: '#0e0b11',
-                    soft: '#171219',
-                    card: '#1d1721',
-                    cardLight: '#251e2b',
-                    border: '#332a3a',
+                    DEFAULT: '#1a201c',
+                    soft: '#232a24',
+                    card: '#2b332c',
+                    cardLight: '#343d34',
+                    border: '#48534a',
                 },
             },
             fontFamily: {
