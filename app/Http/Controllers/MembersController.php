@@ -40,6 +40,7 @@ class MembersController extends Controller
 
         return Inertia::render('Members/Create', [
             'orgUnit' => $orgUnit->only(['id', 'name', 'level_label']),
+            'honorificTitles' => $orgUnit->ministry->honorificTitles(),
         ]);
     }
 
@@ -68,6 +69,7 @@ class MembersController extends Controller
         return Inertia::render('Members/Edit', [
             'orgUnit' => $orgUnit->only(['id', 'name', 'level_label']),
             'member' => $member,
+            'honorificTitles' => $orgUnit->ministry->honorificTitles(),
         ]);
     }
 
@@ -128,6 +130,7 @@ class MembersController extends Controller
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:50'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
             'gender' => ['nullable', 'string', 'in:M,F'],
