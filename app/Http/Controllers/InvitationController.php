@@ -51,7 +51,16 @@ class InvitationController extends Controller
 
     public function acceptShow(string $token): Response
     {
-        return Inertia::render('Invitations/Accept', ['token' => $token]);
+        // Verifie le jeton avant d'afficher le formulaire : inutile de
+        // laisser quelqu'un remplir nom/e-mail/mot de passe pour se
+        // heurter ensuite a une invitation deja utilisee ou expiree.
+        ['invitation' => $invitation, 'reason' => $reason] = $this->invitations->resolve($token);
+
+        return Inertia::render('Invitations/Accept', [
+            'token' => $token,
+            'valid' => $invitation !== null,
+            'error' => $invitation === null ? InvitationService::reasonMessage($reason) : null,
+        ]);
     }
 
     public function acceptStore(Request $request, string $token): RedirectResponse
@@ -63,10 +72,18 @@ class InvitationController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $affectation = $this->invitations->accept($token, [
-            ...$validated,
-            'password' => Hash::make($validated['password']),
-        ]);
+        try {
+            $affectation = $this->invitations->accept($token, [
+                ...$validated,
+                'password' => Hash::make($validated['password']),
+            ]);
+        } catch (\RuntimeException $e) {
+            // Rejoue possible entre l'affichage et la soumission (lien
+            // ouvert dans deux onglets, double clic) : on renvoie un
+            // message clair au lieu de laisser l'exception remonter en
+            // page d'erreur 500 brute.
+            return back()->withErrors(['invitation' => $e->getMessage()]);
+        }
 
         auth()->login($affectation->user);
 
