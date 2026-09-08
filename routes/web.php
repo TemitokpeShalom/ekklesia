@@ -18,6 +18,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TrombinoscopeController;
@@ -92,6 +93,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/cultes/{culte}/modifier', [CultesController::class, 'edit'])->name('cultes.edit');
     Route::put('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'update'])->name('cultes.update');
     Route::delete('/org-units/{orgUnit}/cultes/{culte}', [CultesController::class, 'destroy'])->name('cultes.destroy');
+
+    Route::get('/org-units/{orgUnit}/sacrements', [SacramentsController::class, 'index'])->name('sacrements.index');
+    Route::get('/org-units/{orgUnit}/sacrements/nouveau', [SacramentsController::class, 'create'])->name('sacrements.create');
+    Route::post('/org-units/{orgUnit}/sacrements', [SacramentsController::class, 'store'])->name('sacrements.store');
+    Route::get('/org-units/{orgUnit}/sacrements/{sacrement}/modifier', [SacramentsController::class, 'edit'])->name('sacrements.edit');
+    Route::put('/org-units/{orgUnit}/sacrements/{sacrement}', [SacramentsController::class, 'update'])->name('sacrements.update');
+    Route::delete('/org-units/{orgUnit}/sacrements/{sacrement}', [SacramentsController::class, 'destroy'])->name('sacrements.destroy');
 
     Route::get('/org-units/{orgUnit}/bibliotheque', [BibliothequeController::class, 'index'])->name('bibliotheque.index');
 
