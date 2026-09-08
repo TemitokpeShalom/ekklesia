@@ -40,12 +40,12 @@ function conditionClass(value) {
 }
 
 function formatAmount(value) {
-    if (value === null || value === undefined) return '—'
+    if (value === null || value === undefined) return '-'
     return new Intl.NumberFormat('fr-FR').format(value) + ' FCFA'
 }
 
 function formatDate(value) {
-    if (!value) return '—'
+    if (!value) return '-'
     return new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
