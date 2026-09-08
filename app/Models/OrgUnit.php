@@ -125,6 +125,17 @@ class OrgUnit extends Model
     }
 
     /**
+     * Les signalements deposes depuis ce noeud (point 17), remontes vers
+     * le haut : meme regle de chemin que les rapports (points 06/18), sens
+     * de lecture inverse des annonces. Voir SignalementsController::index
+     * pour la consolidation depuis un ancetre.
+     */
+    public function signalements(): HasMany
+    {
+        return $this->hasMany(Signalement::class);
+    }
+
+    /**
      * Tous les descendants (n'importe quelle profondeur), via le chemin
      * materialise - la requete qui alimente aussi bien la consolidation
      * (point 06) que la visibilite des annonces (point 07).
