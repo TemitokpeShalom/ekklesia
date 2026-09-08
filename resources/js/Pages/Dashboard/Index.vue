@@ -188,6 +188,14 @@ const modules = [
                         <p class="font-semibold text-ink text-[15px]">Titres honorifiques</p>
                         <p class="text-xs text-coffee-light mt-1">Liste utilisée sur les fiches membres</p>
                     </a>
+                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/abonnement`"
+                        class="group bg-white border border-gold-soft rounded-3xl p-6 shadow-sm hover:shadow-xl hover:shadow-gold/10 hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
+                        </span>
+                        <p class="font-semibold text-ink text-[15px]">Abonnement</p>
+                        <p class="text-xs text-coffee-light mt-1">Offre, essai, facturation</p>
+                    </a>
                 </div>
             </section>
 
