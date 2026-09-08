@@ -52,6 +52,17 @@ class OrgUnitPolicy
     }
 
     /**
+     * Gestion des sacrements individuels (baptemes, mariages, point 08) :
+     * meme regle que la gestion des membres et des cultes - il faut un role
+     * habilite a gerer des personnes (can_manage_users), sur ce noeud ou
+     * un de ses ancetres.
+     */
+    public function manageSacrements(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
+    /**
      * Gestion des finances (mouvements et rapport d'activites) : meme
      * regle que la gestion des membres et des cultes - il faut un role
      * habilite a gerer des personnes (can_manage_users), sur ce noeud ou
