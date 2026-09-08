@@ -47,6 +47,11 @@ const modules = [
         icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
     },
     {
+        key: 'sacrements', label: 'Sacrements', desc: 'Baptêmes et mariages, par membre',
+        path: 'sacrements', badge: 'from-forest to-forest/70', glow: 'hover:shadow-glow-forest',
+        icon: 'M12 21a9 9 0 100-18 9 9 0 000 18zm0-13.5v6l3.75 2.25',
+    },
+    {
         key: 'bibliotheque', label: 'Bibliothèque ministérielle', desc: 'Prédications, thèmes, résumés',
         path: 'bibliotheque', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue', requiresRoot: true, requiresLibrary: true,
         icon: 'M12 6.25C10.5 5 8.5 4.5 6 4.5c-1 0-2 .1-3 .4v13.6c1-.3 2-.4 3-.4 2.5 0 4.5.5 6 1.75m0-13.6c1.5-1.25 3.5-1.75 6-1.75 1 0 2 .1 3 .4v13.6c-1-.3-2-.4-3-.4-2.5 0-4.5.5-6 1.75m0-13.6v13.6',
