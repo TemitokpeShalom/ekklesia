@@ -21,7 +21,7 @@ function submit() {
         <form @submit.prevent="submit" class="w-full max-w-sm bg-white p-8 rounded-lg shadow-sm border border-slate-200">
             <h1 class="text-xl font-semibold mb-1">Créer votre compte</h1>
             <p class="text-sm text-slate-500 mb-6">
-                Ce compte est personnel — il vous appartient, même si votre poste change plus tard.
+                Ce compte est personnel : il vous appartient, même si votre poste change plus tard.
             </p>
 
             <label class="block text-sm font-medium mb-1">Nom complet</label>
