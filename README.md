@@ -1,11 +1,11 @@
-# Ekklesia — Module Fondations
+# Ekklesia : Module Fondations
 
 Premier module de code de la plateforme (voir `architecture.html`, point 10
 de la feuille de route). Couvre : `org_units` + `org_unit_history` (point
 02/13), isolation stricte par Row-Level Security (point 04), comptes
 individuels par invitation (point 11), code de rattachement (point 03),
-transformations organisationnelles de base — promotion, rattachement,
-renommage (point 13), et une couche de services separee des controleurs,
+transformations organisationnelles de base (promotion, rattachement,
+renommage, point 13), et une couche de services separee des controleurs,
 prete pour une future API mobile (point 10).
 
 ## Important : ce qui a ete verifie, et ce qui reste a faire chez vous
@@ -25,7 +25,7 @@ seulement ecrites :
    (`database/sql_check/rls_test.sql` et `history_test.sql`) : creation de
    deux ministeres, lecture croisee bloquee, ecriture croisee rejetee,
    promotion d'une cellule en eglise avec reconstitution correcte de
-   l'etat "tel qu'il etait avant" — tout s'est comporte comme prevu.
+   l'etat "tel qu'il etait avant" : tout s'est comporte comme prevu.
 
 Ce qui n'a **pas** pu etre verifie ici, faute de reseau : que
 `composer install` telecharge bien Laravel et ses dependances, et que
@@ -59,7 +59,7 @@ avec succes et donne le SQL exact attendu pour chaque table.
 ```
 app/Models/          Organisation (OrgUnit), Utilisateur (User),
                       Affectation, Role, Invitation, AttachmentCode,
-                      OrgUnitHistory, Ministry — point 11.
+                      OrgUnitHistory, Ministry (point 11).
 app/Services/         Toute la logique metier (point 10) : rien dans les
                       controleurs. AttachmentCodeService (point 03),
                       InvitationService (point 11),
@@ -71,7 +71,7 @@ database/migrations/  Les 9 migrations du module Fondations, dans
                       l'ordre (ministries -> users -> org_units ->
                       org_unit_history -> roles -> affectations ->
                       invitations -> attachment_codes -> RLS).
-database/sql_check/   Scripts de verification manuelle (voir ci-dessus) —
+database/sql_check/   Scripts de verification manuelle (voir ci-dessus) :
                       ne sont pas executes par l'application.
 resources/js/Pages/   Connexion, acceptation d'invitation, tableau de
                       bord vide par niveau (point 10).
