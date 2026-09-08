@@ -93,6 +93,16 @@ class OrgUnit extends Model
     }
 
     /**
+     * Le journal des etapes de croissance spirituelle (parcours de
+     * disciple, point 08) franchies par les membres de ce noeud. Isolation
+     * par ministry_id (point 04), comme toutes les tables multi-tenant.
+     */
+    public function discipleshipStages(): HasMany
+    {
+        return $this->hasMany(DiscipleshipStage::class);
+    }
+
+    /**
      * Les mouvements financiers (dimes, offrandes, actions de grace, dons,
      * depenses) directement rattaches a ce noeud. Isolation par
      * ministry_id (point 04), comme toutes les tables multi-tenant.
