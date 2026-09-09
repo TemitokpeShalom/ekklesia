@@ -1,5 +1,10 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+
+const page = usePage()
+const flashSuccess = computed(() => page.props.flash?.success)
+const flashError = computed(() => page.props.flash?.error)
 
 /**
  * Coquille partagee v3 "Vitrail" (2026-09-08).
@@ -66,6 +71,20 @@ defineProps({
                 <slot name="title" />
             </div>
         </header>
+
+        <!--
+            Bandeau de message ephemere (succes/erreur) - jusqu'ici affiche
+            seulement sur l'ecran de transformation (Transform.vue), donc
+            invisible partout ailleurs, y compris juste apres un
+            rattachement reussi. Centralise ici (audit du 2026-09-09) pour
+            que toute redirection avec message le montre, sans dupliquer ce
+            bandeau dans chaque page. N'apparait que si un message est
+            present : ne change rien a l'ecran quand il n'y en a pas.
+        -->
+        <div v-if="flashSuccess || flashError" class="relative z-10 max-w-6xl mx-auto px-6 pt-4">
+            <p v-if="flashSuccess" class="text-sm text-forest bg-forest/10 border border-forest/30 rounded-xl px-4 py-2.5">{{ flashSuccess }}</p>
+            <p v-if="flashError" class="text-sm text-rose-400 bg-rose-400/10 border border-rose-400/30 rounded-xl px-4 py-2.5">{{ flashError }}</p>
+        </div>
 
         <main class="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-14">
             <slot />
