@@ -67,6 +67,10 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        // Modifie le 2026-09-09 : ramene sur la page d'accueil publique (les
+        // deux choix "creer un ministere" / "se connecter"), pas directement
+        // sur le formulaire de connexion - "il faut que ça puisse me ramener
+        // sur la toute première page" apres deconnexion.
+        return redirect()->route('welcome');
     }
 }
