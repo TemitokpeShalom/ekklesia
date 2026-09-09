@@ -61,6 +61,15 @@ defineProps({
                 <nav class="flex items-center gap-2 shrink-0">
                     <slot name="actions" />
                     <Link v-if="backHref" :href="backHref" class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">{{ backLabel }}</Link>
+                    <!--
+                        Ajoute le 2026-09-09 : avant, la seule facon d'atteindre
+                        /rattachement etait de taper l'adresse a la main - aucun
+                        bouton nulle part n'y menait pour un utilisateur deja
+                        connecte (typiquement celui qui vient de recevoir un
+                        code d'une autre personne). Visible depuis n'importe
+                        quel ecran, comme "Aide".
+                    -->
+                    <Link href="/rattachement" class="hidden sm:inline-flex text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Rattachement</Link>
                     <Link href="/aide" class="hidden sm:inline-flex text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Aide</Link>
                     <form method="post" action="/deconnexion">
                         <button class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Se déconnecter</button>
