@@ -42,6 +42,17 @@ class MinistryRegistrationService
                 'status' => 'active',
                 'subscription_status' => 'essai',
                 'trial_ends_at' => now()->addDays(Ministry::TRIAL_DAYS),
+                // Identite officielle (2026-09-09) - voir migration
+                // 2026_09_10_000007 : demandee des la creation, mais toujours
+                // modifiable ensuite (voir MinistryInfoController), donc
+                // aucun de ces champs n'est requis ici.
+                'acronym' => $ministryAttributes['acronym'] ?? null,
+                'registration_number' => $ministryAttributes['registration_number'] ?? null,
+                'headquarters_address' => $ministryAttributes['headquarters_address'] ?? null,
+                'phone' => $ministryAttributes['phone'] ?? null,
+                'email' => $ministryAttributes['email'] ?? null,
+                'website' => $ministryAttributes['website'] ?? null,
+                'logo_path' => $ministryAttributes['logo_path'] ?? null,
             ]);
 
             // Meme raison que DemoMinistrySeedCommand et tous les points
