@@ -17,6 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.context' => SetTenantContext::class,
         ]);
 
+        // Ajoute le 2026-09-09 : par defaut Laravel envoie un visiteur non
+        // connecte directement sur /connexion des qu'il touche une page
+        // protegee - il n'existait alors aucune page expliquant les deux
+        // parcours possibles ("creer un nouveau ministere" ou "se
+        // connecter a un espace existant"). /bienvenue est cette page (voir
+        // WelcomeController) ; son bouton "Se connecter" renvoie ensuite
+        // normalement vers /connexion.
+        $middleware->redirectGuestsTo('/bienvenue');
+
         // Partage auth/flash a toutes les pages Inertia (point 09) ; le
         // contexte multi-tenant est fixe par tenant.context, applique aux
         // seules routes authentifiees (voir routes/web.php).
