@@ -93,6 +93,15 @@ class InvitationService
         }
 
         return DB::transaction(function () use ($invitation, $userAttributes) {
+            // Cette requete precede forcement toute connexion (point 11) :
+            // elle est hors du middleware tenant.context de routes/web.php,
+            // donc app.current_ministry_id n'a jamais ete fixe pour elle.
+            // Sans ce SET LOCAL, les policies RLS "fail closed" (point 04)
+            // sur affectations/invitations rejetteraient silencieusement
+            // les ecritures ci-dessous - meme mecanisme et meme raison que
+            // AttachmentCodeService::consume().
+            DB::statement("SET LOCAL app.current_ministry_id = '{$invitation->ministry_id}'");
+
             $user = User::where('email', $userAttributes['email'])->first();
 
             if (! $user) {
