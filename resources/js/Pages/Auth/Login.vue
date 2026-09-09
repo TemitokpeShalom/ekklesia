@@ -80,6 +80,18 @@ function submit() {
                 class="w-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
                 Se connecter
             </button>
+
+            <!--
+                Ajoute le 2026-09-09 : avant, un nouvel arrivant qui recevait un
+                code de rattachement (et n'a donc pas encore de compte) n'avait
+                aucun moyen de le decouvrir depuis cette page - il fallait
+                connaitre l'adresse /rattachement par coeur. C'est pourtant le
+                tout premier ecran que voit quiconque n'est pas deja connecte.
+            -->
+            <p class="text-center text-sm text-white/50 mt-6">
+                Vous avez reçu un code de rattachement ?
+                <a href="/rattachement" class="text-gold-soft hover:underline font-medium">Rejoindre votre église</a>
+            </p>
         </form>
     </div>
 </template>
