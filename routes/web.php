@@ -27,7 +27,22 @@ use App\Http\Controllers\SubscriptionFedapayController;
 use App\Http\Controllers\TeamMembersController;
 use App\Http\Controllers\TeamsController;
 use App\Http\Controllers\TrombinoscopeController;
+use App\Http\Controllers\MinistryRegistrationController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
+
+// Page d'accueil publique (2026-09-09, voir WelcomeController) : c'est
+// desormais elle, et non plus /connexion, que redirectGuestsTo
+// (bootstrap/app.php) presente a un visiteur non connecte.
+Route::get('/bienvenue', [WelcomeController::class, 'index'])->name('welcome');
+
+// Creation libre-service d'un nouveau ministere (tenant), sans validation
+// manuelle - voir MinistryRegistrationController. Ouvert a quiconque, comme
+// /rattachement et /invitations/{token} : forcement hors du groupe
+// auth/tenant.context ci-dessous, puisque la personne n'a pas encore de
+// compte au moment ou elle remplit ce formulaire.
+Route::get('/ministeres/nouveau', [MinistryRegistrationController::class, 'create'])->name('ministries.create');
+Route::post('/ministeres/nouveau', [MinistryRegistrationController::class, 'store'])->name('ministries.store');
 
 // Invitation : acceptation ouverte a une personne pas encore connectee.
 Route::get('/invitations/{token}', [InvitationController::class, 'acceptShow'])->name('invitations.accept.show');
