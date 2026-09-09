@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Affectation;
 use App\Models\AttachmentCode;
 use App\Models\OrgUnit;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -52,12 +54,40 @@ class AttachmentCodeService
     }
 
     /**
+     * Retrouve un code de rattachement pendant/valide a partir de sa valeur
+     * en clair, sans le consommer - utilise pour afficher a l'avance a
+     * quel niveau la personne qui saisit le code va creer une entite,
+     * avant qu'elle ne remplisse le reste du formulaire (point 03).
+     */
+    public function peek(string $plainCode): ?AttachmentCode
+    {
+        return AttachmentCode::where('status', 'pending')
+            ->where('expires_at', '>', now())
+            ->get()
+            ->first(fn (AttachmentCode $candidate) => Hash::check($plainCode, $candidate->code_hash));
+    }
+
+    /**
      * Consomme un code pour creer le nouveau noeud. parent_id, path et
      * ministry_id sont TOUJOURS herites du noeud emetteur - jamais saisis
      * par la personne qui remplit le formulaire (point 03).
+     *
+     * $usedBy est la personne qui redeem le code si elle a deja un compte
+     * Ekklesia (ex. un responsable regional qui rattache lui-meme une
+     * nouvelle entite a sa propre branche). Si elle n'en a pas encore -
+     * cas normal d'une eglise reellement nouvelle - $usedBy est null et
+     * $newAccount doit porter les champs necessaires a la creation d'un
+     * compte (name/email/phone/password, deja hache) : ce compte devient
+     * le titulaire (role Pasteur) de la nouvelle entite.
+     *
+     * @return array{0: OrgUnit, 1: User}
      */
-    public function consume(string $plainCode, array $newUnitAttributes, User $usedBy): OrgUnit
+    public function consume(string $plainCode, array $newUnitAttributes, ?User $usedBy, ?array $newAccount = null): array
     {
+        if (! $usedBy && ! $newAccount) {
+            throw new RuntimeException('Un compte existant ou les informations pour en créer un sont nécessaires.');
+        }
+
         $candidates = AttachmentCode::where('status', 'pending')
             ->where('expires_at', '>', now())
             ->get();
@@ -70,8 +100,32 @@ class AttachmentCodeService
             throw new RuntimeException('Code de rattachement invalide, déjà utilisé ou expiré.');
         }
 
-        return DB::transaction(function () use ($attachmentCode, $newUnitAttributes, $usedBy) {
+        return DB::transaction(function () use ($attachmentCode, $newUnitAttributes, $usedBy, $newAccount) {
             $issuingUnit = $attachmentCode->issuingOrgUnit;
+
+            // Ce transaction s'execute forcement hors du middleware
+            // tenant.context (point 04) : que la personne qui redeem ait
+            // deja une session ou non, cette requete precede toute
+            // connexion pour une eglise reellement nouvelle. Sans ce
+            // SET LOCAL, les policies RLS "fail closed" des tables
+            // multi-tenant (org_units, org_unit_history, affectations)
+            // rejetteraient silencieusement chaque ecriture ci-dessous -
+            // meme technique que DemoMinistrySeedCommand pour la meme
+            // raison (une commande artisan ne passe pas non plus par le
+            // middleware web).
+            DB::statement("SET LOCAL app.current_ministry_id = '{$issuingUnit->ministry_id}'");
+
+            if (! $usedBy) {
+                $usedBy = User::firstWhere('email', $newAccount['email']) ?? User::create([
+                    'name' => $newAccount['name'],
+                    'email' => $newAccount['email'],
+                    'phone' => $newAccount['phone'] ?? null,
+                    'password' => $newAccount['password'],
+                    'status' => 'active',
+                ]);
+            }
+
+            $code = $this->uniqueChildCode($issuingUnit, $newUnitAttributes['code']);
 
             $newUnit = OrgUnit::create([
                 'ministry_id' => $issuingUnit->ministry_id, // herite, jamais choisi
@@ -79,10 +133,10 @@ class AttachmentCodeService
                 'level_rank' => $attachmentCode->target_level_rank,
                 'level_label' => $newUnitAttributes['level_label'],
                 'name' => $newUnitAttributes['name'],
-                'code' => $newUnitAttributes['code'],
+                'code' => $code,
                 'metadata' => $newUnitAttributes['metadata'] ?? [],
                 'status' => 'active',
-                'path' => $issuingUnit->path.'.'.$newUnitAttributes['code'],
+                'path' => $issuingUnit->path.'.'.$code,
             ]);
 
             $newUnit->history()->create([
@@ -100,6 +154,23 @@ class AttachmentCodeService
                 'reason' => 'Création via code de rattachement.',
             ]);
 
+            // Sans cette affectation, la personne qui vient de rattacher
+            // sa nouvelle entite n'a aucun droit dessus (OrgUnitPolicy::view
+            // exige une affectation active sur le noeud ou un ancetre) et
+            // se heurte a un refus d'acces immediatement apres avoir
+            // "reussi" a la creer - le code Pasteur en fait le titulaire,
+            // habilite (can_manage_users) a inviter d'autres personnes et
+            // a emettre a son tour des codes pour ses propres rattachements.
+            Affectation::create([
+                'ministry_id' => $newUnit->ministry_id,
+                'user_id' => $usedBy->id,
+                'org_unit_id' => $newUnit->id,
+                'role_id' => Role::where('code', Role::PASTEUR)->firstOrFail()->id,
+                'status' => 'active',
+                'started_at' => now()->toDateString(),
+                'assigned_by' => $attachmentCode->issued_by,
+            ]);
+
             $attachmentCode->update([
                 'status' => 'utilise',
                 'used_by' => $usedBy->id,
@@ -107,7 +178,29 @@ class AttachmentCodeService
                 'created_org_unit_id' => $newUnit->id,
             ]);
 
-            return $newUnit;
+            return [$newUnit, $usedBy];
         });
+    }
+
+    /**
+     * Le code (slug court) n'est unique que dans le perimetre du parent
+     * (contrainte ['parent_id', 'code'], voir migration org_units). Une
+     * personne qui remplit ce formulaire ne connait pas forcement les
+     * codes deja pris sous ce parent : on ajoute un suffixe numerique
+     * plutot que de faire echouer la creation sur une contrainte SQL avec
+     * un message illisible.
+     */
+    private function uniqueChildCode(OrgUnit $parent, string $desiredCode): string
+    {
+        $base = Str::slug($desiredCode) ?: 'entite';
+        $code = $base;
+        $suffix = 1;
+
+        while (OrgUnit::where('parent_id', $parent->id)->where('code', $code)->exists()) {
+            $suffix++;
+            $code = "{$base}-{$suffix}";
+        }
+
+        return $code;
     }
 }
