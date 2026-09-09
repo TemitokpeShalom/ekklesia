@@ -1,15 +1,29 @@
 <script setup>
+import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
  * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
- * partagee AppLayout, sans aucun changement fonctionnel. Le texte reçoit
- * des surcharges print:* pour rester lisible (noir sur blanc) une fois
- * imprimé, malgré l'habillage sombre a l'ecran.
+ * partagee AppLayout, avec un seul changement fonctionnel - la barre de
+ * recherche ci-dessous. Elle remplace l'ancien ecran separe "Assistant"
+ * (anciennement /assistant), qui n'etait qu'une deuxieme facon de
+ * chercher dans ce meme manuel : deux entrees de menu pour un seul
+ * contenu (voir l'audit du 2026-09-09, point 1). Desormais "Aide" est le
+ * seul acces, recherche comprise - voir HelpController. Le texte reçoit
+ * par ailleurs des surcharges print:* pour rester lisible (noir sur
+ * blanc) une fois imprimé, malgré l'habillage sombre a l'ecran.
  */
-defineProps({
+const props = defineProps({
     modules: Object,
+    query: { type: String, default: '' },
+    results: { type: Array, default: () => [] },
 })
+
+const form = useForm({ q: props.query })
+
+function search() {
+    form.get('/aide', { preserveState: true, preserveScroll: true, only: ['query', 'results'] })
+}
 
 function goBack() {
     window.history.back()
@@ -50,6 +64,37 @@ function moduleSlug(name) {
                 construit, à partir du code réellement écrit. Le même contenu est consultable ici en entier, et
                 depuis le lien "Aide" de chaque écran concerné.
             </p>
+
+            <form @submit.prevent="search" class="mb-8 print:hidden flex gap-2">
+                <input
+                    v-model="form.q"
+                    type="search"
+                    placeholder="Chercher un mot-clé dans le manuel (ex. « rattachement », « finances »)"
+                    class="flex-1 bg-white/5 border border-white/15 text-white placeholder-white/35 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"
+                />
+                <button type="submit" :disabled="form.processing"
+                    class="shrink-0 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-60">
+                    Chercher
+                </button>
+            </form>
+
+            <section v-if="query" class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.5s_ease-out_both]">
+                <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-3">
+                    Résultats pour « {{ query }} »
+                </h2>
+                <p v-if="!results.length" class="text-sm text-white/55">
+                    Aucun article ne correspond. Le sommaire complet reste ci-dessous.
+                </p>
+                <ul v-else class="space-y-4">
+                    <li v-for="r in results" :key="r.slug">
+                        <a :href="`/aide/${r.slug}`" class="block group">
+                            <p class="text-xs uppercase tracking-widest text-gold-soft/70 mb-0.5">{{ r.module }}</p>
+                            <p class="text-sm font-semibold text-white group-hover:text-gold-soft">{{ r.title }}</p>
+                            <p class="text-xs text-white/50 mt-0.5">{{ r.excerpt }}</p>
+                        </a>
+                    </li>
+                </ul>
+            </section>
 
             <nav class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.55s_ease-out_both]">
                 <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-3">Sommaire</h2>
