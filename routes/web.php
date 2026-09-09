@@ -19,6 +19,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
+use App\Http\Controllers\MinistryInfoController;
 use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
@@ -110,6 +111,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // unique par ministere, ecran reserve a la racine de l'arbre.
     Route::get('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'edit'])->name('honorific-titles.edit');
     Route::put('/org-units/{orgUnit}/titres-honorifiques', [HonorificTitlesController::class, 'update'])->name('honorific-titles.update');
+
+    // Informations officielles du ministere (2026-09-09) : sigle, siege,
+    // coordonnees, numero d'autorisation, logo - renseignables des la
+    // creation (voir MinistryRegistrationController) mais completables ici
+    // ensuite. Meme droit et meme reserve a la racine que ci-dessus.
+    Route::get('/org-units/{orgUnit}/informations-ministere', [MinistryInfoController::class, 'edit'])->name('ministry-info.edit');
+    Route::put('/org-units/{orgUnit}/informations-ministere', [MinistryInfoController::class, 'update'])->name('ministry-info.update');
 
     // Abonnement et facturation (point 15) : reglage unique par ministere,
     // ecran reserve a la racine de l'arbre - meme droit que les titres
