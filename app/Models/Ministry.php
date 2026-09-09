@@ -29,6 +29,13 @@ class Ministry extends Model
     protected $fillable = [
         'name', 'short_code', 'status', 'settings',
         'plan_id', 'subscription_status', 'trial_ends_at', 'current_period_ends_at',
+        // Identite officielle (2026-09-09) : ce que porte un dossier de
+        // reconnaissance de culte aupres du Ministere de l'Interieur et de
+        // la Securite Publique (nom, sigle, siege, coordonnees, numero
+        // d'autorisation), plus le logo. Tous nullables - voir la migration
+        // 2026_09_10_000007 pour le detail.
+        'acronym', 'registration_number', 'headquarters_address',
+        'phone', 'email', 'website', 'logo_path',
     ];
 
     protected $casts = [
