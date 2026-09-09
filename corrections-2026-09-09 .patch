@@ -1,0 +1,1046 @@
+diff --git a/app/Http/Controllers/AssistantController.php b/app/Http/Controllers/AssistantController.php
+deleted file mode 100644
+index 2d84fbc..0000000
+--- a/app/Http/Controllers/AssistantController.php
++++ /dev/null
+@@ -1,66 +0,0 @@
+-<?php
+-
+-namespace App\Http\Controllers;
+-
+-use App\Models\HelpArticle;
+-use Illuminate\Http\Request;
+-use Illuminate\Support\Str;
+-use Inertia\Inertia;
+-use Inertia\Response;
+-
+-/**
+- * Assistant IA (point 17). Recherche par mots-cles sur le manuel integre
+- * (point 09) plutot qu'un modele de langage externe : fonctionne sans cle
+- * API ni service tiers, et suffit a orienter vers le bon article. Un vrai
+- * assistant conversationnel pourra remplacer ce moteur de recherche plus
+- * tard sans changer l'ecran cote utilisateur (meme reponse Inertia).
+- *
+- * Accessible a tout utilisateur connecte, comme le manuel lui-meme (voir
+- * HelpController) : ce n'est pas une donnee de ministere.
+- */
+-class AssistantController extends Controller
+-{
+-    private const MIN_WORD_LENGTH = 3;
+-
+-    private const MAX_RESULTS = 3;
+-
+-    public function index(Request $request): Response
+-    {
+-        $query = trim((string) $request->query('q', ''));
+-
+-        return Inertia::render('Assistant/Index', [
+-            'query' => $query,
+-            'results' => $query !== '' ? $this->search($query) : [],
+-        ]);
+-    }
+-
+-    private function search(string $query): array
+-    {
+-        $words = collect(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($query), -1, PREG_SPLIT_NO_EMPTY))
+-            ->unique()
+-            ->filter(fn ($word) => mb_strlen($word) >= self::MIN_WORD_LENGTH);
+-
+-        if ($words->isEmpty()) {
+-            return [];
+-        }
+-
+-        return HelpArticle::orderBy('order')->get(['slug', 'module', 'title', 'body'])
+-            ->map(function (HelpArticle $article) use ($words) {
+-                $haystack = mb_strtolower($article->title.' '.$article->body);
+-                $score = $words->sum(fn ($word) => substr_count($haystack, $word));
+-
+-                return ['article' => $article, 'score' => $score];
+-            })
+-            ->filter(fn ($scored) => $scored['score'] > 0)
+-            ->sortByDesc('score')
+-            ->take(self::MAX_RESULTS)
+-            ->map(fn ($scored) => [
+-                'slug' => $scored['article']->slug,
+-                'module' => $scored['article']->module,
+-                'title' => $scored['article']->title,
+-                'excerpt' => Str::limit(strip_tags($scored['article']->body), 220),
+-            ])
+-            ->values()
+-            ->all();
+-    }
+-}
+diff --git a/app/Http/Controllers/AttachmentCodeController.php b/app/Http/Controllers/AttachmentCodeController.php
+index 707f861..74aeb1b 100644
+--- a/app/Http/Controllers/AttachmentCodeController.php
++++ b/app/Http/Controllers/AttachmentCodeController.php
+@@ -6,8 +6,10 @@ use App\Models\OrgUnit;
+ use App\Services\AttachmentCodeService;
+ use Illuminate\Http\RedirectResponse;
+ use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Hash;
+ use Inertia\Inertia;
+ use Inertia\Response;
++use RuntimeException;
+ 
+ /**
+  * Controleur volontairement mince (point 10) : il valide l'entree, appelle
+@@ -46,20 +48,75 @@ class AttachmentCodeController extends Controller
+         return back()->with('plain_code', $plainCode)->with('attachment_code_id', $attachmentCode->id);
+     }
+ 
++    /**
++     * Page publique (point 03) : la seule ou saisir un code de
++     * rattachement. Accessible sans compte - c'est le cas normal d'une
++     * eglise reellement nouvelle - donc hors du groupe auth/tenant.context
++     * de routes/web.php. Si un code est deja connu (lien transmis avec le
++     * code en parametre), on l'affiche a l'avance pour eviter une saisie
++     * manuelle source d'erreur, mais sans jamais reveler a quel niveau il
++     * ouvre droit avant validation (le code seul fait foi, point 03).
++     */
++    public function redeemShow(Request $request): Response
++    {
++        return Inertia::render('OrgUnits/RedeemAttachmentCode', [
++            'authenticated' => $request->user() !== null,
++            'prefillCode' => $request->query('code'),
++        ]);
++    }
++
+     public function redeem(Request $request): RedirectResponse
+     {
+-        $validated = $request->validate([
++        $rules = [
+             'code' => ['required', 'string'],
+             'name' => ['required', 'string', 'max:255'],
+-            'code_short' => ['required', 'string', 'max:255'],
++            'code_short' => ['nullable', 'string', 'max:255'],
+             'level_label' => ['required', 'string', 'max:255'],
+-        ]);
++        ];
++
++        $authenticatedUser = $request->user();
++
++        if (! $authenticatedUser) {
++            // Personne pas encore connue d'Ekklesia (nouvelle eglise) : son
++            // compte est cree dans le meme geste que le rattachement, comme
++            // pour une invitation (point 11) - jamais un compte partage.
++            $rules += [
++                'account_name' => ['required', 'string', 'max:255'],
++                'account_email' => ['required', 'email', 'max:255'],
++                'account_phone' => ['nullable', 'string', 'max:255'],
++                'account_password' => ['required', 'string', 'min:8', 'confirmed'],
++            ];
++        }
++
++        $validated = $request->validate($rules);
++
++        $newAccount = $authenticatedUser ? null : [
++            'name' => $validated['account_name'],
++            'email' => $validated['account_email'],
++            'phone' => $validated['account_phone'] ?? null,
++            'password' => Hash::make($validated['account_password']),
++        ];
++
++        try {
++            [$newUnit, $usedBy] = $this->attachmentCodes->consume($validated['code'], [
++                'name' => $validated['name'],
++                'code' => $validated['code_short'] ?: $validated['name'],
++                'level_label' => $validated['level_label'],
++            ], $authenticatedUser, $newAccount);
++        } catch (RuntimeException $e) {
++            return back()->withErrors(['code' => $e->getMessage()])->withInput();
++        }
++
++        if (! $authenticatedUser) {
++            auth()->login($usedBy);
++            $request->session()->regenerate();
++        }
+ 
+-        $newUnit = $this->attachmentCodes->consume($validated['code'], [
+-            'name' => $validated['name'],
+-            'code' => $validated['code_short'],
+-            'level_label' => $validated['level_label'],
+-        ], $request->user());
++        // Complement du point 04, meme raison que LoginController@store :
++        // sans ceci, la policy RLS par ministere de la requete suivante
++        // (le tableau de bord vers lequel on redirige juste en dessous)
++        // ne laisse rien passer et produit une fausse erreur 404/403.
++        $request->session()->put('current_ministry_id', $newUnit->ministry_id);
+ 
+         return redirect()
+             ->route('dashboard', ['orgUnit' => $newUnit->id])
+diff --git a/app/Http/Controllers/HelpController.php b/app/Http/Controllers/HelpController.php
+index 3737d23..5f4d82a 100644
+--- a/app/Http/Controllers/HelpController.php
++++ b/app/Http/Controllers/HelpController.php
+@@ -3,30 +3,52 @@
+ namespace App\Http\Controllers;
+ 
+ use App\Models\HelpArticle;
++use Illuminate\Http\Request;
++use Illuminate\Support\Str;
+ use Inertia\Inertia;
+ use Inertia\Response;
+ 
+ /**
+- * Manuel d'utilisation integre (point 09). Contenu stocke une seule fois
+- * dans help_articles, affiche a deux endroits a partir des memes donnees :
+- * - index() : le manuel complet, regroupe par module, pense pour etre
+- *   imprime d'un bloc (formation en presentiel, export "PDF" via
+- *   l'impression du navigateur, comme deja fait pour le trombinoscope) ;
++ * Manuel d'utilisation integre (point 09) et recherche rapide (point 17,
++ * anciennement AssistantController, fusionnes ici le 2026-09-09 : les deux
++ * ecrans lisaient exactement la meme table help_articles sous deux noms
++ * differents - « Assistant » et « Manuel d'utilisation » - ce qui creait
++ * un doublon dans l'interface sans rien ajouter de fonctionnel). Contenu
++ * stocke une seule fois, affiche a deux endroits a partir des memes
++ * donnees :
++ * - index() : le manuel complet, regroupe par module, et - si une
++ *   recherche est en cours (parametre ?q=) - les articles les plus
++ *   pertinents en tete, pense pour etre imprime d'un bloc (formation en
++ *   presentiel, export "PDF" via l'impression du navigateur, comme deja
++ *   fait pour le trombinoscope) ;
+  * - show() : une seule page, ouverte depuis le lien "Aide" d'un ecran
+  *   precis, pour une consultation rapide en contexte.
+  *
++ * La recherche reste un moteur par mots-cles, pas un modele de langage
++ * externe : fonctionne sans cle API ni service tiers, et suffit a orienter
++ * vers le bon article. Un vrai assistant conversationnel pourra la
++ * remplacer plus tard sans changer l'ecran cote utilisateur (meme reponse
++ * Inertia) - voir la feuille de route, point 17.
++ *
+  * Accessible a tout utilisateur connecte, quel que soit son role : ce
+  * n'est pas une donnee de ministere, juste la documentation du logiciel.
+  * Ne depend donc d'aucun OrgUnit ni d'aucune policy.
+  */
+ class HelpController extends Controller
+ {
+-    public function index(): Response
++    private const MIN_WORD_LENGTH = 3;
++
++    private const MAX_RESULTS = 3;
++
++    public function index(Request $request): Response
+     {
++        $query = trim((string) $request->query('q', ''));
+         $articles = HelpArticle::orderBy('order')->get(['slug', 'module', 'title', 'body']);
+ 
+         return Inertia::render('Aide/Index', [
+             'modules' => $articles->groupBy('module')->map->values(),
++            'query' => $query,
++            'results' => $query !== '' ? $this->search($articles, $query) : [],
+         ]);
+     }
+ 
+@@ -41,4 +63,34 @@ class HelpController extends Controller
+             'modules' => $summary->groupBy('module')->map->values(),
+         ]);
+     }
++
++    private function search($articles, string $query): array
++    {
++        $words = collect(preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($query), -1, PREG_SPLIT_NO_EMPTY))
++            ->unique()
++            ->filter(fn ($word) => mb_strlen($word) >= self::MIN_WORD_LENGTH);
++
++        if ($words->isEmpty()) {
++            return [];
++        }
++
++        return $articles
++            ->map(function (HelpArticle $article) use ($words) {
++                $haystack = mb_strtolower($article->title.' '.$article->body);
++                $score = $words->sum(fn ($word) => substr_count($haystack, $word));
++
++                return ['article' => $article, 'score' => $score];
++            })
++            ->filter(fn ($scored) => $scored['score'] > 0)
++            ->sortByDesc('score')
++            ->take(self::MAX_RESULTS)
++            ->map(fn ($scored) => [
++                'slug' => $scored['article']->slug,
++                'module' => $scored['article']->module,
++                'title' => $scored['article']->title,
++                'excerpt' => Str::limit(strip_tags($scored['article']->body), 220),
++            ])
++            ->values()
++            ->all();
++    }
+ }
+diff --git a/app/Http/Controllers/HomeController.php b/app/Http/Controllers/HomeController.php
+new file mode 100644
+index 0000000..bfe2211
+--- /dev/null
++++ b/app/Http/Controllers/HomeController.php
+@@ -0,0 +1,28 @@
++<?php
++
++namespace App\Http\Controllers;
++
++use Illuminate\Http\Request;
++use Illuminate\Http\RedirectResponse;
++
++/**
++ * Point d'entree "/" (point 09) : jusqu'ici aucune route ne repondait a
++ * cette adresse, alors que le logo Ekklesia de l'en-tete (AppLayout.vue)
++ * y renvoie des qu'aucun orgUnit n'est en contexte (ecrans Aide, ex-
++ * Assistant) - un clic dessus depuis ces pages tombait sur une 404. Cette
++ * route renvoie simplement vers le tableau de bord le plus pertinent,
++ * comme le fait deja LoginController@store juste apres la connexion.
++ */
++class HomeController extends Controller
++{
++    public function index(Request $request): RedirectResponse
++    {
++        $firstAffectation = $request->user()->activeAffectations()->first();
++
++        if (! $firstAffectation) {
++            return redirect()->route('login');
++        }
++
++        return redirect()->route('dashboard', ['orgUnit' => $firstAffectation->org_unit_id]);
++    }
++}
+diff --git a/app/Http/Controllers/InvitationController.php b/app/Http/Controllers/InvitationController.php
+index d8c9636..4b0b1c1 100644
+--- a/app/Http/Controllers/InvitationController.php
++++ b/app/Http/Controllers/InvitationController.php
+@@ -86,6 +86,14 @@ class InvitationController extends Controller
+         }
+ 
+         auth()->login($affectation->user);
++        $request->session()->regenerate();
++
++        // Complement du point 04, meme raison que LoginController@store :
++        // sans ceci, la policy RLS par ministere de la requete suivante (le
++        // tableau de bord vers lequel on redirige juste en dessous) ne
++        // laisse rien passer et produit une fausse erreur 404, meme si
++        // l'affectation vient d'etre creee avec succes juste au-dessus.
++        $request->session()->put('current_ministry_id', $affectation->ministry_id);
+ 
+         return redirect()->route('dashboard', ['orgUnit' => $affectation->org_unit_id]);
+     }
+diff --git a/app/Services/AttachmentCodeService.php b/app/Services/AttachmentCodeService.php
+index bb8beed..cf4b47e 100644
+--- a/app/Services/AttachmentCodeService.php
++++ b/app/Services/AttachmentCodeService.php
+@@ -2,8 +2,10 @@
+ 
+ namespace App\Services;
+ 
++use App\Models\Affectation;
+ use App\Models\AttachmentCode;
+ use App\Models\OrgUnit;
++use App\Models\Role;
+ use App\Models\User;
+ use Illuminate\Support\Facades\DB;
+ use Illuminate\Support\Facades\Hash;
+@@ -51,13 +53,41 @@ class AttachmentCodeService
+         return [$attachmentCode, $plainCode];
+     }
+ 
++    /**
++     * Retrouve un code de rattachement pendant/valide a partir de sa valeur
++     * en clair, sans le consommer - utilise pour afficher a l'avance a
++     * quel niveau la personne qui saisit le code va creer une entite,
++     * avant qu'elle ne remplisse le reste du formulaire (point 03).
++     */
++    public function peek(string $plainCode): ?AttachmentCode
++    {
++        return AttachmentCode::where('status', 'pending')
++            ->where('expires_at', '>', now())
++            ->get()
++            ->first(fn (AttachmentCode $candidate) => Hash::check($plainCode, $candidate->code_hash));
++    }
++
+     /**
+      * Consomme un code pour creer le nouveau noeud. parent_id, path et
+      * ministry_id sont TOUJOURS herites du noeud emetteur - jamais saisis
+      * par la personne qui remplit le formulaire (point 03).
++     *
++     * $usedBy est la personne qui redeem le code si elle a deja un compte
++     * Ekklesia (ex. un responsable regional qui rattache lui-meme une
++     * nouvelle entite a sa propre branche). Si elle n'en a pas encore -
++     * cas normal d'une eglise reellement nouvelle - $usedBy est null et
++     * $newAccount doit porter les champs necessaires a la creation d'un
++     * compte (name/email/phone/password, deja hache) : ce compte devient
++     * le titulaire (role Pasteur) de la nouvelle entite.
++     *
++     * @return array{0: OrgUnit, 1: User}
+      */
+-    public function consume(string $plainCode, array $newUnitAttributes, User $usedBy): OrgUnit
++    public function consume(string $plainCode, array $newUnitAttributes, ?User $usedBy, ?array $newAccount = null): array
+     {
++        if (! $usedBy && ! $newAccount) {
++            throw new RuntimeException('Un compte existant ou les informations pour en créer un sont nécessaires.');
++        }
++
+         $candidates = AttachmentCode::where('status', 'pending')
+             ->where('expires_at', '>', now())
+             ->get();
+@@ -70,19 +100,43 @@ class AttachmentCodeService
+             throw new RuntimeException('Code de rattachement invalide, déjà utilisé ou expiré.');
+         }
+ 
+-        return DB::transaction(function () use ($attachmentCode, $newUnitAttributes, $usedBy) {
++        return DB::transaction(function () use ($attachmentCode, $newUnitAttributes, $usedBy, $newAccount) {
+             $issuingUnit = $attachmentCode->issuingOrgUnit;
+ 
++            // Ce transaction s'execute forcement hors du middleware
++            // tenant.context (point 04) : que la personne qui redeem ait
++            // deja une session ou non, cette requete precede toute
++            // connexion pour une eglise reellement nouvelle. Sans ce
++            // SET LOCAL, les policies RLS "fail closed" des tables
++            // multi-tenant (org_units, org_unit_history, affectations)
++            // rejetteraient silencieusement chaque ecriture ci-dessous -
++            // meme technique que DemoMinistrySeedCommand pour la meme
++            // raison (une commande artisan ne passe pas non plus par le
++            // middleware web).
++            DB::statement("SET LOCAL app.current_ministry_id = '{$issuingUnit->ministry_id}'");
++
++            if (! $usedBy) {
++                $usedBy = User::firstWhere('email', $newAccount['email']) ?? User::create([
++                    'name' => $newAccount['name'],
++                    'email' => $newAccount['email'],
++                    'phone' => $newAccount['phone'] ?? null,
++                    'password' => $newAccount['password'],
++                    'status' => 'active',
++                ]);
++            }
++
++            $code = $this->uniqueChildCode($issuingUnit, $newUnitAttributes['code']);
++
+             $newUnit = OrgUnit::create([
+                 'ministry_id' => $issuingUnit->ministry_id, // herite, jamais choisi
+                 'parent_id' => $issuingUnit->id,             // herite, jamais choisi
+                 'level_rank' => $attachmentCode->target_level_rank,
+                 'level_label' => $newUnitAttributes['level_label'],
+                 'name' => $newUnitAttributes['name'],
+-                'code' => $newUnitAttributes['code'],
++                'code' => $code,
+                 'metadata' => $newUnitAttributes['metadata'] ?? [],
+                 'status' => 'active',
+-                'path' => $issuingUnit->path.'.'.$newUnitAttributes['code'],
++                'path' => $issuingUnit->path.'.'.$code,
+             ]);
+ 
+             $newUnit->history()->create([
+@@ -100,6 +154,23 @@ class AttachmentCodeService
+                 'reason' => 'Création via code de rattachement.',
+             ]);
+ 
++            // Sans cette affectation, la personne qui vient de rattacher
++            // sa nouvelle entite n'a aucun droit dessus (OrgUnitPolicy::view
++            // exige une affectation active sur le noeud ou un ancetre) et
++            // se heurte a un refus d'acces immediatement apres avoir
++            // "reussi" a la creer - le code Pasteur en fait le titulaire,
++            // habilite (can_manage_users) a inviter d'autres personnes et
++            // a emettre a son tour des codes pour ses propres rattachements.
++            Affectation::create([
++                'ministry_id' => $newUnit->ministry_id,
++                'user_id' => $usedBy->id,
++                'org_unit_id' => $newUnit->id,
++                'role_id' => Role::where('code', Role::PASTEUR)->firstOrFail()->id,
++                'status' => 'active',
++                'started_at' => now()->toDateString(),
++                'assigned_by' => $attachmentCode->issued_by,
++            ]);
++
+             $attachmentCode->update([
+                 'status' => 'utilise',
+                 'used_by' => $usedBy->id,
+@@ -107,7 +178,29 @@ class AttachmentCodeService
+                 'created_org_unit_id' => $newUnit->id,
+             ]);
+ 
+-            return $newUnit;
++            return [$newUnit, $usedBy];
+         });
+     }
++
++    /**
++     * Le code (slug court) n'est unique que dans le perimetre du parent
++     * (contrainte ['parent_id', 'code'], voir migration org_units). Une
++     * personne qui remplit ce formulaire ne connait pas forcement les
++     * codes deja pris sous ce parent : on ajoute un suffixe numerique
++     * plutot que de faire echouer la creation sur une contrainte SQL avec
++     * un message illisible.
++     */
++    private function uniqueChildCode(OrgUnit $parent, string $desiredCode): string
++    {
++        $base = Str::slug($desiredCode) ?: 'entite';
++        $code = $base;
++        $suffix = 1;
++
++        while (OrgUnit::where('parent_id', $parent->id)->where('code', $code)->exists()) {
++            $suffix++;
++            $code = "{$base}-{$suffix}";
++        }
++
++        return $code;
++    }
+ }
+diff --git a/app/Services/InvitationService.php b/app/Services/InvitationService.php
+index 86f2d95..6ac82a5 100644
+--- a/app/Services/InvitationService.php
++++ b/app/Services/InvitationService.php
+@@ -93,6 +93,15 @@ class InvitationService
+         }
+ 
+         return DB::transaction(function () use ($invitation, $userAttributes) {
++            // Cette requete precede forcement toute connexion (point 11) :
++            // elle est hors du middleware tenant.context de routes/web.php,
++            // donc app.current_ministry_id n'a jamais ete fixe pour elle.
++            // Sans ce SET LOCAL, les policies RLS "fail closed" (point 04)
++            // sur affectations/invitations rejetteraient silencieusement
++            // les ecritures ci-dessous - meme mecanisme et meme raison que
++            // AttachmentCodeService::consume().
++            DB::statement("SET LOCAL app.current_ministry_id = '{$invitation->ministry_id}'");
++
+             $user = User::where('email', $userAttributes['email'])->first();
+ 
+             if (! $user) {
+diff --git a/resources/js/Layouts/AppLayout.vue b/resources/js/Layouts/AppLayout.vue
+index 5cfd151..c5e8c77 100644
+--- a/resources/js/Layouts/AppLayout.vue
++++ b/resources/js/Layouts/AppLayout.vue
+@@ -1,5 +1,10 @@
+ <script setup>
+-import { Link } from '@inertiajs/vue3'
++import { Link, usePage } from '@inertiajs/vue3'
++import { computed } from 'vue'
++
++const page = usePage()
++const flashSuccess = computed(() => page.props.flash?.success)
++const flashError = computed(() => page.props.flash?.error)
+ 
+ /**
+  * Coquille partagee v3 "Vitrail" (2026-09-08).
+@@ -67,6 +72,20 @@ defineProps({
+             </div>
+         </header>
+ 
++        <!--
++            Bandeau de message ephemere (succes/erreur) - jusqu'ici affiche
++            seulement sur l'ecran de transformation (Transform.vue), donc
++            invisible partout ailleurs, y compris juste apres un
++            rattachement reussi. Centralise ici (audit du 2026-09-09) pour
++            que toute redirection avec message le montre, sans dupliquer ce
++            bandeau dans chaque page. N'apparait que si un message est
++            present : ne change rien a l'ecran quand il n'y en a pas.
++        -->
++        <div v-if="flashSuccess || flashError" class="relative z-10 max-w-6xl mx-auto px-6 pt-4">
++            <p v-if="flashSuccess" class="text-sm text-forest bg-forest/10 border border-forest/30 rounded-xl px-4 py-2.5">{{ flashSuccess }}</p>
++            <p v-if="flashError" class="text-sm text-rose-400 bg-rose-400/10 border border-rose-400/30 rounded-xl px-4 py-2.5">{{ flashError }}</p>
++        </div>
++
+         <main class="relative z-10 max-w-6xl mx-auto px-6 py-10 md:py-14">
+             <slot />
+         </main>
+diff --git a/resources/js/Pages/Aide/Index.vue b/resources/js/Pages/Aide/Index.vue
+index 5459375..2e597a6 100644
+--- a/resources/js/Pages/Aide/Index.vue
++++ b/resources/js/Pages/Aide/Index.vue
+@@ -1,16 +1,30 @@
+ <script setup>
++import { useForm } from '@inertiajs/vue3'
+ import AppLayout from '@/Layouts/AppLayout.vue'
+ 
+ /**
+  * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
+- * partagee AppLayout, sans aucun changement fonctionnel. Le texte reçoit
+- * des surcharges print:* pour rester lisible (noir sur blanc) une fois
+- * imprimé, malgré l'habillage sombre a l'ecran.
++ * partagee AppLayout, avec un seul changement fonctionnel - la barre de
++ * recherche ci-dessous. Elle remplace l'ancien ecran separe "Assistant"
++ * (anciennement /assistant), qui n'etait qu'une deuxieme facon de
++ * chercher dans ce meme manuel : deux entrees de menu pour un seul
++ * contenu (voir l'audit du 2026-09-09, point 1). Desormais "Aide" est le
++ * seul acces, recherche comprise - voir HelpController. Le texte reçoit
++ * par ailleurs des surcharges print:* pour rester lisible (noir sur
++ * blanc) une fois imprimé, malgré l'habillage sombre a l'ecran.
+  */
+-defineProps({
++const props = defineProps({
+     modules: Object,
++    query: { type: String, default: '' },
++    results: { type: Array, default: () => [] },
+ })
+ 
++const form = useForm({ q: props.query })
++
++function search() {
++    form.get('/aide', { preserveState: true, preserveScroll: true, only: ['query', 'results'] })
++}
++
+ function goBack() {
+     window.history.back()
+ }
+@@ -51,6 +65,37 @@ function moduleSlug(name) {
+                 depuis le lien "Aide" de chaque écran concerné.
+             </p>
+ 
++            <form @submit.prevent="search" class="mb-8 print:hidden flex gap-2">
++                <input
++                    v-model="form.q"
++                    type="search"
++                    placeholder="Chercher un mot-clé dans le manuel (ex. « rattachement », « finances »)"
++                    class="flex-1 bg-white/5 border border-white/15 text-white placeholder-white/35 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"
++                />
++                <button type="submit" :disabled="form.processing"
++                    class="shrink-0 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-60">
++                    Chercher
++                </button>
++            </form>
++
++            <section v-if="query" class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.5s_ease-out_both]">
++                <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-3">
++                    Résultats pour « {{ query }} »
++                </h2>
++                <p v-if="!results.length" class="text-sm text-white/55">
++                    Aucun article ne correspond. Le sommaire complet reste ci-dessous.
++                </p>
++                <ul v-else class="space-y-4">
++                    <li v-for="r in results" :key="r.slug">
++                        <a :href="`/aide/${r.slug}`" class="block group">
++                            <p class="text-xs uppercase tracking-widest text-gold-soft/70 mb-0.5">{{ r.module }}</p>
++                            <p class="text-sm font-semibold text-white group-hover:text-gold-soft">{{ r.title }}</p>
++                            <p class="text-xs text-white/50 mt-0.5">{{ r.excerpt }}</p>
++                        </a>
++                    </li>
++                </ul>
++            </section>
++
+             <nav class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.55s_ease-out_both]">
+                 <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-3">Sommaire</h2>
+                 <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-1">
+diff --git a/resources/js/Pages/Assistant/Index.vue b/resources/js/Pages/Assistant/Index.vue
+deleted file mode 100644
+index 4b26aef..0000000
+--- a/resources/js/Pages/Assistant/Index.vue
++++ /dev/null
+@@ -1,108 +0,0 @@
+-<script setup>
+-import { Link, router } from '@inertiajs/vue3'
+-import { ref } from 'vue'
+-import AppLayout from '@/Layouts/AppLayout.vue'
+-
+-/**
+- * Assistant (point 17) : recherche par mots-clés dans les articles d'aide
+- * (voir AssistantController::search) -- pas de LLM branche, une reponse
+- * franche a ce sujet reste dans /aide si l'utilisateur cherche plus loin.
+- * Route independante d'un org_unit, d'ou AppLayout sans org-unit ici.
+- */
+-const props = defineProps({
+-  query: String,
+-  results: Array,
+-})
+-
+-const question = ref('')
+-const history = ref([])
+-
+-if (props.query) {
+-  history.value.push({ question: props.query, results: props.results })
+-}
+-
+-function ask() {
+-  const q = question.value.trim()
+-  if (!q) return
+-
+-  router.get('/assistant', { q }, {
+-    preserveState: true,
+-    preserveScroll: true,
+-    only: ['query', 'results'],
+-    onSuccess: (page) => {
+-      history.value.push({ question: q, results: page.props.results })
+-      question.value = ''
+-    },
+-  })
+-}
+-
+-const suggestions = [
+-  'Comment inviter un titulaire ?',
+-  'Comment créer un code de rattachement ?',
+-  'Comment enregistrer une dîme ?',
+-]
+-
+-function askSuggestion(text) {
+-  question.value = text
+-  ask()
+-}
+-</script>
+-
+-<template>
+-  <AppLayout back-href="/aide" back-label="Manuel complet">
+-    <template #title>
+-      <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+-        <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+-          <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+-          Documentation
+-        </p>
+-        <h1 class="font-serif text-3xl text-white mt-2">Assistant</h1>
+-        <p class="text-sm text-white/55 mt-2 max-w-xl">
+-          Recherche dans le manuel d'utilisation à partir de vos mots-clés : aucune connexion externe, tout reste dans l'application.
+-        </p>
+-      </div>
+-    </template>
+-
+-    <div class="max-w-2xl mx-auto">
+-      <form @submit.prevent="ask" class="flex items-center gap-2 mb-8 animate-[fadeInUp_0.55s_ease-out_both]">
+-        <input v-model="question" type="text" placeholder="Ex. : comment inviter un titulaire ?"
+-          class="flex-1 bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+-        <button type="submit"
+-          class="shrink-0 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20">
+-          Demander
+-        </button>
+-      </form>
+-
+-      <div v-if="!history.length" class="mb-8">
+-        <p class="text-xs uppercase tracking-widest text-white/40 font-semibold mb-3">Exemples</p>
+-        <div class="flex flex-wrap gap-2">
+-          <button v-for="s in suggestions" :key="s" type="button" @click="askSuggestion(s)"
+-            class="text-sm glass-panel-light rounded-full px-4 py-2 hover:border-gold/40 hover:text-gold-soft transition">
+-            {{ s }}
+-          </button>
+-        </div>
+-      </div>
+-
+-      <div class="space-y-8">
+-        <div v-for="(exchange, i) in history" :key="i">
+-          <p class="text-sm text-white/85 glass-panel-light rounded-2xl px-4 py-2.5 inline-block mb-3">
+-            {{ exchange.question }}
+-          </p>
+-
+-          <div v-if="exchange.results.length" class="space-y-3">
+-            <a v-for="r in exchange.results" :key="r.slug" :href="`/aide/${r.slug}`"
+-              class="block glass-panel rounded-2xl p-5 hover:border-gold/30 hover:shadow-glow-gold transition-all duration-300">
+-              <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">{{ r.module }}</p>
+-              <p class="font-semibold text-white text-[15px] mb-1">{{ r.title }}</p>
+-              <p class="text-sm text-white/50">{{ r.excerpt }}</p>
+-            </a>
+-          </div>
+-          <p v-else class="text-sm text-white/45">
+-            Aucun article ne correspond à cette question. Essayez d'autres mots-clés, ou consultez le
+-            <Link href="/aide" class="text-gold-soft hover:underline">manuel complet</Link>.
+-          </p>
+-        </div>
+-      </div>
+-    </div>
+-  </AppLayout>
+-</template>
+diff --git a/resources/js/Pages/Dashboard/Index.vue b/resources/js/Pages/Dashboard/Index.vue
+index 1afada0..59fb329 100644
+--- a/resources/js/Pages/Dashboard/Index.vue
++++ b/resources/js/Pages/Dashboard/Index.vue
+@@ -1,15 +1,13 @@
+ <script setup>
+-import { Link } from '@inertiajs/vue3'
+ import AppLayout from '@/Layouts/AppLayout.vue'
+ 
+ /**
+- * v3 "Vitrail" (2026-09-08) : meme structure, memes props, memes regles
+- * d'affichage que la version precedente (rien de fonctionnel ne change) --
+- * seule l'habillage passe du parchemin clair a la coquille sombre en verre
+- * depoli d'AppLayout. Deux modules ajoutes ici pour le point 17 de la
+- * feuille de route : "Canal de signalement" et "Assistant" (recherche
+- * dans le manuel), tous deux ouverts a quiconque voit ce noeud (pas de
+- * requiresRoot), comme decrit dans le point.
++ * v3 "Vitrail" (2026-09-08). Module "Canal de signalement" ajoute pour le
++ * point 17 de la feuille de route, ouvert a quiconque voit ce noeud (pas
++ * de requiresRoot), comme decrit dans le point. L'"Assistant" qui
++ * accompagnait ce module a ete retire le 2026-09-09 : ce n'etait qu'une
++ * deuxieme tuile vers le manuel deja accessible par "Aide" dans l'en-tete
++ * (voir HelpController) - doublon corrige par l'audit du 2026-09-09.
+  */
+ defineProps({
+     orgUnit: Object,
+@@ -37,7 +35,7 @@ const modules = [
+         icon2: 'M12 13m-3.2 0a3.2 3.2 0 106.4 0a3.2 3.2 0 10-6.4 0',
+     },
+     {
+-        key: 'documents', label: 'Documents', desc: 'Affiche, calendrier, trombinoscope',
++        key: 'documents', label: 'Documents', desc: 'Affiche et calendrier annuel imprimables',
+         path: 'documents', badge: 'from-sanctuary to-sanctuary-dark', glow: 'hover:shadow-glow-sanctuary',
+         icon: 'M4 4h16v16H4V4zM4 9h16M9 4v16',
+     },
+@@ -146,27 +144,15 @@ const modules = [
+                             </svg>
+                         </a>
+                     </template>
+-
+-                    <Link href="/assistant"
+-                        class="group relative glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-slateblue hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+-                        style="animation-delay: 600ms;">
+-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-slateblue to-slateblue/70 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 00-3.5 10.9V16a1 1 0 001 1h5a1 1 0 001-1v-2.1A6 6 0 0012 3z" /></svg>
+-                        </span>
+-                        <p class="font-semibold text-white text-[15px]">Assistant</p>
+-                        <p class="text-xs text-white/55 mt-1">Recherche rapide dans le manuel</p>
+-                    </Link>
+-
+-                    <Link href="/aide"
+-                        class="group relative glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+-                        style="animation-delay: 660ms;">
+-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-coffee to-coffee-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a2.5 2.5 0 115 0c0 1.5-2.5 1.8-2.5 3.5M12 17h.01M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H8l-4 3V6a1 1 0 011-1z" /></svg>
+-                        </span>
+-                        <p class="font-semibold text-white text-[15px]">Manuel d'utilisation</p>
+-                        <p class="text-xs text-white/55 mt-1">Aide écran par écran</p>
+-                    </Link>
+                 </div>
++                <!--
++                    Pas de tuile "Aide"/"Assistant" ici : le lien "Aide" de
++                    l'en-tete (AppLayout.vue, present sur cet ecran comme sur
++                    tous les autres) est desormais le seul acces au manuel,
++                    recherche comprise - voir HelpController. Les deux
++                    tuiles qui y menaient en double ont ete retirees le
++                    2026-09-09 (point 1 de l'audit du 2026-09-09).
++                -->
+             </section>
+ 
+             <section v-if="canManageAccess">
+diff --git a/resources/js/Pages/OrgUnits/IssueAttachmentCode.vue b/resources/js/Pages/OrgUnits/IssueAttachmentCode.vue
+index bc810ec..7617c18 100644
+--- a/resources/js/Pages/OrgUnits/IssueAttachmentCode.vue
++++ b/resources/js/Pages/OrgUnits/IssueAttachmentCode.vue
+@@ -13,6 +13,7 @@ const props = defineProps({
+ 
+ const page = usePage()
+ const plainCode = computed(() => page.props.flash?.plain_code)
++const redeemUrl = `${window.location.origin}/rattachement`
+ 
+ const LEVEL_NAMES = ['Ministère', 'Continent', 'Pays', 'Région', 'District', 'Église locale', 'Cellule']
+ 
+@@ -51,6 +52,9 @@ function submit() {
+                 <p class="mb-2 text-sm font-medium text-forest">Code généré. Transmettez-le à la personne qui va créer la nouvelle entité :</p>
+                 <p class="rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 text-center text-2xl font-mono tracking-widest text-white">{{ plainCode }}</p>
+                 <p class="mt-2 text-xs text-white/40">Ce code ne peut être utilisé qu'une seule fois et expire après la durée choisie.</p>
++                <p class="mt-2 text-xs text-white/40">
++                    La page où le saisir : <a href="/rattachement" target="_blank" class="text-gold-soft hover:underline">{{ redeemUrl }}</a>
++                </p>
+             </div>
+ 
+             <form @submit.prevent="submit" class="space-y-4 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
+diff --git a/resources/js/Pages/OrgUnits/RedeemAttachmentCode.vue b/resources/js/Pages/OrgUnits/RedeemAttachmentCode.vue
+new file mode 100644
+index 0000000..4c2518c
+--- /dev/null
++++ b/resources/js/Pages/OrgUnits/RedeemAttachmentCode.vue
+@@ -0,0 +1,115 @@
++<script setup>
++import { useForm } from '@inertiajs/vue3'
++
++/**
++ * Page manquante jusqu'ici (audit du 2026-09-09, point 3) : le code de
++ * rattachement (voir IssueAttachmentCode.vue) n'avait nulle part où être
++ * saisi - seule la route POST existait, sans écran. Accessible sans
++ * compte (le code lui-même est la preuve de mandat, point 03) : une
++ * personne responsable d'une église réellement nouvelle n'a encore aucun
++ * compte Ekklesia, donc le formulaire crée les deux à la fois - la
++ * nouvelle entité ET son compte - dans le même geste, comme pour une
++ * invitation (point 11). Même habillage autonome que Auth/Login.vue et
++ * Invitations/Accept.vue : cette page doit s'afficher correctement pour
++ * quelqu'un qui n'a pas encore de session.
++ */
++const props = defineProps({
++    authenticated: Boolean,
++    prefillCode: { type: String, default: null },
++})
++
++const form = useForm({
++    code: props.prefillCode ?? '',
++    name: '',
++    level_label: '',
++    code_short: '',
++    account_name: '',
++    account_email: '',
++    account_phone: '',
++    account_password: '',
++    account_password_confirmation: '',
++})
++
++function submit() {
++    form.post('/rattachement')
++}
++</script>
++
++<template>
++    <div class="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-night">
++        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/26 rounded-full blur-[100px]" style="animation: driftGlow 14s ease-in-out infinite;" aria-hidden="true"></div>
++        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/18 rounded-full blur-[100px]" style="animation: driftGlow 18s ease-in-out infinite reverse;" aria-hidden="true"></div>
++        <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
++
++        <form @submit.prevent="submit"
++            class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
++            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
++            <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">Rattachement</p>
++            <h1 class="font-serif text-2xl text-white mb-1">Saisir un code de rattachement</h1>
++            <p class="text-sm text-white/60 mb-7">
++                Le code vous a été transmis par le responsable qui l'a émis. Il crée une seule nouvelle entité,
++                rattachée automatiquement sous la sienne.
++            </p>
++
++            <p v-if="form.errors.code" class="text-sm text-rose-400 mb-4 rounded-xl bg-rose-400/10 border border-rose-400/30 px-3.5 py-2.5">
++                {{ form.errors.code }}
++            </p>
++
++            <label class="block text-sm font-medium text-white/80 mb-1">Code de rattachement</label>
++            <input v-model="form.code" required placeholder="XXXX-XXXX"
++                class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-4 tracking-widest uppercase transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++
++            <div class="border-t border-white/10 pt-4 mb-4">
++                <p class="text-xs uppercase tracking-widest text-white/40 font-semibold mb-3">La nouvelle entité</p>
++
++                <label class="block text-sm font-medium text-white/80 mb-1">Nom (ex. « Église APC Cotonou »)</label>
++                <input v-model="form.name" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                <p v-if="form.errors.name" class="text-sm text-rose-400 mb-3 -mt-2">{{ form.errors.name }}</p>
++
++                <label class="block text-sm font-medium text-white/80 mb-1">Niveau (ex. « Église locale », « District »)</label>
++                <input v-model="form.level_label" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                <p v-if="form.errors.level_label" class="text-sm text-rose-400 mb-3 -mt-2">{{ form.errors.level_label }}</p>
++
++                <label class="block text-sm font-medium text-white/80 mb-1">Code court (optionnel)</label>
++                <input v-model="form.code_short" placeholder="Généré automatiquement à partir du nom si laissé vide"
++                    class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++            </div>
++
++            <template v-if="!authenticated">
++                <div class="border-t border-white/10 pt-4 mb-2">
++                    <p class="text-xs uppercase tracking-widest text-white/40 font-semibold mb-1">Votre compte</p>
++                    <p class="text-xs text-white/45 mb-3">
++                        Vous devenez le titulaire (Pasteur) de cette nouvelle entité. Ce compte est personnel : il
++                        vous appartient, même si votre poste change plus tard.
++                    </p>
++
++                    <label class="block text-sm font-medium text-white/80 mb-1">Nom complet</label>
++                    <input v-model="form.account_name" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                    <p v-if="form.errors.account_name" class="text-sm text-rose-400 mb-3 -mt-2">{{ form.errors.account_name }}</p>
++
++                    <label class="block text-sm font-medium text-white/80 mb-1">Adresse e-mail</label>
++                    <input v-model="form.account_email" type="email" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                    <p v-if="form.errors.account_email" class="text-sm text-rose-400 mb-3 -mt-2">{{ form.errors.account_email }}</p>
++
++                    <label class="block text-sm font-medium text-white/80 mb-1">Téléphone (optionnel)</label>
++                    <input v-model="form.account_phone" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++
++                    <label class="block text-sm font-medium text-white/80 mb-1">Mot de passe</label>
++                    <input v-model="form.account_password" type="password" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-3 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                    <p v-if="form.errors.account_password" class="text-sm text-rose-400 mb-3 -mt-2">{{ form.errors.account_password }}</p>
++
++                    <label class="block text-sm font-medium text-white/80 mb-1">Confirmer le mot de passe</label>
++                    <input v-model="form.account_password_confirmation" type="password" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
++                </div>
++            </template>
++            <p v-else class="text-xs text-white/45 mb-2 border-t border-white/10 pt-4">
++                Vous êtes déjà connecté : la nouvelle entité sera rattachée à votre compte.
++            </p>
++
++            <button type="submit" :disabled="form.processing"
++                class="w-full mt-4 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
++                Rattacher cette entité
++            </button>
++        </form>
++    </div>
++</template>
+diff --git a/resources/js/Pages/OrgUnits/Transform.vue b/resources/js/Pages/OrgUnits/Transform.vue
+index 650a921..f7b4e29 100644
+--- a/resources/js/Pages/OrgUnits/Transform.vue
++++ b/resources/js/Pages/OrgUnits/Transform.vue
+@@ -1,6 +1,5 @@
+ <script setup>
+-import { useForm, usePage } from '@inertiajs/vue3'
+-import { computed } from 'vue'
++import { useForm } from '@inertiajs/vue3'
+ import AppLayout from '@/Layouts/AppLayout.vue'
+ 
+ /**
+@@ -13,10 +12,6 @@ const props = defineProps({
+     history: Array,
+ })
+ 
+-const page = usePage()
+-const success = computed(() => page.props.flash?.success)
+-const error = computed(() => page.props.flash?.error)
+-
+ const TRANSFORMATION_LABELS = {
+     creation: 'Création',
+     promotion: 'Changement de niveau',
+@@ -54,12 +49,7 @@ function submit() {
+         </template>
+ 
+         <div class="max-w-2xl mx-auto space-y-8">
+-            <div v-if="success" class="glass-panel rounded-2xl p-5 border-forest/40 animate-[fadeInUp_0.5s_ease-out_both]">
+-                <p class="text-sm font-medium text-forest">{{ success }}</p>
+-            </div>
+-            <div v-if="error" class="glass-panel rounded-2xl p-5 border-sanctuary/40 animate-[fadeInUp_0.5s_ease-out_both]">
+-                <p class="text-sm font-medium text-sanctuary-light">{{ error }}</p>
+-            </div>
++            <!-- Succes/erreur : bandeau desormais commun a tout AppLayout (voir AppLayout.vue), plus besoin de le dupliquer ici. -->
+ 
+             <form @submit.prevent="submit" class="space-y-4 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
+                 <div>
+diff --git a/routes/web.php b/routes/web.php
+index 7020d10..e753e3b 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -3,7 +3,6 @@
+ use App\Http\Controllers\Auth\LoginController;
+ use App\Http\Controllers\ActivityReportController;
+ use App\Http\Controllers\AffectationsController;
+-use App\Http\Controllers\AssistantController;
+ use App\Http\Controllers\OrgUnitTransformationController;
+ use App\Http\Controllers\AnnouncementsController;
+ use App\Http\Controllers\AssetsController;
+@@ -16,6 +15,7 @@ use App\Http\Controllers\DocumentGeneratorController;
+ use App\Http\Controllers\FinanceReportController;
+ use App\Http\Controllers\FinanceTransactionsController;
+ use App\Http\Controllers\HelpController;
++use App\Http\Controllers\HomeController;
+ use App\Http\Controllers\HonorificTitlesController;
+ use App\Http\Controllers\InvitationController;
+ use App\Http\Controllers\MembersController;
+@@ -33,9 +33,12 @@ use Illuminate\Support\Facades\Route;
+ Route::get('/invitations/{token}', [InvitationController::class, 'acceptShow'])->name('invitations.accept.show');
+ Route::post('/invitations/{token}', [InvitationController::class, 'acceptStore'])->name('invitations.accept.store');
+ 
+-// Rattachement d'un nouveau noeud : ouvert (le code lui-meme est la preuve
+-// de mandat, point 03), mais la creation du compte associe passe par une
+-// invitation separee (point 11).
++// Rattachement d'un nouveau noeud : ouvert a quiconque possede le code (le
++// code lui-meme est la preuve de mandat, point 03) - avec ou sans compte
++// Ekklesia existant. Le formulaire (page GET) cree le compte de la
++// personne dans le meme geste si elle n'en a pas encore, comme pour une
++// invitation (point 11) ; voir AttachmentCodeController::redeem.
++Route::get('/rattachement', [AttachmentCodeController::class, 'redeemShow'])->name('attachment-codes.redeem.show');
+ Route::post('/rattachement', [AttachmentCodeController::class, 'redeem'])->name('attachment-codes.redeem');
+ 
+ Route::get('/connexion', [LoginController::class, 'create'])->name('login');
+@@ -52,6 +55,11 @@ Route::post('/webhooks/fedapay', [SubscriptionFedapayController::class, 'webhook
+ Route::middleware(['auth', 'tenant.context'])->group(function () {
+     Route::post('/deconnexion', [LoginController::class, 'destroy'])->name('logout');
+ 
++    // Point 09 : le logo de l'en-tete (AppLayout.vue) y renvoie des qu'aucun
++    // orgUnit n'est en contexte (ecran Aide notamment) - jusqu'ici sans
++    // route associee, donc une 404 a chaque clic depuis ces ecrans.
++    Route::get('/', [HomeController::class, 'index'])->name('home');
++
+     Route::get('/org-units/{orgUnit}', [DashboardController::class, 'show'])->name('dashboard');
+ 
+     Route::get('/org-units/{orgUnit}/code-de-rattachement', [AttachmentCodeController::class, 'create'])
+@@ -68,11 +76,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
+     Route::get('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'create'])->name('org-units.transform.create');
+     Route::post('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'store'])->name('org-units.transform.store');
+ 
+-    // Manuel d'utilisation integre (point 09) : contenu global, non lie a
+-    // un OrgUnit precis, accessible depuis n'importe quel contexte connecte.
++    // Manuel d'utilisation integre (point 09), recherche comprise (point 17) :
++    // contenu global, non lie a un OrgUnit precis, accessible depuis
++    // n'importe quel contexte connecte. Anciennement deux ecrans separes
++    // ("Aide" et "Assistant") pour le meme contenu - fusionnes le
++    // 2026-09-09 (voir HelpController).
+     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
+     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
+-    Route::get('/assistant', [AssistantController::class, 'index'])->name('assistant.index');
+ 
+     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
+     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
