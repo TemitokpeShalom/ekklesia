@@ -1,15 +1,13 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
- * v3 "Vitrail" (2026-09-08) : meme structure, memes props, memes regles
- * d'affichage que la version precedente (rien de fonctionnel ne change) --
- * seule l'habillage passe du parchemin clair a la coquille sombre en verre
- * depoli d'AppLayout. Deux modules ajoutes ici pour le point 17 de la
- * feuille de route : "Canal de signalement" et "Assistant" (recherche
- * dans le manuel), tous deux ouverts a quiconque voit ce noeud (pas de
- * requiresRoot), comme decrit dans le point.
+ * v3 "Vitrail" (2026-09-08). Module "Canal de signalement" ajoute pour le
+ * point 17 de la feuille de route, ouvert a quiconque voit ce noeud (pas
+ * de requiresRoot), comme decrit dans le point. L'"Assistant" qui
+ * accompagnait ce module a ete retire le 2026-09-09 : ce n'etait qu'une
+ * deuxieme tuile vers le manuel deja accessible par "Aide" dans l'en-tete
+ * (voir HelpController) - doublon corrige par l'audit du 2026-09-09.
  */
 defineProps({
     orgUnit: Object,
@@ -37,7 +35,7 @@ const modules = [
         icon2: 'M12 13m-3.2 0a3.2 3.2 0 106.4 0a3.2 3.2 0 10-6.4 0',
     },
     {
-        key: 'documents', label: 'Documents', desc: 'Affiche, calendrier, trombinoscope',
+        key: 'documents', label: 'Documents', desc: 'Affiche et calendrier annuel imprimables',
         path: 'documents', badge: 'from-sanctuary to-sanctuary-dark', glow: 'hover:shadow-glow-sanctuary',
         icon: 'M4 4h16v16H4V4zM4 9h16M9 4v16',
     },
@@ -146,27 +144,15 @@ const modules = [
                             </svg>
                         </a>
                     </template>
-
-                    <Link href="/assistant"
-                        class="group relative glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-slateblue hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
-                        style="animation-delay: 600ms;">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-slateblue to-slateblue/70 text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3a6 6 0 00-3.5 10.9V16a1 1 0 001 1h5a1 1 0 001-1v-2.1A6 6 0 0012 3z" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Assistant</p>
-                        <p class="text-xs text-white/55 mt-1">Recherche rapide dans le manuel</p>
-                    </Link>
-
-                    <Link href="/aide"
-                        class="group relative glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
-                        style="animation-delay: 660ms;">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-coffee to-coffee-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 9a2.5 2.5 0 115 0c0 1.5-2.5 1.8-2.5 3.5M12 17h.01M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H8l-4 3V6a1 1 0 011-1z" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Manuel d'utilisation</p>
-                        <p class="text-xs text-white/55 mt-1">Aide écran par écran</p>
-                    </Link>
                 </div>
+                <!--
+                    Pas de tuile "Aide"/"Assistant" ici : le lien "Aide" de
+                    l'en-tete (AppLayout.vue, present sur cet ecran comme sur
+                    tous les autres) est desormais le seul acces au manuel,
+                    recherche comprise - voir HelpController. Les deux
+                    tuiles qui y menaient en double ont ete retirees le
+                    2026-09-09 (point 1 de l'audit du 2026-09-09).
+                -->
             </section>
 
             <section v-if="canManageAccess">
