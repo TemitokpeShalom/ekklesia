@@ -13,6 +13,7 @@ const props = defineProps({
 
 const page = usePage()
 const plainCode = computed(() => page.props.flash?.plain_code)
+const redeemUrl = `${window.location.origin}/rattachement`
 
 const LEVEL_NAMES = ['Ministère', 'Continent', 'Pays', 'Région', 'District', 'Église locale', 'Cellule']
 
@@ -51,6 +52,9 @@ function submit() {
                 <p class="mb-2 text-sm font-medium text-forest">Code généré. Transmettez-le à la personne qui va créer la nouvelle entité :</p>
                 <p class="rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 text-center text-2xl font-mono tracking-widest text-white">{{ plainCode }}</p>
                 <p class="mt-2 text-xs text-white/40">Ce code ne peut être utilisé qu'une seule fois et expire après la durée choisie.</p>
+                <p class="mt-2 text-xs text-white/40">
+                    La page où le saisir : <a href="/rattachement" target="_blank" class="text-gold-soft hover:underline">{{ redeemUrl }}</a>
+                </p>
             </div>
 
             <form @submit.prevent="submit" class="space-y-4 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
