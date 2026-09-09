@@ -3,7 +3,6 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ActivityReportController;
 use App\Http\Controllers\AffectationsController;
-use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\OrgUnitTransformationController;
 use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
@@ -16,6 +15,7 @@ use App\Http\Controllers\DocumentGeneratorController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
@@ -33,9 +33,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/invitations/{token}', [InvitationController::class, 'acceptShow'])->name('invitations.accept.show');
 Route::post('/invitations/{token}', [InvitationController::class, 'acceptStore'])->name('invitations.accept.store');
 
-// Rattachement d'un nouveau noeud : ouvert (le code lui-meme est la preuve
-// de mandat, point 03), mais la creation du compte associe passe par une
-// invitation separee (point 11).
+// Rattachement d'un nouveau noeud : ouvert a quiconque possede le code (le
+// code lui-meme est la preuve de mandat, point 03) - avec ou sans compte
+// Ekklesia existant. Le formulaire (page GET) cree le compte de la
+// personne dans le meme geste si elle n'en a pas encore, comme pour une
+// invitation (point 11) ; voir AttachmentCodeController::redeem.
+Route::get('/rattachement', [AttachmentCodeController::class, 'redeemShow'])->name('attachment-codes.redeem.show');
 Route::post('/rattachement', [AttachmentCodeController::class, 'redeem'])->name('attachment-codes.redeem');
 
 Route::get('/connexion', [LoginController::class, 'create'])->name('login');
@@ -51,6 +54,11 @@ Route::post('/webhooks/fedapay', [SubscriptionFedapayController::class, 'webhook
 
 Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::post('/deconnexion', [LoginController::class, 'destroy'])->name('logout');
+
+    // Point 09 : le logo de l'en-tete (AppLayout.vue) y renvoie des qu'aucun
+    // orgUnit n'est en contexte (ecran Aide notamment) - jusqu'ici sans
+    // route associee, donc une 404 a chaque clic depuis ces ecrans.
+    Route::get('/', [HomeController::class, 'index'])->name('home');
 
     Route::get('/org-units/{orgUnit}', [DashboardController::class, 'show'])->name('dashboard');
 
@@ -68,11 +76,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'create'])->name('org-units.transform.create');
     Route::post('/org-units/{orgUnit}/transformation', [OrgUnitTransformationController::class, 'store'])->name('org-units.transform.store');
 
-    // Manuel d'utilisation integre (point 09) : contenu global, non lie a
-    // un OrgUnit precis, accessible depuis n'importe quel contexte connecte.
+    // Manuel d'utilisation integre (point 09), recherche comprise (point 17) :
+    // contenu global, non lie a un OrgUnit precis, accessible depuis
+    // n'importe quel contexte connecte. Anciennement deux ecrans separes
+    // ("Aide" et "Assistant") pour le meme contenu - fusionnes le
+    // 2026-09-09 (voir HelpController).
     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
-    Route::get('/assistant', [AssistantController::class, 'index'])->name('assistant.index');
 
     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
