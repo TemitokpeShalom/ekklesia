@@ -1,6 +1,5 @@
 <script setup>
-import { useForm, usePage } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
@@ -12,10 +11,6 @@ const props = defineProps({
     candidateParents: Array,
     history: Array,
 })
-
-const page = usePage()
-const success = computed(() => page.props.flash?.success)
-const error = computed(() => page.props.flash?.error)
 
 const TRANSFORMATION_LABELS = {
     creation: 'Création',
@@ -54,12 +49,7 @@ function submit() {
         </template>
 
         <div class="max-w-2xl mx-auto space-y-8">
-            <div v-if="success" class="glass-panel rounded-2xl p-5 border-forest/40 animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-sm font-medium text-forest">{{ success }}</p>
-            </div>
-            <div v-if="error" class="glass-panel rounded-2xl p-5 border-sanctuary/40 animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-sm font-medium text-sanctuary-light">{{ error }}</p>
-            </div>
+            <!-- Succes/erreur : bandeau desormais commun a tout AppLayout (voir AppLayout.vue), plus besoin de le dupliquer ici. -->
 
             <form @submit.prevent="submit" class="space-y-4 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <div>
