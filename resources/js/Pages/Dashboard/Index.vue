@@ -183,6 +183,14 @@ const modules = [
                         <p class="font-semibold text-white text-[15px]">Code de rattachement</p>
                         <p class="text-xs text-white/55 mt-1">Créer une entité rattachée</p>
                     </a>
+                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/informations-ministere`"
+                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
+                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01M9 13.5h.01M15 13.5h.01" /></svg>
+                        </span>
+                        <p class="font-semibold text-white text-[15px]">Informations du ministère</p>
+                        <p class="text-xs text-white/55 mt-1">Sigle, siège, coordonnées, n° d'autorisation, logo</p>
+                    </a>
                     <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/titres-honorifiques`"
                         class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
                         <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
