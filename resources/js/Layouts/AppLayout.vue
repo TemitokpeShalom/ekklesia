@@ -71,9 +71,19 @@ defineProps({
                     -->
                     <Link href="/rattachement" class="hidden sm:inline-flex text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Rattachement</Link>
                     <Link href="/aide" class="hidden sm:inline-flex text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Aide</Link>
-                    <form method="post" action="/deconnexion">
-                        <button class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Se déconnecter</button>
-                    </form>
+                    <!--
+                        Corrige le 2026-09-09 : ce bouton envoyait un vrai
+                        formulaire HTML natif (method="post") sans le moindre
+                        jeton CSRF (ni champ _token, ni en-tete X-XSRF-TOKEN) -
+                        Laravel rejetait donc TOUJOURS cette requete avec une
+                        erreur 419 "Page Expired", empechant purement et
+                        simplement de se deconnecter. Le composant <Link>
+                        d'Inertia (deja utilise partout ailleurs dans ce
+                        fichier, et par Login.vue pour la connexion) passe par
+                        le meme client que le reste de l'app et gere le jeton
+                        CSRF automatiquement.
+                    -->
+                    <Link href="/deconnexion" method="post" as="button" class="text-sm text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-4 py-2 transition-colors">Se déconnecter</Link>
                 </nav>
             </div>
             <div v-if="$slots.title" class="max-w-6xl mx-auto px-6 pb-6 -mt-1">
