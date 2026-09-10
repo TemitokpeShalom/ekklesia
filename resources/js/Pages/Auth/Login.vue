@@ -2,12 +2,14 @@
 import { useForm } from '@inertiajs/vue3';
 
 /**
- * v3 "Vitrail" (2026-09-08) : premiere impression de la plateforme, donc
- * l'ecran le plus visible pour juger si l'identite reste "trop classique".
- * Fond nuit chaleureux (jamais un noir froid), rosace en filigrane,
- * carte en verre depoli plutot que carte blanche opaque -- la meme
- * structure de formulaire et les memes routes qu'avant (rien ne change
- * cote fonctionnel).
+ * v6 "Vitrine claire" (2026-09-10) : le ministere a fourni son propre logo
+ * (globe/croix/agneau/livre, bleu et or) et a demande un fond blanc partout,
+ * y compris sur les ecrans publics jusque-la restes sombres ("Vitrail",
+ * v3/v5) - avec une silhouette de croix en filigrane a la place de la
+ * rosace. Le composant `.app-shell` (deja utilise pour tout l'outil de
+ * travail depuis "Constellation") est reutilise ici tel quel : meme carte
+ * blanche (`glass-panel`), meme fond `bg-paper` - la meme structure de
+ * formulaire et les memes routes qu'avant (rien ne change cote fonctionnel).
  */
 const form = useForm({
     email: '',
@@ -23,55 +25,35 @@ function submit() {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-night">
-        <!-- Halos qui derivent tres lentement (eclaircis, plus verts le 2026-09-09) -->
-        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/26 rounded-full blur-[100px]" style="animation: driftGlow 14s ease-in-out infinite;" aria-hidden="true"></div>
-        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/18 rounded-full blur-[100px]" style="animation: driftGlow 18s ease-in-out infinite reverse;" aria-hidden="true"></div>
-        <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-forest/22 rounded-full blur-[100px]" aria-hidden="true"></div>
-        <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
+    <div class="app-shell min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-paper">
+        <!-- Halos tres doux, tons de la marque (2026-09-10, fond blanc) -->
+        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/8 rounded-full blur-[100px]" aria-hidden="true"></div>
+        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/10 rounded-full blur-[100px]" aria-hidden="true"></div>
 
-        <!-- Rosace : mullions rayonnants + arche, motif "vitrail" en filigrane -->
-        <svg class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[42rem] h-[42rem] opacity-[0.07] pointer-events-none hidden sm:block"
-            viewBox="0 0 200 200" fill="none" stroke="#f1e4c8" stroke-width="0.7" aria-hidden="true"
-            style="animation: shimmerPulse 9s ease-in-out infinite;">
-            <circle cx="100" cy="100" r="78" />
-            <circle cx="100" cy="100" r="60" />
-            <circle cx="100" cy="100" r="16" />
-            <g v-for="n in 16" :key="n" :transform="`rotate(${n * 22.5} 100 100)`">
-                <line x1="100" y1="22" x2="100" y2="100" />
-            </g>
-        </svg>
-
-        <!-- Arche gothique, deja utilisee en v2, reprise et amplifiee -->
-        <svg class="absolute right-[-70px] bottom-[-40px] w-[30rem] h-[30rem] opacity-[0.1] pointer-events-none hidden md:block"
-            viewBox="0 0 200 200" fill="none" stroke="#b98a3e" stroke-width="1.3" aria-hidden="true">
-            <path d="M20 150 C60 135,90 135,100 145 C110 135,140 135,180 150 L180 160 C140 145,110 145,100 155 C90 145,60 145,20 160 Z" />
-            <path d="M100 145 L100 155" />
-            <path d="M30 145 C55 133,80 133,95 141" />
-            <path d="M170 145 C145 133,120 133,105 141" />
-            <path d="M100 38 L100 92" />
-            <path d="M76 58 L124 58" />
-            <circle cx="100" cy="95" r="46" stroke-opacity="0.5" />
+        <!-- Croix en filigrane (remplace la rosace "Vitrail" sombre - demande du ministere, 2026-09-10) -->
+        <svg class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] opacity-[0.05] pointer-events-none hidden sm:block"
+            viewBox="0 0 200 200" fill="#8f6a2c" aria-hidden="true">
+            <path d="M90 10 H110 V80 H180 V100 H110 V190 H90 V100 H20 V80 H90 Z" />
         </svg>
 
         <form @submit.prevent="submit"
-            class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
+            class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <img src="/images/oikonema-logo.png" alt="OIKONEMA" class="w-40 sm:w-44 mx-auto mb-3 rounded-2xl bg-white p-2 shadow-glow-gold" />
-            <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-5">Bienvenue</p>
-            <p class="text-sm text-white/60 mb-7 -mt-2">Plateforme de gestion de ministère : connectez-vous à votre espace.</p>
+            <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-5 text-center">Bienvenue</p>
+            <p class="text-sm text-graphite/70 mb-7 -mt-2 text-center">Plateforme de gestion de ministère : connectez-vous à votre espace.</p>
 
-            <label class="block text-sm font-medium text-white/80 mb-1" for="email">Adresse e-mail</label>
+            <label class="block text-sm font-medium text-graphite/85 mb-1" for="email">Adresse e-mail</label>
             <input id="email" v-model="form.email" type="email" required autofocus
-                class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-            <p v-if="form.errors.email" class="text-sm text-rose-400 mb-3">{{ form.errors.email }}</p>
+                class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/35 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+            <p v-if="form.errors.email" class="text-sm text-rose-600 mb-3">{{ form.errors.email }}</p>
 
-            <label class="block text-sm font-medium text-white/80 mb-1 mt-4" for="password">Mot de passe</label>
+            <label class="block text-sm font-medium text-graphite/85 mb-1 mt-4" for="password">Mot de passe</label>
             <input id="password" v-model="form.password" type="password" required
-                class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-            <p v-if="form.errors.password" class="text-sm text-rose-400 mb-3">{{ form.errors.password }}</p>
+                class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/35 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+            <p v-if="form.errors.password" class="text-sm text-rose-600 mb-3">{{ form.errors.password }}</p>
 
-            <label class="flex items-center gap-2 text-sm text-white/60 my-5">
-                <input type="checkbox" v-model="form.remember" class="rounded border-white/25 bg-white/5 text-gold focus:ring-gold/50" />
+            <label class="flex items-center gap-2 text-sm text-graphite/70 my-5">
+                <input type="checkbox" v-model="form.remember" class="rounded border-graphite/25 bg-graphite/5 text-gold focus:ring-gold/50" />
                 Se souvenir de moi
             </label>
 
@@ -87,9 +69,9 @@ function submit() {
                 connaitre l'adresse /rattachement par coeur. C'est pourtant le
                 tout premier ecran que voit quiconque n'est pas deja connecte.
             -->
-            <p class="text-center text-sm text-white/50 mt-6">
+            <p class="text-center text-sm text-graphite/60 mt-6">
                 Vous avez reçu un code de rattachement ?
-                <a href="/rattachement" class="text-gold-soft hover:underline font-medium">Rejoindre votre église</a>
+                <a href="/rattachement" class="text-sanctuary hover:underline font-medium">Rejoindre votre église</a>
             </p>
         </form>
     </div>

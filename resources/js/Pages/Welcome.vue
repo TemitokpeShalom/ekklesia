@@ -2,10 +2,11 @@
 import { Link } from '@inertiajs/vue3'
 
 /**
- * Page d'accueil publique (v5 "vitrine", 2026-09-10) - voir WelcomeController
- * pour le contexte. Reprend le meme decor "vitrail" que Login.vue pour que le
- * tout premier ecran de l'application soit visuellement coherent avec celui
- * qui suit juste apres (clic sur "Se connecter").
+ * Page d'accueil publique (v6 "vitrine claire", 2026-09-10) - voir
+ * WelcomeController pour le contexte. Reprend le meme decor que Login.vue
+ * (fond blanc `.app-shell`, croix en filigrane) pour que le tout premier
+ * ecran de l'application soit visuellement coherent avec celui qui suit
+ * juste apres (clic sur "Se connecter").
  *
  * Enrichie a la demande du ministere (chantier OIKONEMA) pour presenter
  * concretement ce que la plateforme administre, sur le modele d'une page
@@ -57,29 +58,22 @@ const atouts = [
 </script>
 
 <template>
-    <div class="min-h-screen relative overflow-x-hidden bg-night">
-        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/26 rounded-full blur-[100px]" style="animation: driftGlow 14s ease-in-out infinite;" aria-hidden="true"></div>
-        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/18 rounded-full blur-[100px]" style="animation: driftGlow 18s ease-in-out infinite reverse;" aria-hidden="true"></div>
-        <div class="absolute top-1/3 right-1/4 w-80 h-80 bg-forest/22 rounded-full blur-[100px]" aria-hidden="true"></div>
-        <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
+    <div class="app-shell min-h-screen relative overflow-x-hidden bg-paper">
+        <div class="absolute -top-24 -right-16 w-[28rem] h-[28rem] bg-sanctuary/8 rounded-full blur-[100px]" aria-hidden="true"></div>
+        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] bg-gold/10 rounded-full blur-[100px]" aria-hidden="true"></div>
 
-        <svg class="absolute left-1/2 top-0 -translate-x-1/2 w-[42rem] h-[42rem] opacity-[0.07] pointer-events-none hidden sm:block"
-            viewBox="0 0 200 200" fill="none" stroke="#f1e4c8" stroke-width="0.7" aria-hidden="true"
-            style="animation: shimmerPulse 9s ease-in-out infinite;">
-            <circle cx="100" cy="100" r="78" />
-            <circle cx="100" cy="100" r="60" />
-            <circle cx="100" cy="100" r="16" />
-            <g v-for="n in 16" :key="n" :transform="`rotate(${n * 22.5} 100 100)`">
-                <line x1="100" y1="22" x2="100" y2="100" />
-            </g>
+        <!-- Croix en filigrane (remplace la rosace "Vitrail" sombre - demande du ministere, 2026-09-10) -->
+        <svg class="absolute left-1/2 top-0 -translate-x-1/2 w-[30rem] h-[30rem] opacity-[0.05] pointer-events-none hidden sm:block"
+            viewBox="0 0 200 200" fill="#8f6a2c" aria-hidden="true">
+            <path d="M90 10 H110 V80 H180 V100 H110 V190 H90 V100 H20 V80 H90 Z" />
         </svg>
 
         <div class="relative px-4 pt-16 pb-20 md:pt-24">
             <!-- Carte d'accueil (inchangee dans son role : premier point de contact) -->
-            <div class="mx-auto w-full max-w-md glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
+            <div class="mx-auto w-full max-w-md glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
                 <img src="/images/oikonema-logo.png" alt="OIKONEMA" class="w-40 sm:w-44 mx-auto mb-3 rounded-2xl bg-white p-2 shadow-glow-gold" />
-                <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-5">Bienvenue</p>
-                <p class="text-sm text-white/60 mb-8 -mt-2">Administrer tout ce qui vous est confié — membres, finances, vie pastorale, patrimoine — en un seul endroit.</p>
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-5">Bienvenue</p>
+                <p class="text-sm text-graphite/70 mb-8 -mt-2">Administrer tout ce qui vous est confié — membres, finances, vie pastorale, patrimoine — en un seul endroit.</p>
 
                 <div class="space-y-3">
                     <Link href="/connexion"
@@ -87,14 +81,14 @@ const atouts = [
                         Se connecter à mon espace de travail
                     </Link>
                     <Link href="/ministeres/nouveau"
-                        class="w-full inline-flex items-center justify-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/15 transition-colors text-white rounded-xl py-3 font-semibold">
+                        class="w-full inline-flex items-center justify-center gap-1.5 bg-graphite/5 hover:bg-graphite/10 border border-graphite/15 transition-colors text-graphite rounded-xl py-3 font-semibold">
                         Créer un nouveau ministère
                     </Link>
                 </div>
 
-                <p class="text-center text-sm text-white/50 mt-7">
+                <p class="text-center text-sm text-graphite/60 mt-7">
                     Vous avez reçu un code de rattachement ?
-                    <a href="/rattachement" class="text-gold-soft hover:underline font-medium">Rejoindre votre église</a>
+                    <a href="/rattachement" class="text-sanctuary hover:underline font-medium">Rejoindre votre église</a>
                 </p>
             </div>
 
@@ -104,27 +98,27 @@ const atouts = [
                  icones/couleurs que Dashboard/Index.vue, aucun lien direct. -->
             <div class="relative mx-auto w-full max-w-5xl mt-20 animate-[fadeInUp_0.7s_ease-out_both]">
                 <div class="text-center mb-10">
-                    <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-2">Ce que la plateforme administre</p>
-                    <h2 class="font-serif text-2xl sm:text-3xl text-white">Une seule administration, pour toute la vie du ministère</h2>
+                    <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-2">Ce que la plateforme administre</p>
+                    <h2 class="font-serif text-2xl sm:text-3xl text-graphite">Une seule administration, pour toute la vie du ministère</h2>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div v-for="m in modules" :key="m.label"
-                        class="glass-panel rounded-3xl p-6 border border-white/10">
+                        class="glass-panel rounded-3xl p-6">
                         <span :class="['inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md', m.badge]">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="m.icon" />
                                 <path v-if="m.icon2" stroke-linecap="round" stroke-linejoin="round" :d="m.icon2" />
                             </svg>
                         </span>
-                        <p class="font-semibold text-white text-[15px]">{{ m.label }}</p>
-                        <p class="text-xs text-white/55 mt-1">{{ m.desc }}</p>
+                        <p class="font-semibold text-graphite text-[15px]">{{ m.label }}</p>
+                        <p class="text-xs text-graphite/60 mt-1">{{ m.desc }}</p>
                     </div>
                 </div>
 
                 <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div v-for="a in atouts" :key="a" class="flex items-start gap-2.5 text-sm text-white/60">
-                        <svg class="w-4 h-4 mt-0.5 shrink-0 text-gold-soft" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div v-for="a in atouts" :key="a" class="flex items-start gap-2.5 text-sm text-graphite/70">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0 text-sanctuary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                         <span>{{ a }}</span>
