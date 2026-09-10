@@ -2,97 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrgUnit;
-use App\Models\Role;
-use App\Services\InvitationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
-use Inertia\Response;
 
-class InvitationController extends Controller
+/**
+ * Correction du 2026-09-10 (trouvee en marge du chantier assistant IA) :
+ * ce fichier ne contenait, depuis sa toute premiere version sur GitHub
+ * (commit "Create HomeController.php", 9 septembre), que le code
+ * d'InvitationController recopie a l'identique (class InvitationController
+ * au lieu de class HomeController) - jamais corrige depuis, a la
+ * difference d'InvitationController.php lui-meme qui avait recu le meme
+ * type de correction le meme jour. Consequence : la route "/" (point 09 -
+ * le logo Ekklesia y renvoie des qu'aucun orgUnit n'est en contexte, par
+ * exemple depuis "Aide") plantait avec "Class HomeController not found".
+ *
+ * Reconstruit ici sur le meme principe que LoginController@store : trouver
+ * l'affectation active a utiliser et rediriger vers son tableau de bord.
+ * Priorite a une affectation dans le ministere DEJA en contexte
+ * (current_ministry_id, ex. utilisateur multi-ministere qui vient de
+ * "Aide"), puis a defaut la premiere affectation active tout court -
+ * jamais de tableau de bord "vide" propre a ce controleur.
+ */
+class HomeController extends Controller
 {
-    public function __construct(private InvitationService $invitations)
+    public function index(Request $request): RedirectResponse
     {
-    }
+        $currentMinistryId = $request->session()->get('current_ministry_id');
 
-    public function create(OrgUnit $orgUnit): Response
-    {
-        $this->authorize('inviteTo', $orgUnit);
+        $affectation = $request->user()->activeAffectations()
+            ->when($currentMinistryId, fn ($q) => $q->where('ministry_id', $currentMinistryId))
+            ->first()
+            ?? $request->user()->activeAffectations()->first();
 
-        return Inertia::render('OrgUnits/Invite', [
-            'orgUnit' => $orgUnit,
-            'roles' => Role::orderBy('label')->get(['id', 'code', 'label']),
-        ]);
-    }
-
-    public function store(Request $request, OrgUnit $orgUnit): RedirectResponse
-    {
-        $this->authorize('inviteTo', $orgUnit);
-
-        $validated = $request->validate([
-            'role_id' => ['required', 'uuid', 'exists:roles,id'],
-            'email' => ['nullable', 'email'],
-        ]);
-
-        [$invitation, $plainToken] = $this->invitations->invite(
-            $orgUnit,
-            Role::findOrFail($validated['role_id']),
-            $request->user(),
-            $validated['email'] ?? null,
-        );
-
-        // Le lien complet (avec le jeton en clair) est envoye par
-        // notification (email/sms) - hors perimetre de ce premier module ;
-        // affiche ici pour permettre un partage manuel en attendant.
-        return back()->with('invitation_link', route('invitations.accept.show', ['token' => $plainToken]));
-    }
-
-    public function acceptShow(string $token): Response
-    {
-        // Verifie le jeton avant d'afficher le formulaire : inutile de
-        // laisser quelqu'un remplir nom/e-mail/mot de passe pour se
-        // heurter ensuite a une invitation deja utilisee ou expiree.
-        ['invitation' => $invitation, 'reason' => $reason] = $this->invitations->resolve($token);
-
-        return Inertia::render('Invitations/Accept', [
-            'token' => $token,
-            'valid' => $invitation !== null,
-            'error' => $invitation === null ? InvitationService::reasonMessage($reason) : null,
-        ]);
-    }
-
-    public function acceptStore(Request $request, string $token): RedirectResponse
-    {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        try {
-            $affectation = $this->invitations->accept($token, [
-                ...$validated,
-                'password' => Hash::make($validated['password']),
-            ]);
-        } catch (\RuntimeException $e) {
-            // Rejoue possible entre l'affichage et la soumission (lien
-            // ouvert dans deux onglets, double clic) : on renvoie un
-            // message clair au lieu de laisser l'exception remonter en
-            // page d'erreur 500 brute.
-            return back()->withErrors(['invitation' => $e->getMessage()]);
+        if (! $affectation) {
+            return redirect()->route('welcome')
+                ->with('error', "Aucune affectation active n'est associée à votre compte. Contactez votre responsable.");
         }
 
-        auth()->login($affectation->user);
-        $request->session()->regenerate();
-
-        // Complement du point 04, meme raison que LoginController@store :
-        // sans ceci, la policy RLS par ministere de la requete suivante (le
-        // tableau de bord vers lequel on redirige juste en dessous) ne
-        // laisse rien passer et produit une fausse erreur 404, meme si
-        // l'affectation vient d'etre creee avec succes juste au-dessus.
+        // Garde le ministere en contexte coherent avec l'affectation choisie
+        // (utile si l'utilisateur arrive ici depuis un contexte multi-
+        // ministere different de celui deja fixe en session).
         $request->session()->put('current_ministry_id', $affectation->ministry_id);
 
         return redirect()->route('dashboard', ['orgUnit' => $affectation->org_unit_id]);
