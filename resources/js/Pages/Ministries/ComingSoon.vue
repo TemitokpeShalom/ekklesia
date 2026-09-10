@@ -20,11 +20,11 @@ import { Link } from '@inertiajs/vue3'
         <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
 
         <div class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
-            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
+            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">O</span>
             <h1 class="font-serif text-2xl text-white mb-3">Bientôt disponible</h1>
             <p class="text-sm text-white/60 mb-8">
                 La création directe d'un nouveau ministère depuis cette page arrive prochainement.
-                En attendant, contactez l'équipe Ekklesia pour l'ouverture de votre espace.
+                En attendant, contactez l'équipe Oikonema pour l'ouverture de votre espace.
             </p>
             <Link href="/bienvenue"
                 class="w-full inline-flex items-center justify-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/15 transition-colors text-white rounded-xl py-3 font-semibold">

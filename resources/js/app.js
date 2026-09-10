@@ -5,7 +5,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import AssistantWidget from './Components/Assistant/AssistantWidget.vue';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} · Ekklesia` : 'Ekklesia'),
+    title: (title) => (title ? `${title} · Oikonema` : 'Oikonema'),
     resolve: (name) =>
         resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {

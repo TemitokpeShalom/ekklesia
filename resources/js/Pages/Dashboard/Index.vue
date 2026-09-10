@@ -1,13 +1,25 @@
 <script setup>
+import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
- * v3 "Vitrail" (2026-09-08). Module "Canal de signalement" ajoute pour le
+ * v4 "Constellation" (2026-09-10) : demande du ministere de revoir
+ * l'architecture de cet ecran, pas seulement ses couleurs -- "les options
+ * de gestion de gouvernance... doit s'afficher sous forme de menu quelque
+ * part ou on clique. Et puis les autres fonctions cles peuvent rester sur
+ * le tableau." Les sections "Gouvernance des acces" et "Structure
+ * organisationnelle" (avant : des tuiles au meme niveau que les modules du
+ * quotidien) sont retirees du corps de la page et deviennent le menu
+ * deroulant "Gouvernance" ci-dessous, place dans l'en-tete (slot #actions
+ * d'AppLayout) - visible seulement si l'utilisateur a le droit d'y toucher
+ * (canManageAccess/canTransform, deja fournis par DashboardController,
+ * aucun changement cote back). Le tableau de bord lui-meme ne garde que
+ * les "fonctions cles" : les modules operationnels du quotidien et les
+ * entites rattachees.
+ *
+ * v3 "Vitrail" (2026-09-08) : module "Canal de signalement" ajoute pour le
  * point 17 de la feuille de route, ouvert a quiconque voit ce noeud (pas
- * de requiresRoot), comme decrit dans le point. L'"Assistant" qui
- * accompagnait ce module a ete retire le 2026-09-09 : ce n'etait qu'une
- * deuxieme tuile vers le manuel deja accessible par "Aide" dans l'en-tete
- * (voir HelpController) - doublon corrige par l'audit du 2026-09-09.
+ * de requiresRoot), comme decrit dans le point.
  */
 defineProps({
     orgUnit: Object,
@@ -17,6 +29,8 @@ defineProps({
     canManageAccess: Boolean,
     canTransform: Boolean,
 })
+
+const governanceMenuOpen = ref(false)
 
 // Un module par carte : badge en degrade (une nuance vers une nuance plus
 // sombre de la meme couleur, jamais un arc-en-ciel), icone, courte
@@ -98,37 +112,92 @@ const modules = [
 
 <template>
     <AppLayout :org-unit="orgUnit">
+        <template #actions>
+            <div v-if="canManageAccess || canTransform" class="relative">
+                <button type="button" @click="governanceMenuOpen = !governanceMenuOpen"
+                    class="flex items-center gap-1.5 text-sm text-graphite/70 hover:text-graphite bg-graphite/5 hover:bg-graphite/10 border border-graphite/10 rounded-full px-4 py-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.96 11.96 0 013.598 6 11.96 11.96 0 001.5 12.253c0 4.798 3.036 9.036 7.65 10.632a11.96 11.96 0 004.7 0C18.464 21.29 21.5 17.05 21.5 12.253 21.5 9.68 20.807 7.284 19.5 5.25a11.96 11.96 0 01-8.5-.036z" /></svg>
+                    <span class="hidden sm:inline">Gouvernance</span>
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+
+                <button v-if="governanceMenuOpen" type="button" tabindex="-1" aria-hidden="true"
+                    @click="governanceMenuOpen = false" class="fixed inset-0 z-10 cursor-default"></button>
+
+                <div v-if="governanceMenuOpen"
+                    class="absolute right-0 mt-2 w-80 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
+                    <template v-if="canManageAccess">
+                        <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Gestion des accès</p>
+                        <a :href="`/org-units/${orgUnit.id}/acces`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                            <p class="text-sm font-medium text-graphite">Gérer les accès</p>
+                            <p class="text-xs text-graphite/60">Lister, révoquer, réaffecter</p>
+                        </a>
+                        <a :href="`/org-units/${orgUnit.id}/inviter`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                            <p class="text-sm font-medium text-graphite">Inviter un titulaire</p>
+                            <p class="text-xs text-graphite/60">Un nouveau responsable</p>
+                        </a>
+                        <a :href="`/org-units/${orgUnit.id}/code-de-rattachement`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                            <p class="text-sm font-medium text-graphite">Code de rattachement</p>
+                            <p class="text-xs text-graphite/60">Créer une entité rattachée</p>
+                        </a>
+                        <template v-if="orgUnit.level_rank === 0">
+                            <a :href="`/org-units/${orgUnit.id}/informations-ministere`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Informations du ministère</p>
+                                <p class="text-xs text-graphite/60">Sigle, siège, coordonnées, n° d'autorisation, logo</p>
+                            </a>
+                            <a :href="`/org-units/${orgUnit.id}/titres-honorifiques`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Titres honorifiques</p>
+                                <p class="text-xs text-graphite/60">Liste utilisée sur les fiches membres</p>
+                            </a>
+                            <a :href="`/org-units/${orgUnit.id}/abonnement`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Abonnement</p>
+                                <p class="text-xs text-graphite/60">Offre, essai, facturation</p>
+                            </a>
+                        </template>
+                    </template>
+                    <template v-if="canTransform">
+                        <div v-if="canManageAccess" class="my-1.5 border-t border-graphite/10"></div>
+                        <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Structure organisationnelle</p>
+                        <a :href="`/org-units/${orgUnit.id}/transformation`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                            <p class="text-sm font-medium text-graphite">Transformer cette entité</p>
+                            <p class="text-xs text-graphite/60">Renommer, promouvoir, rattacher</p>
+                        </a>
+                    </template>
+                </div>
+            </div>
+        </template>
+
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <h1 class="font-serif text-3xl sm:text-4xl text-white mt-2">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-3xl sm:text-4xl text-graphite mt-2">{{ orgUnit.name }}</h1>
             </div>
         </template>
 
         <div class="space-y-14">
             <section v-if="activeAffectations.length" class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Mes affectations actives</h2>
+                <h2 class="text-xs font-semibold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
                 <div class="flex flex-wrap gap-2">
                     <span v-for="a in activeAffectations" :key="a.id"
                         class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3 pr-4 py-1.5 text-sm">
-                        <span class="font-semibold text-gold-soft">{{ a.role.label }}</span>
-                        <span class="text-white/50">· {{ a.org_unit.name }}</span>
+                        <span class="font-semibold text-sanctuary">{{ a.role.label }}</span>
+                        <span class="text-graphite/68">· {{ a.org_unit.name }}</span>
                     </span>
                 </div>
             </section>
 
             <section>
-                <h2 class="font-serif text-2xl text-white mb-1">Modules</h2>
-                <p class="text-sm text-white/55 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
+                <h2 class="font-serif text-2xl text-graphite mb-1">Modules</h2>
+                <p class="text-sm text-graphite/70 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <template v-for="(m, i) in modules" :key="m.key">
                         <a v-if="!m.requiresRoot || (orgUnit.level_rank === 0 && (!m.requiresLibrary || canAccessLibrary))"
                             :href="`/org-units/${orgUnit.id}/${m.path}`"
                             :class="m.glow"
-                            class="group relative glass-panel rounded-3xl p-6 hover:border-white/20 hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+                            class="group relative glass-panel rounded-3xl p-6 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
                             :style="{ animationDelay: `${i * 60}ms` }">
                             <span :class="m.badge" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -137,107 +206,35 @@ const modules = [
                                     <path v-if="m.icon2" stroke-linecap="round" stroke-linejoin="round" :d="m.icon2" />
                                 </svg>
                             </span>
-                            <p class="font-semibold text-white text-[15px]">{{ m.label }}</p>
-                            <p class="text-xs text-white/55 mt-1">{{ m.desc }}</p>
-                            <svg class="absolute top-6 right-6 w-4 h-4 text-white/40 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <p class="font-semibold text-graphite text-[15px]">{{ m.label }}</p>
+                            <p class="text-xs text-graphite/70 mt-1">{{ m.desc }}</p>
+                            <svg class="absolute top-6 right-6 w-4 h-4 text-graphite/62 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </a>
                     </template>
                 </div>
                 <!--
-                    Pas de tuile "Aide"/"Assistant" ici : le lien "Aide" de
-                    l'en-tete (AppLayout.vue, present sur cet ecran comme sur
-                    tous les autres) est desormais le seul acces au manuel,
-                    recherche comprise - voir HelpController. Les deux
-                    tuiles qui y menaient en double ont ete retirees le
-                    2026-09-09 (point 1 de l'audit du 2026-09-09).
+                    Pas de tuile "Aide"/"Assistant" ici : le lien "Aide" du
+                    menu profil (AppLayout.vue, present sur cet ecran comme
+                    sur tous les autres) est desormais le seul acces au
+                    manuel, recherche comprise - voir HelpController.
                 -->
             </section>
 
-            <section v-if="canManageAccess">
-                <h2 class="font-serif text-2xl text-white mb-1">Gouvernance des accès</h2>
-                <p class="text-sm text-white/55 mb-6">Inviter, révoquer, rattacher de nouvelles entités.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <a :href="`/org-units/${orgUnit.id}/acces`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 11-4 0 2 2 0 014 0zM6 21v-2a4 4 0 014-4h1m9-3l-3 3m0 0l-3-3m3 3V4" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Gérer les accès</p>
-                        <p class="text-xs text-white/55 mt-1">Lister, révoquer, réaffecter</p>
-                    </a>
-                    <a :href="`/org-units/${orgUnit.id}/inviter`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Inviter un titulaire</p>
-                        <p class="text-xs text-white/55 mt-1">Un nouveau responsable</p>
-                    </a>
-                    <a :href="`/org-units/${orgUnit.id}/code-de-rattachement`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a3 3 0 11-6 0 3 3 0 016 0zM4 20a5 5 0 0110 0M14 12l6 6m0 0v-4m0 4h-4" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Code de rattachement</p>
-                        <p class="text-xs text-white/55 mt-1">Créer une entité rattachée</p>
-                    </a>
-                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/informations-ministere`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01M9 13.5h.01M15 13.5h.01" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Informations du ministère</p>
-                        <p class="text-xs text-white/55 mt-1">Sigle, siège, coordonnées, n° d'autorisation, logo</p>
-                    </a>
-                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/titres-honorifiques`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4l1.8 4.2L18 10l-4.2 1.8L12 16l-1.8-4.2L6 10l4.2-1.8L12 4zM5 18l.8 1.8L7.5 20l-1.7.8L5 22.5l-.8-1.7L2.5 20l1.7-.2L5 18z" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Titres honorifiques</p>
-                        <p class="text-xs text-white/55 mt-1">Liste utilisée sur les fiches membres</p>
-                    </a>
-                    <a v-if="orgUnit.level_rank === 0" :href="`/org-units/${orgUnit.id}/abonnement`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-gold/25 hover:shadow-glow-gold hover:-translate-y-1 transition-all duration-300">
-                        <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br from-gold to-gold-dark text-night shadow-md group-hover:scale-110 transition-transform duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
-                        </span>
-                        <p class="font-semibold text-white text-[15px]">Abonnement</p>
-                        <p class="text-xs text-white/55 mt-1">Offre, essai, facturation</p>
-                    </a>
-                </div>
-            </section>
-
-            <section v-if="canTransform">
-                <h2 class="font-serif text-2xl text-white mb-1">Structure organisationnelle</h2>
-                <p class="text-sm text-white/55 mb-6">Faire évoluer cette entité sans perdre son historique.</p>
-                <a :href="`/org-units/${orgUnit.id}/transformation`"
-                    class="group inline-flex items-center glass-panel rounded-3xl p-6 hover:border-white/20 hover:shadow-glow-sanctuary hover:-translate-y-1 transition-all duration-300 max-w-sm w-full">
-                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mr-4 shrink-0 bg-gradient-to-br from-sanctuary to-sanctuary-dark text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4.5 15a8 8 0 0013.9 3.4M19.5 9A8 8 0 005.6 5.6" /></svg>
-                    </span>
-                    <span>
-                        <p class="font-semibold text-white text-[15px]">Transformer cette entité</p>
-                        <p class="text-xs text-white/55 mt-1">Renommer, promouvoir, rattacher</p>
-                    </span>
-                </a>
-            </section>
-
             <section>
-                <h2 class="font-serif text-2xl text-white mb-1">
+                <h2 class="font-serif text-2xl text-graphite mb-1">
                     {{ children.length ? 'Entités directement rattachées' : "Aucune entité rattachée pour l'instant" }}
                 </h2>
-                <p v-if="children.length" class="text-sm text-white/55 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
+                <p v-if="children.length" class="text-sm text-graphite/70 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
                 <div v-if="children.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <a v-for="child in children" :key="child.id" :href="`/org-units/${child.id}`"
-                        class="group glass-panel rounded-3xl p-6 hover:border-white/20 hover:-translate-y-1 transition-all duration-300">
-                        <span class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold block mb-1">{{ child.level_label }}</span>
-                        <p class="font-semibold text-white text-[15px]">{{ child.name }}</p>
+                        class="group glass-panel rounded-3xl p-6 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300">
+                        <span class="text-xs uppercase tracking-widest text-sanctuary/90 font-semibold block mb-1">{{ child.level_label }}</span>
+                        <p class="font-semibold text-graphite text-[15px]">{{ child.name }}</p>
                     </a>
                 </div>
-                <p v-else class="text-sm text-white/55">
+                <p v-else class="text-sm text-graphite/70">
                     Les prochaines entités rattachées à {{ orgUnit.name }} apparaîtront ici.
                 </p>
             </section>

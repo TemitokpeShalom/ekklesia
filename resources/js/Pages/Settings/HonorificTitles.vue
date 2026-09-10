@@ -38,12 +38,12 @@ function submit() {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Paramètres
                 </p>
-                <h1 class="font-serif text-3xl text-white mt-2">Titres honorifiques</h1>
-                <p class="text-sm text-white/55 mt-2 max-w-2xl">
+                <h1 class="font-serif text-3xl text-graphite mt-2">Titres honorifiques</h1>
+                <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Cette liste alimente le champ « titre » du formulaire membre, pour tout le ministère.
                 </p>
             </div>
@@ -54,24 +54,24 @@ function submit() {
                 <div class="space-y-2.5">
                     <div v-for="(t, i) in form.titles" :key="i" class="flex items-center gap-2">
                         <input v-model="form.titles[i]" type="text" maxlength="50"
-                            class="flex-1 bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            class="flex-1 bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         <button type="button" @click="removeTitle(i)"
-                            class="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-white/40 hover:text-rose-400 hover:bg-rose-500/10 transition">
+                            class="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl text-graphite/62 hover:text-rose-600 hover:bg-rose-500/10 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                <p v-if="form.errors.titles" class="mt-3 text-sm text-rose-400">{{ form.errors.titles }}</p>
+                <p v-if="form.errors.titles" class="mt-3 text-sm text-rose-600">{{ form.errors.titles }}</p>
 
-                <div class="flex items-center gap-3 mt-5 pt-5 border-t border-white/10">
+                <div class="flex items-center gap-3 mt-5 pt-5 border-t border-graphite/10">
                     <button type="button" @click="addTitle"
-                        class="text-sm font-medium text-gold-soft hover:text-gold transition">
+                        class="text-sm font-medium text-sanctuary hover:text-gold transition">
                         + Ajouter un titre
                     </button>
                     <button type="button" @click="restoreDefaults"
-                        class="ml-auto text-sm text-white/50 hover:text-white transition">
+                        class="ml-auto text-sm text-graphite/68 hover:text-graphite transition">
                         Rétablir les valeurs par défaut
                     </button>
                 </div>

@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
  * au lieu de class HomeController) - jamais corrige depuis, a la
  * difference d'InvitationController.php lui-meme qui avait recu le meme
  * type de correction le meme jour. Consequence : la route "/" (point 09 -
- * le logo Ekklesia y renvoie des qu'aucun orgUnit n'est en contexte, par
+ * le logo Oikonema y renvoie des qu'aucun orgUnit n'est en contexte, par
  * exemple depuis "Aide") plantait avec "Class HomeController not found".
  *
  * Reconstruit ici sur le meme principe que LoginController@store : trouver

@@ -21,6 +21,7 @@ use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MinistryInfoController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
@@ -52,7 +53,7 @@ Route::post('/invitations/{token}', [InvitationController::class, 'acceptStore']
 
 // Rattachement d'un nouveau noeud : ouvert a quiconque possede le code (le
 // code lui-meme est la preuve de mandat, point 03) - avec ou sans compte
-// Ekklesia existant. Le formulaire (page GET) cree le compte de la
+// Oikonema existant. Le formulaire (page GET) cree le compte de la
 // personne dans le meme geste si elle n'en a pas encore, comme pour une
 // invitation (point 11) ; voir AttachmentCodeController::redeem.
 Route::get('/rattachement', [AttachmentCodeController::class, 'redeemShow'])->name('attachment-codes.redeem.show');
@@ -100,6 +101,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // 2026-09-09 (voir HelpController).
     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
+
+    // "Mon profil" (v4 "Constellation", 2026-09-10, voir ProfileController) :
+    // comme /aide, non lie a un OrgUnit - une personne modifie son propre
+    // compte quel que soit le ministere ou elle se trouve.
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profil/mot-de-passe', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
     // Assistant IA integre (chantier du 2026-09-10, "autres corrections"
     // point 1) : API JSON pour le widget flottant (AssistantWidget.vue),

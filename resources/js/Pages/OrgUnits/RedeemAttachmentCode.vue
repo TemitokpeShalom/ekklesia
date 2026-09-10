@@ -7,7 +7,7 @@ import { useForm } from '@inertiajs/vue3'
  * saisi - seule la route POST existait, sans écran. Accessible sans
  * compte (le code lui-même est la preuve de mandat, point 03) : une
  * personne responsable d'une église réellement nouvelle n'a encore aucun
- * compte Ekklesia, donc le formulaire crée les deux à la fois - la
+ * compte Oikonema, donc le formulaire crée les deux à la fois - la
  * nouvelle entité ET son compte - dans le même geste, comme pour une
  * invitation (point 11). Même habillage autonome que Auth/Login.vue et
  * Invitations/Accept.vue : cette page doit s'afficher correctement pour
@@ -43,7 +43,7 @@ function submit() {
 
         <form @submit.prevent="submit"
             class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
-            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
+            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">O</span>
             <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">Rattachement</p>
             <h1 class="font-serif text-2xl text-white mb-1">Saisir un code de rattachement</h1>
             <p class="text-sm text-white/60 mb-7">

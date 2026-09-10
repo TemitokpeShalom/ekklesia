@@ -52,7 +52,7 @@ function submit() {
 
         <form v-else @submit.prevent="submit"
             class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
-            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">E</span>
+            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">O</span>
             <p class="text-xs uppercase tracking-widest text-gold-soft/90 font-semibold mb-1">Bienvenue</p>
             <h1 class="font-serif text-2xl text-white mb-1">Créer votre compte</h1>
             <p class="text-sm text-white/60 mb-7">

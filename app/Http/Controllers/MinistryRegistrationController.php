@@ -43,7 +43,7 @@ class MinistryRegistrationController extends Controller
             // dossier de reconnaissance de culte, mais volontairement
             // facultative : obtenir le numero d'autorisation aupres du
             // Ministere de l'Interieur peut prendre du temps, et rien ici
-            // ne doit empecher de commencer a utiliser Ekklesia en
+            // ne doit empecher de commencer a utiliser Oikonema en
             // attendant. Tout reste completable ensuite (voir
             // MinistryInfoController, accessible depuis le tableau de
             // bord).
@@ -97,6 +97,6 @@ class MinistryRegistrationController extends Controller
 
         return redirect()
             ->route('dashboard', ['orgUnit' => $root->id])
-            ->with('success', "« {$ministry->name} » a été créé. Bienvenue sur Ekklesia !");
+            ->with('success', "« {$ministry->name} » a été créé. Bienvenue sur Oikonema !");
     }
 }

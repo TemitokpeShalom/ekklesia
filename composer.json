@@ -1,8 +1,8 @@
 {
-    "name": "ekklesia/plateforme",
+    "name": "oikonema/plateforme",
     "type": "project",
     "description": "Plateforme de gestion hierarchique des ministeres et de leurs eglises (Fondations).",
-    "keywords": ["laravel", "ekklesia"],
+    "keywords": ["laravel", "oikonema"],
     "license": "proprietary",
     "require": {
         "php": "^8.2",

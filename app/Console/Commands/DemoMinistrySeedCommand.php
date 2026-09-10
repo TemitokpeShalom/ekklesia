@@ -43,7 +43,7 @@ class DemoMinistrySeedCommand extends Command
 
     public function handle(): int
     {
-        if (Ministry::where('short_code', 'DEMO-EKKLESIA')->exists()) {
+        if (Ministry::where('short_code', 'DEMO-OIKONEMA')->exists()) {
             $this->error('Le ministere de demonstration existe deja. Lancez d\'abord "php artisan demo:reset".');
 
             return self::FAILURE;
@@ -59,8 +59,8 @@ class DemoMinistrySeedCommand extends Command
             ]);
 
             $ministry = Ministry::create([
-                'name' => 'Ministere de Demonstration Ekklesia',
-                'short_code' => 'DEMO-EKKLESIA',
+                'name' => 'Ministere de Demonstration Oikonema',
+                'short_code' => 'DEMO-OIKONEMA',
                 'status' => 'active',
             ]);
 
@@ -70,7 +70,7 @@ class DemoMinistrySeedCommand extends Command
             // commande artisan (qui ne passe pas par le middleware web habituel).
             DB::statement("SET LOCAL app.current_ministry_id = '{$ministry->id}'");
 
-            $rootCode = 'demo_ekklesia';
+            $rootCode = 'demo_oikonema';
             $root = OrgUnit::create([
                 'ministry_id' => $ministry->id,
                 'parent_id' => null,

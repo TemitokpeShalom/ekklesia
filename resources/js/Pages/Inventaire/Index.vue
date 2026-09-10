@@ -40,9 +40,9 @@ function conditionLabel(value) {
 function conditionClass(value) {
     return {
         fonctionnel: 'bg-forest/15 text-forest',
-        a_surveiller: 'bg-gold/15 text-gold-soft',
+        a_surveiller: 'bg-gold/15 text-sanctuary',
         hors_service: 'bg-sanctuary/15 text-sanctuary-light',
-    }[value] ?? 'bg-white/10 text-white/50'
+    }[value] ?? 'bg-graphite/10 text-graphite/68'
 }
 
 function formatAmount(value) {
@@ -64,12 +64,12 @@ function filterBy(categorie) {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-3xl text-white mt-2">Immobilier et mobilier</h1>
-                <p class="text-sm text-white/55 mt-2 max-w-2xl">Avec code d'identification automatique, jamais réattribué même après retrait.</p>
+                <h1 class="font-serif text-3xl text-graphite mt-2">Immobilier et mobilier</h1>
+                <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Avec code d'identification automatique, jamais réattribué même après retrait.</p>
             </div>
         </template>
 
@@ -88,12 +88,12 @@ function filterBy(categorie) {
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 animate-[fadeInUp_0.55s_ease-out_both]">
                 <div class="glass-panel rounded-2xl p-5">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-white/50">Valeur immobilier</p>
-                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totaux.immobilier) }}</p>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-graphite/68">Valeur immobilier</p>
+                    <p class="mt-2 text-2xl font-serif text-graphite">{{ formatAmount(totaux.immobilier) }}</p>
                 </div>
                 <div class="glass-panel rounded-2xl p-5">
-                    <p class="text-xs font-semibold uppercase tracking-widest text-white/50">Valeur mobilier</p>
-                    <p class="mt-2 text-2xl font-serif text-white">{{ formatAmount(totaux.mobilier) }}</p>
+                    <p class="text-xs font-semibold uppercase tracking-widest text-graphite/68">Valeur mobilier</p>
+                    <p class="mt-2 text-2xl font-serif text-graphite">{{ formatAmount(totaux.mobilier) }}</p>
                 </div>
             </div>
 
@@ -101,59 +101,59 @@ function filterBy(categorie) {
                 <div class="flex gap-2 text-sm">
                     <button
                         @click="filterBy(null)"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', !categorie ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-white/70 hover:text-white']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', !categorie ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Tous
                     </button>
                     <button
                         @click="filterBy('immobilier')"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'immobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-white/70 hover:text-white']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'immobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Immobilier
                     </button>
                     <button
                         @click="filterBy('mobilier')"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'mobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-white/70 hover:text-white']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'mobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Mobilier
                     </button>
                 </div>
                 <Link
                     :href="`/org-units/${orgUnit.id}/inventaire-rapport`"
-                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 text-sm font-medium text-white/80 hover:border-gold/40 hover:text-gold-soft transition"
+                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 text-sm font-medium text-graphite/87 hover:border-gold/40 hover:text-sanctuary transition"
                 >
                     Fiche d'inventaire consolidée
                 </Link>
             </div>
 
             <div v-if="assets.length === 0" class="glass-panel flex flex-col items-center rounded-3xl px-8 py-14 text-center">
-                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-white/40">
+                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-graphite/5 text-graphite/62">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                     </svg>
                 </span>
-                <p class="mt-4 text-sm font-medium text-white/70">Aucun bien enregistré pour l'instant.</p>
-                <p class="mt-1 text-sm text-white/40">Ajoute un bâtiment, une parcelle ou du mobilier pour commencer.</p>
+                <p class="mt-4 text-sm font-medium text-graphite/80">Aucun bien enregistré pour l'instant.</p>
+                <p class="mt-1 text-sm text-graphite/62">Ajoute un bâtiment, une parcelle ou du mobilier pour commencer.</p>
             </div>
 
             <div v-else class="space-y-3">
                 <div
                     v-for="(asset, i) in assets"
                     :key="asset.id"
-                    class="flex items-center gap-4 glass-panel rounded-2xl p-5 hover:border-white/20 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+                    class="flex items-center gap-4 glass-panel rounded-2xl p-5 hover:border-graphite/20 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
                     :style="{ animationDelay: `${Math.min(i, 10) * 40}ms` }"
                 >
-                    <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 text-white/60 text-xs font-semibold">
+                    <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-graphite/5 text-graphite/73 text-xs font-semibold">
                         {{ categoryLabel(asset.category).slice(0, 3).toUpperCase() }}
                     </span>
 
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-3">
-                            <p class="truncate font-semibold text-white text-[15px]">{{ asset.label }}</p>
-                            <p class="flex-shrink-0 font-semibold text-white">{{ formatAmount(asset.acquisition_value) }}</p>
+                            <p class="truncate font-semibold text-graphite text-[15px]">{{ asset.label }}</p>
+                            <p class="flex-shrink-0 font-semibold text-graphite">{{ formatAmount(asset.acquisition_value) }}</p>
                         </div>
-                        <p class="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/45">
-                            <span class="font-mono text-xs text-white/35">{{ asset.code }}</span>
+                        <p class="mt-1 flex flex-wrap items-center gap-2 text-sm text-graphite/65">
+                            <span class="font-mono text-xs text-graphite/58">{{ asset.code }}</span>
                             <span>· Qté {{ asset.quantity }}</span>
                             <span>· {{ provenanceLabel(asset.provenance) }}</span>
                             <span>· {{ formatDate(asset.acquisition_date) }}</span>
@@ -165,7 +165,7 @@ function filterBy(categorie) {
 
                     <Link
                         :href="`/org-units/${orgUnit.id}/inventaire/${asset.id}/modifier`"
-                        class="flex-shrink-0 self-center rounded-lg px-3 py-1.5 text-sm font-medium text-white/50 transition hover:bg-white/10 hover:text-white"
+                        class="flex-shrink-0 self-center rounded-lg px-3 py-1.5 text-sm font-medium text-graphite/68 transition hover:bg-graphite/10 hover:text-graphite"
                     >
                         Modifier
                     </Link>

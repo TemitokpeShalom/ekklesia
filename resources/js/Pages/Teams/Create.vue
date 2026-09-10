@@ -24,28 +24,28 @@ function submit() {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/equipes`" back-label="Annuler">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Équipes et bénévolat
                 </p>
-                <h1 class="font-serif text-3xl text-white mt-2">Créer une équipe</h1>
+                <h1 class="font-serif text-3xl text-graphite mt-2">Créer une équipe</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Nom de l'équipe</h2>
-                    <input v-model="form.name" type="text" placeholder="Accueil, Louange, Enfants, Technique..." class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-                    <p v-if="form.errors.name" class="mt-1 text-sm text-rose-400">{{ form.errors.name }}</p>
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Nom de l'équipe</h2>
+                    <input v-model="form.name" type="text" placeholder="Accueil, Louange, Enfants, Technique..." class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                    <p v-if="form.errors.name" class="mt-1 text-sm text-rose-600">{{ form.errors.name }}</p>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Description (optionnel)</h2>
-                    <textarea v-model="form.description" rows="3" class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Description (optionnel)</h2>
+                    <textarea v-model="form.description" rows="3" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                 </section>
 
-                <div class="border-t border-white/10 pt-6">
+                <div class="border-t border-graphite/10 pt-6">
                     <button
                         type="submit"
                         :disabled="form.processing"

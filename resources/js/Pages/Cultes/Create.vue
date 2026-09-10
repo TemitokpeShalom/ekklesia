@@ -30,76 +30,76 @@ function submit() {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/cultes`" back-label="Annuler">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Cultes
                 </p>
-                <h1 class="font-serif text-3xl text-white mt-2">Nouveau culte</h1>
+                <h1 class="font-serif text-3xl text-graphite mt-2">Nouveau culte</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Le message</h2>
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Le message</h2>
                     <div class="space-y-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Thème du message</label>
-                            <input v-model="form.title" type="text" placeholder="La grâce de Dieu" class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-                            <p v-if="form.errors.title" class="mt-1 text-sm text-rose-400">{{ form.errors.title }}</p>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Thème du message</label>
+                            <input v-model="form.title" type="text" placeholder="La grâce de Dieu" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p v-if="form.errors.title" class="mt-1 text-sm text-rose-600">{{ form.errors.title }}</p>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Orateur</label>
-                            <input v-model="form.speaker" type="text" placeholder="Pasteur..." class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Orateur</label>
+                            <input v-model="form.speaker" type="text" placeholder="Pasteur..." class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Quand</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Quand</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Date</label>
-                            <input v-model="form.service_date" type="date" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-                            <p v-if="form.errors.service_date" class="mt-1 text-sm text-rose-400">{{ form.errors.service_date }}</p>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Date</label>
+                            <input v-model="form.service_date" type="date" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p v-if="form.errors.service_date" class="mt-1 text-sm text-rose-600">{{ form.errors.service_date }}</p>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Heure</label>
-                            <input v-model="form.start_time" type="time" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Heure</label>
+                            <input v-model="form.start_time" type="time" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Assistance</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Assistance</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Effectif adultes</label>
-                            <input v-model="form.attendance_adults" type="number" min="0" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Effectif adultes</label>
+                            <input v-model="form.attendance_adults" type="number" min="0" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Effectif enfants</label>
-                            <input v-model="form.attendance_children" type="number" min="0" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Effectif enfants</label>
+                            <input v-model="form.attendance_children" type="number" min="0" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Étude et remarques</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Étude et remarques</h2>
                     <div class="space-y-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Versets clés étudiés</label>
-                            <input v-model="form.key_verses" type="text" placeholder="Jean 3:16, Romains 8:28..." class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-                            <p class="mt-1 text-xs text-white/35">Sépare plusieurs références par une virgule.</p>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Versets clés étudiés</label>
+                            <input v-model="form.key_verses" type="text" placeholder="Jean 3:16, Romains 8:28..." class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p class="mt-1 text-xs text-graphite/58">Sépare plusieurs références par une virgule.</p>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Notes</label>
-                            <textarea v-model="form.notes" rows="3" class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Notes</label>
+                            <textarea v-model="form.notes" rows="3" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                         </div>
                     </div>
                 </section>
 
-                <div class="border-t border-white/10 pt-6">
+                <div class="border-t border-graphite/10 pt-6">
                     <button
                         type="submit"
                         :disabled="form.processing"

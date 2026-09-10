@@ -66,124 +66,124 @@ function destroy() {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/membres`" back-label="Annuler">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Membres
                 </p>
-                <h1 class="font-serif text-3xl text-white mt-2">Modifier {{ member.first_name }} {{ member.last_name }}</h1>
+                <h1 class="font-serif text-3xl text-graphite mt-2">Modifier {{ member.first_name }} {{ member.last_name }}</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]" enctype="multipart/form-data">
                 <section>
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Identité</h2>
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Identité</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-white/80">Prénom</label>
-                                <input v-model="form.first_name" type="text" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                                <label class="mb-1 block text-sm font-medium text-graphite/87">Prénom</label>
+                                <input v-model="form.first_name" type="text" required class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                             </div>
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-white/80">Nom</label>
-                                <input v-model="form.last_name" type="text" required class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                                <label class="mb-1 block text-sm font-medium text-graphite/87">Nom</label>
+                                <input v-model="form.last_name" type="text" required class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                             </div>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Titre honorifique</label>
-                            <select v-model="form.title" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
-                                <option value="" class="bg-night text-white">Aucun</option>
-                                <option v-for="t in honorificTitles" :key="t" :value="t" class="bg-night text-white">{{ t }}</option>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Titre honorifique</label>
+                            <select v-model="form.title" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                <option value="" class="bg-white text-graphite">Aucun</option>
+                                <option v-for="t in honorificTitles" :key="t" :value="t" class="bg-white text-graphite">{{ t }}</option>
                             </select>
-                            <p v-if="form.errors.title" class="mt-1 text-sm text-rose-400">{{ form.errors.title }}</p>
+                            <p v-if="form.errors.title" class="mt-1 text-sm text-rose-600">{{ form.errors.title }}</p>
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Contact</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Contact</h2>
                     <div class="space-y-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Téléphone</label>
-                            <input v-model="form.phone" type="text" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Téléphone</label>
+                            <input v-model="form.phone" type="text" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Email</label>
-                            <input v-model="form.email" type="email" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Email</label>
+                            <input v-model="form.email" type="email" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Détails</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Détails</h2>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-white/80">Genre</label>
-                                <select v-model="form.gender" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
-                                    <option value="" class="bg-night text-white">Non précisé</option>
-                                    <option value="M" class="bg-night text-white">Homme</option>
-                                    <option value="F" class="bg-night text-white">Femme</option>
+                                <label class="mb-1 block text-sm font-medium text-graphite/87">Genre</label>
+                                <select v-model="form.gender" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                    <option value="" class="bg-white text-graphite">Non précisé</option>
+                                    <option value="M" class="bg-white text-graphite">Homme</option>
+                                    <option value="F" class="bg-white text-graphite">Femme</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="mb-1 block text-sm font-medium text-white/80">Date de naissance</label>
-                                <input v-model="form.birth_date" type="date" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                                <label class="mb-1 block text-sm font-medium text-graphite/87">Date de naissance</label>
+                                <input v-model="form.birth_date" type="date" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                             </div>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Date d'adhésion</label>
-                            <input v-model="form.joined_at" type="date" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Date d'adhésion</label>
+                            <input v-model="form.joined_at" type="date" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Statut</label>
-                            <select v-model="form.status" class="w-full bg-white/5 border border-white/15 text-white rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
-                                <option value="active" class="bg-night text-white">Actif</option>
-                                <option value="inactive" class="bg-night text-white">Inactif</option>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Statut</label>
+                            <select v-model="form.status" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                <option value="active" class="bg-white text-graphite">Actif</option>
+                                <option value="inactive" class="bg-white text-graphite">Inactif</option>
                             </select>
                         </div>
                     </div>
                 </section>
 
-                <section class="border-t border-white/10 pt-6">
-                    <h2 class="text-xs font-semibold text-gold-soft/80 uppercase tracking-widest mb-4">Photos et conjoint(e)</h2>
+                <section class="border-t border-graphite/10 pt-6">
+                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Photos et conjoint(e)</h2>
                     <div class="space-y-4">
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Photo</label>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Photo</label>
                             <div v-if="member.photo_path && !removePhoto" class="mb-2 flex items-center gap-3">
-                                <img :src="`/storage/${member.photo_path}`" class="h-14 w-14 rounded-full object-cover border border-white/15" />
-                                <button type="button" @click="toggleRemovePhoto" class="text-xs text-rose-400 hover:underline">Retirer la photo</button>
+                                <img :src="`/storage/${member.photo_path}`" class="h-14 w-14 rounded-full object-cover border border-graphite/15" />
+                                <button type="button" @click="toggleRemovePhoto" class="text-xs text-rose-600 hover:underline">Retirer la photo</button>
                             </div>
-                            <p v-else-if="removePhoto" class="mb-2 text-xs text-white/40">
+                            <p v-else-if="removePhoto" class="mb-2 text-xs text-graphite/62">
                                 Photo retirée après enregistrement.
-                                <button type="button" @click="toggleRemovePhoto" class="text-white/70 hover:underline">Annuler</button>
+                                <button type="button" @click="toggleRemovePhoto" class="text-graphite/80 hover:underline">Annuler</button>
                             </p>
-                            <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white/80 hover:file:bg-white/20" />
-                            <p class="mt-1 text-xs text-white/35">Image, 5 Mo maximum.</p>
-                            <p v-if="form.errors.photo" class="mt-1 text-sm text-rose-400">{{ form.errors.photo }}</p>
+                            <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20" />
+                            <p class="mt-1 text-xs text-graphite/58">Image, 5 Mo maximum.</p>
+                            <p v-if="form.errors.photo" class="mt-1 text-sm text-rose-600">{{ form.errors.photo }}</p>
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Conjoint(e) (optionnel)</label>
-                            <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Conjoint(e) (optionnel)</label>
+                            <input v-model="form.spouse_name" type="text" placeholder="Nom du conjoint ou de la conjointe" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                         </div>
                         <div>
-                            <label class="mb-1 block text-sm font-medium text-white/80">Photo du conjoint</label>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Photo du conjoint</label>
                             <div v-if="member.spouse_photo_path && !removeSpousePhoto" class="mb-2 flex items-center gap-3">
-                                <img :src="`/storage/${member.spouse_photo_path}`" class="h-14 w-14 rounded-full object-cover border border-white/15" />
-                                <button type="button" @click="toggleRemoveSpousePhoto" class="text-xs text-rose-400 hover:underline">Retirer la photo</button>
+                                <img :src="`/storage/${member.spouse_photo_path}`" class="h-14 w-14 rounded-full object-cover border border-graphite/15" />
+                                <button type="button" @click="toggleRemoveSpousePhoto" class="text-xs text-rose-600 hover:underline">Retirer la photo</button>
                             </div>
-                            <p v-else-if="removeSpousePhoto" class="mb-2 text-xs text-white/40">
+                            <p v-else-if="removeSpousePhoto" class="mb-2 text-xs text-graphite/62">
                                 Photo retirée après enregistrement.
-                                <button type="button" @click="toggleRemoveSpousePhoto" class="text-white/70 hover:underline">Annuler</button>
+                                <button type="button" @click="toggleRemoveSpousePhoto" class="text-graphite/80 hover:underline">Annuler</button>
                             </p>
-                            <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-white/60 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white/80 hover:file:bg-white/20" />
-                            <p class="mt-1 text-xs text-white/35">Image, 5 Mo maximum.</p>
-                            <p v-if="form.errors.spouse_photo" class="mt-1 text-sm text-rose-400">{{ form.errors.spouse_photo }}</p>
+                            <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20" />
+                            <p class="mt-1 text-xs text-graphite/58">Image, 5 Mo maximum.</p>
+                            <p v-if="form.errors.spouse_photo" class="mt-1 text-sm text-rose-600">{{ form.errors.spouse_photo }}</p>
                         </div>
                     </div>
                 </section>
 
-                <div class="flex items-center justify-between border-t border-white/10 pt-6">
+                <div class="flex items-center justify-between border-t border-graphite/10 pt-6">
                     <button
                         type="submit"
                         :disabled="form.processing"
@@ -197,7 +197,7 @@ function destroy() {
                     <button
                         type="button"
                         @click="destroy"
-                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-rose-400 transition hover:bg-rose-500/10"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium text-rose-600 transition hover:bg-rose-500/10"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />

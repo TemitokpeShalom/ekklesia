@@ -4,7 +4,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { assistantFetch } from '../../assistantApi'
 
 /**
- * Assistant IA integre a Ekklesia (chantier du 2026-09-10, "autres
+ * Assistant IA integre a Oikonema (chantier du 2026-09-10, "autres
  * corrections" point 1). Monte UNE SEULE FOIS, globalement, depuis
  * app.js (pas depuis AppLayout.vue) : plusieurs ecrans plus anciens
  * n'utilisent pas encore ce layout (voir son commentaire d'en-tete), et
@@ -28,7 +28,7 @@ const sending = ref(false)
 const errorMessage = ref(null)
 const dailyLimitReached = ref(false)
 
-const assistantName = ref('Assistant Ekklesia')
+const assistantName = ref('Assistant Oikonema')
 const assistantTagline = ref('')
 const conversationId = ref(null)
 const messages = ref([])
@@ -228,7 +228,7 @@ watch(open, (isOpen) => {
                     <span class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-night font-serif font-bold text-[13px]">{{ initials }}</span>
                     <div class="min-w-0 flex-1">
                         <p class="font-serif text-white text-[14px] leading-tight truncate">{{ assistantName }}</p>
-                        <p class="text-[11px] text-white/50 truncate">{{ assistantTagline || 'Assistant Ekklesia' }}</p>
+                        <p class="text-[11px] text-white/50 truncate">{{ assistantTagline || 'Assistant Oikonema' }}</p>
                     </div>
                     <button
                         type="button"
@@ -264,7 +264,7 @@ watch(open, (isOpen) => {
                     <div v-if="loading && messages.length === 0" class="text-center text-white/40 text-[12px] pt-8">Chargement…</div>
 
                     <p v-if="!loading && messages.length === 0" class="text-white/50 text-[13px] leading-relaxed">
-                        Shalom et bienvenue 👋 Je suis {{ assistantName }}, {{ assistantTagline || 'votre assistant Ekklesia' }}. Posez-moi une question sur le fonctionnement de la plateforme, ou décrivez-moi une difficulté rencontrée.
+                        Shalom et bienvenue 👋 Je suis {{ assistantName }}, {{ assistantTagline || 'votre assistant Oikonema' }}. Posez-moi une question sur le fonctionnement de la plateforme, ou décrivez-moi une difficulté rencontrée.
                     </p>
 
                     <div v-for="message in messages" :key="message.id" class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
@@ -332,7 +332,7 @@ watch(open, (isOpen) => {
         <button
             type="button"
             class="w-14 h-14 rounded-full bg-gradient-to-br from-gold to-gold-dark shadow-glow-gold flex items-center justify-center text-night hover:scale-105 transition-transform"
-            :aria-label="open ? 'Fermer l\'assistant' : 'Ouvrir l\'assistant Ekklesia'"
+            :aria-label="open ? 'Fermer l\'assistant' : 'Ouvrir l\'assistant Oikonema'"
             @click="toggleOpen"
         >
             <svg v-if="!open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.678 3.348-3.97Z" clip-rule="evenodd" /></svg>

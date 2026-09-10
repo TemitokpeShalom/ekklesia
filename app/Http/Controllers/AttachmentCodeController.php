@@ -77,7 +77,7 @@ class AttachmentCodeController extends Controller
         $authenticatedUser = $request->user();
 
         if (! $authenticatedUser) {
-            // Personne pas encore connue d'Ekklesia (nouvelle eglise) : son
+            // Personne pas encore connue d'Oikonema (nouvelle eglise) : son
             // compte est cree dans le meme geste que le rattachement, comme
             // pour une invitation (point 11) - jamais un compte partage.
             $rules += [

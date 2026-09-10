@@ -73,7 +73,7 @@ class AttachmentCodeService
      * par la personne qui remplit le formulaire (point 03).
      *
      * $usedBy est la personne qui redeem le code si elle a deja un compte
-     * Ekklesia (ex. un responsable regional qui rattache lui-meme une
+     * Oikonema (ex. un responsable regional qui rattache lui-meme une
      * nouvelle entite a sa propre branche). Si elle n'en a pas encore -
      * cas normal d'une eglise reellement nouvelle - $usedBy est null et
      * $newAccount doit porter les champs necessaires a la creation d'un

@@ -62,6 +62,29 @@ export default {
                     cardLight: '#343d34',
                     border: '#48534a',
                 },
+                // v4 "Constellation" (2026-09-10) : demande du ministere de
+                // revenir a un fond clair, mais SANS reprendre le parchemin
+                // v1 (juge "trop classique") -- ici un blanc net et un gris
+                // neutre tres pale, dans l'esprit d'un portail administratif
+                // (gouv.fr, service public...), plutot qu'un ton chaud
+                // "papier ancien". Le vin et l'or restent les seuls accents
+                // de marque, employes avec parcimonie sur ce fond clair --
+                // rien n'est jete de l'identite, elle change seulement de
+                // support (voir commentaires plus haut : v1 clair -> v3
+                // sombre -> v4 clair a nouveau, mais neutre cette fois).
+                paper: {
+                    DEFAULT: '#ffffff',
+                    soft: '#f6f7f9',
+                    muted: '#eceef2',
+                },
+                // Texte : gris-anthracite neutre (jamais le brun chaud
+                // d'"ink", reserve aux ecrans pas encore migres) pour un
+                // rendu sobre et tres lisible sur fond blanc.
+                graphite: {
+                    DEFAULT: '#20242c',
+                    soft: '#4c525c',
+                    faint: '#8a909b',
+                },
             },
             fontFamily: {
                 serif: ['Fraunces', 'ui-serif', 'Georgia', 'serif'],
@@ -73,6 +96,12 @@ export default {
                 'glow-forest': '0 0 50px -14px rgba(47,107,79,0.5)',
                 'glow-slateblue': '0 0 50px -14px rgba(46,76,109,0.5)',
                 'inner-glow': 'inset 0 1px 0 0 rgba(255,255,255,0.06)',
+                // v4 : ombre neutre discrete pour les cartes sur fond clair
+                // (remplace l'effet "verre depoli sur fond sombre" -- les
+                // glow-* colores restent disponibles et fonctionnent aussi
+                // bien en survol sur fond blanc, cf. Dashboard/Index.vue).
+                card: '0 1px 2px rgba(32,36,44,0.04), 0 2px 8px rgba(32,36,44,0.06)',
+                'card-hover': '0 2px 4px rgba(32,36,44,0.05), 0 8px 20px rgba(32,36,44,0.09)',
             },
             backdropBlur: {
                 xs: '2px',

@@ -92,12 +92,12 @@ function formatUsdt(value) {
   <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
     <template #title>
       <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-        <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold flex items-center gap-2">
+        <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
           <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
           Paramètres
         </p>
-        <h1 class="font-serif text-3xl text-white mt-2">Abonnement et facturation</h1>
-        <p class="text-sm text-white/55 mt-2 max-w-2xl">
+        <h1 class="font-serif text-3xl text-graphite mt-2">Abonnement et facturation</h1>
+        <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
           Choisissez l'offre adaptée à la taille de votre ministère. Le changement est appliqué immédiatement.
         </p>
       </div>
@@ -105,27 +105,27 @@ function formatUsdt(value) {
 
     <div class="space-y-8">
       <div v-if="flashError" class="glass-panel rounded-2xl px-5 py-4 border-rose-400/40 animate-[fadeInUp_0.5s_ease-out_both]">
-        <p class="text-sm text-rose-300">{{ flashError }}</p>
+        <p class="text-sm text-rose-500">{{ flashError }}</p>
       </div>
 
       <div v-if="subscription.on_trial" class="glass-panel rounded-2xl px-5 py-4 flex items-center gap-3 border-gold/30 animate-[fadeInUp_0.55s_ease-out_both]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gold-soft shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-sanctuary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p class="text-sm text-white/80">
-          Période d'essai en cours, jusqu'au <span class="font-semibold text-white">{{ formatDate(subscription.trial_ends_at) }}</span>.
+        <p class="text-sm text-graphite/87">
+          Période d'essai en cours, jusqu'au <span class="font-semibold text-graphite">{{ formatDate(subscription.trial_ends_at) }}</span>.
         </p>
       </div>
 
       <div v-else-if="subscription.status === 'active'" class="glass-panel rounded-2xl px-5 py-4 border-forest/30 animate-[fadeInUp_0.55s_ease-out_both]">
-        <p class="text-sm text-white/80">
-          Abonnement actif : renouvellement le <span class="font-semibold text-white">{{ formatDate(subscription.current_period_ends_at) }}</span>.
+        <p class="text-sm text-graphite/87">
+          Abonnement actif : renouvellement le <span class="font-semibold text-graphite">{{ formatDate(subscription.current_period_ends_at) }}</span>.
         </p>
       </div>
 
       <div v-else class="glass-panel rounded-2xl px-5 py-4 border-sanctuary/30 animate-[fadeInUp_0.55s_ease-out_both]">
         <p class="text-sm text-sanctuary-light">
-          Aucun abonnement actif. Choisissez une offre ci-dessous pour continuer à utiliser Ekklesia sans interruption.
+          Aucun abonnement actif. Choisissez une offre ci-dessous pour continuer à utiliser Oikonema sans interruption.
         </p>
       </div>
 
@@ -135,11 +135,11 @@ function formatUsdt(value) {
         <div v-for="plan in plans" :key="plan.id"
           class="glass-panel rounded-3xl p-6 flex flex-col"
           :class="plan.id === subscription.plan_id ? 'border-forest/50 ring-1 ring-forest/30' : ''">
-          <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold mb-1">{{ plan.name }}</p>
-          <p class="font-serif text-2xl text-white mb-1">{{ formatPrice(plan.price_monthly, plan.currency) }}</p>
-          <p class="text-sm text-white/45 mb-4">{{ formatChurches(plan.max_local_churches) }}</p>
+          <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">{{ plan.name }}</p>
+          <p class="font-serif text-2xl text-graphite mb-1">{{ formatPrice(plan.price_monthly, plan.currency) }}</p>
+          <p class="text-sm text-graphite/65 mb-4">{{ formatChurches(plan.max_local_churches) }}</p>
 
-          <ul class="space-y-2 text-sm text-white/75 mb-6 flex-1">
+          <ul class="space-y-2 text-sm text-graphite/83 mb-6 flex-1">
             <li v-for="(feature, i) in plan.features" :key="i" class="flex items-start gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-forest shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -162,7 +162,7 @@ function formatUsdt(value) {
             </button>
             <button v-if="payment.crypto_wallet_address && Number(plan.price_monthly) > 0" type="button"
               @click="openCrypto(plan.id)"
-              class="w-full glass-panel-light rounded-xl py-2.5 font-medium text-sm text-white/80 hover:border-gold/40 hover:text-gold-soft transition">
+              class="w-full glass-panel-light rounded-xl py-2.5 font-medium text-sm text-graphite/87 hover:border-gold/40 hover:text-sanctuary transition">
               <template v-if="plan.usdt_estimate != null">Payer en crypto (≈ {{ formatUsdt(plan.usdt_estimate) }} USDT)</template>
               <template v-else>Payer en crypto (USDT/BNB)</template>
             </button>
@@ -170,28 +170,28 @@ function formatUsdt(value) {
             <!-- Correction du 2026-09-10 : palier "sur devis" (price_monthly
             null, ex. National) - pas de paiement en ligne possible, un
             plafond fixe n'a pas de sens au-delà de 110 églises locales. -->
-            <p v-if="plan.price_monthly === null" class="text-xs text-white/50 text-center px-2 py-2.5">
-              Contactez l'équipe Ekklesia pour activer ce palier.
+            <p v-if="plan.price_monthly === null" class="text-xs text-graphite/68 text-center px-2 py-2.5">
+              Contactez l'équipe Oikonema pour activer ce palier.
             </p>
 
-            <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
-              <p v-if="plan.usdt_estimate != null" class="text-sm text-gold-soft font-semibold">
+            <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-graphite/10 bg-graphite/5 p-4">
+              <p v-if="plan.usdt_estimate != null" class="text-sm text-sanctuary font-semibold">
                 Montant à envoyer : ≈ {{ formatUsdt(plan.usdt_estimate) }} USDT (ou l'équivalent en BNB au cours du jour)
               </p>
-              <p class="text-xs text-white/55">
+              <p class="text-xs text-graphite/70">
                 Envoyez ce montant en USDT (BEP-20) ou BNB, sur BNB Smart Chain, à l'adresse :
-                <span class="block mt-1 break-all font-mono text-white/80">{{ payment.crypto_wallet_address }}</span>
+                <span class="block mt-1 break-all font-mono text-graphite/87">{{ payment.crypto_wallet_address }}</span>
                 Puis collez ici le hash de la transaction pour vérification. Le montant reçu est vérifié automatiquement par rapport au prix du plan (une petite marge est tolérée en cas de légère variation du cours entre l'affichage et l'envoi).
               </p>
               <input v-model="cryptoForm.tx_hash" type="text" placeholder="0x..."
-                class="w-full bg-white/5 border border-white/15 text-white placeholder-white/30 rounded-xl px-3.5 py-2.5 text-sm font-mono transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
-              <p v-if="cryptoForm.errors.tx_hash" class="text-sm text-rose-400">{{ cryptoForm.errors.tx_hash }}</p>
+                class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm font-mono transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+              <p v-if="cryptoForm.errors.tx_hash" class="text-sm text-rose-600">{{ cryptoForm.errors.tx_hash }}</p>
               <div class="flex items-center gap-2">
                 <button type="button" :disabled="cryptoForm.processing || !cryptoForm.tx_hash" @click="submitCrypto"
                   class="flex-1 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2 text-sm font-semibold disabled:opacity-60">
                   Vérifier et activer
                 </button>
-                <button type="button" @click="cryptoOpenFor = null" class="rounded-xl px-3 py-2 text-sm text-white/50 hover:text-white">
+                <button type="button" @click="cryptoOpenFor = null" class="rounded-xl px-3 py-2 text-sm text-graphite/68 hover:text-graphite">
                   Annuler
                 </button>
               </div>
@@ -201,15 +201,15 @@ function formatUsdt(value) {
       </div>
 
       <section v-if="paymentHistory.length > 0" class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.65s_ease-out_both]">
-        <h3 class="mb-4 text-xs font-semibold text-gold-soft/80 uppercase tracking-widest">Historique des paiements</h3>
+        <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Historique des paiements</h3>
         <table class="w-full text-sm">
           <tbody>
-            <tr v-for="entry in paymentHistory" :key="entry.id" class="border-b border-white/10 last:border-0">
-              <td class="py-2 text-white/45">{{ formatDate(entry.created_at) }}</td>
-              <td class="py-2 text-white/80">{{ entry.plan?.name ?? '-' }}</td>
-              <td class="py-2 text-white/60">{{ providerLabel(entry.provider) }}</td>
-              <td class="py-2 text-right text-white/80">{{ entry.amount ? formatPrice(entry.amount, entry.currency) : '-' }}</td>
-              <td class="py-2 text-right" :class="entry.status === 'success' ? 'text-forest' : entry.status === 'failed' ? 'text-rose-400' : 'text-gold-soft'">
+            <tr v-for="entry in paymentHistory" :key="entry.id" class="border-b border-graphite/10 last:border-0">
+              <td class="py-2 text-graphite/65">{{ formatDate(entry.created_at) }}</td>
+              <td class="py-2 text-graphite/87">{{ entry.plan?.name ?? '-' }}</td>
+              <td class="py-2 text-graphite/73">{{ providerLabel(entry.provider) }}</td>
+              <td class="py-2 text-right text-graphite/87">{{ entry.amount ? formatPrice(entry.amount, entry.currency) : '-' }}</td>
+              <td class="py-2 text-right" :class="entry.status === 'success' ? 'text-forest' : entry.status === 'failed' ? 'text-rose-600' : 'text-sanctuary'">
                 {{ statusLabel(entry.status) }}
               </td>
             </tr>

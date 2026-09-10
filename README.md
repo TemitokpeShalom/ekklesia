@@ -1,4 +1,4 @@
-# Ekklesia : Module Fondations
+# Oikonema : Module Fondations
 
 Premier module de code de la plateforme (voir `architecture.html`, point 10
 de la feuille de route). Couvre : `org_units` + `org_unit_history` (point

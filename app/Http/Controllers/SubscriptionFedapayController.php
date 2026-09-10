@@ -59,7 +59,7 @@ class SubscriptionFedapayController extends Controller
             $client = new FedaPayClient;
 
             $transaction = $client->createTransaction([
-                'description' => "Abonnement Ekklesia - {$plan->name} - {$ministry->name}",
+                'description' => "Abonnement Oikonema - {$plan->name} - {$ministry->name}",
                 'amount' => (int) round($plan->price_monthly),
                 'currency' => ['iso' => $plan->currency],
                 'callback_url' => route('subscription.edit', ['orgUnit' => $orgUnit->id]),

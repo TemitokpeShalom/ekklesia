@@ -3,7 +3,7 @@
 return [
 
     /*
-     * Assistant IA integre a Ekklesia (chantier du 2026-09-10). Comme pour
+     * Assistant IA integre a Oikonema (chantier du 2026-09-10). Comme pour
      * FedaPay, jamais de valeur en dur ici - tout vient du .env du serveur.
      *
      * ANTHROPIC_API_KEY : cle secrete a creer sur https://console.anthropic.com
@@ -26,7 +26,7 @@ return [
     // reglage a changer pour renommer l'assistant, jamais en dur dans le
     // Vue (voir AssistantWidget.vue).
     'name' => env('ASSISTANT_NAME', 'Frère David'),
-    'tagline' => env('ASSISTANT_TAGLINE', 'votre assistant Ekklesia'),
+    'tagline' => env('ASSISTANT_TAGLINE', 'votre assistant Oikonema'),
 
     // Combien de messages (tours utilisateur) une conversation peut
     // accumuler avant que l'historique envoye a l'API ne soit tronque aux

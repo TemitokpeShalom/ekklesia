@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
  * contient (regions, districts, eglises, historique, affectation, compte
  * demo@example.com). Grace a l'isolation stricte par ministry_id (point 04),
  * ceci ne touche jamais un ministere reel : la suppression est limitee au
- * seul ministere marque "DEMO-EKKLESIA". A relancer avant chaque nouvelle
+ * seul ministere marque "DEMO-OIKONEMA". A relancer avant chaque nouvelle
  * demonstration, suivi de "php artisan demo:seed" pour repartir a zero.
  */
 class DemoMinistryResetCommand extends Command
@@ -26,7 +26,7 @@ class DemoMinistryResetCommand extends Command
 
     public function handle(): int
     {
-        $ministry = Ministry::where('short_code', 'DEMO-EKKLESIA')->first();
+        $ministry = Ministry::where('short_code', 'DEMO-OIKONEMA')->first();
 
         if (! $ministry) {
             $this->info('Aucun ministere de demonstration a supprimer.');
