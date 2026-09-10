@@ -56,7 +56,7 @@ defineProps({
         <header class="relative z-10 sticky top-0 border-b border-graphite/10 glass-panel">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
                 <Link :href="orgUnit ? `/org-units/${orgUnit.id}` : '/'" class="flex items-center gap-3 min-w-0 group">
-                    <span class="shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-night font-serif font-bold text-[15px] shadow-glow-gold group-hover:scale-105 transition-transform duration-300">O</span>
+                    <span class="shrink-0 w-9 h-9 rounded-xl bg-white p-1 shadow-glow-gold flex items-center justify-center group-hover:scale-105 transition-transform duration-300"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-lg" /></span>
                     <span class="min-w-0" v-if="orgUnit">
                         <span class="block text-[10.5px] uppercase tracking-widest text-sanctuary/80 font-semibold truncate">{{ orgUnit.level_label }}</span>
                         <span class="block font-serif text-graphite text-[15px] leading-tight truncate">{{ orgUnit.name }}</span>

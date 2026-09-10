@@ -20,7 +20,7 @@ import { Link } from '@inertiajs/vue3'
         <div class="absolute inset-0 bg-vitrail" aria-hidden="true"></div>
 
         <div class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
-            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-gold to-gold-dark text-night font-serif font-bold shadow-glow-gold mb-5">O</span>
+            <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
             <h1 class="font-serif text-2xl text-white mb-3">Bientôt disponible</h1>
             <p class="text-sm text-white/60 mb-8">
                 La création directe d'un nouveau ministère depuis cette page arrive prochainement.
