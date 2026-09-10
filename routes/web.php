@@ -6,6 +6,7 @@ use App\Http\Controllers\AffectationsController;
 use App\Http\Controllers\OrgUnitTransformationController;
 use App\Http\Controllers\AnnouncementsController;
 use App\Http\Controllers\AssetsController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\AttachmentCodeController;
 use App\Http\Controllers\BibliothequeController;
 use App\Http\Controllers\CultesController;
@@ -99,6 +100,19 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // 2026-09-09 (voir HelpController).
     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
+
+    // Assistant IA integre (chantier du 2026-09-10, "autres corrections"
+    // point 1) : API JSON pour le widget flottant (AssistantWidget.vue),
+    // present sur toutes les pages authentifiees - jamais de visite
+    // Inertia ici, uniquement des appels fetch en arriere-plan. Voir
+    // AssistantController pour le detail de l'isolation par utilisateur
+    // (en plus de la RLS par ministere, deja active par tenant.context).
+    Route::prefix('assistant')->name('assistant.')->group(function () {
+        Route::get('/conversation', [AssistantController::class, 'show'])->name('show');
+        Route::post('/conversation/nouvelle', [AssistantController::class, 'startNew'])->name('new');
+        Route::post('/conversation/{conversation}/messages', [AssistantController::class, 'sendMessage'])->name('messages.store');
+        Route::post('/conversation/{conversation}/signaler', [AssistantController::class, 'flagFeedback'])->name('feedback');
+    });
 
     Route::get('/org-units/{orgUnit}/membres', [MembersController::class, 'index'])->name('members.index');
     Route::get('/org-units/{orgUnit}/membres/nouveau', [MembersController::class, 'create'])->name('members.create');
