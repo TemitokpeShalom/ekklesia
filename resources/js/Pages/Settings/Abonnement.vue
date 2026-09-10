@@ -5,11 +5,12 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
  * v3 "Vitrail" (2026-09-09), puis point 15 (passerelle de paiement,
- * 10/09/2026) : la mise a jour directe d'origine (form/choose) reste le
- * traitement d'un paiement recu hors ligne (virement, especes). FedaPay et
- * crypto s'y ajoutent comme deux moyens de paiement en ligne verifies,
- * chacun affiche seulement s'il est reellement configure sur ce serveur
- * (voir payment.fedapay_available / payment.crypto_wallet_address).
+ * 10/09/2026), puis reforme du 10/09/2026 : l'ancienne mise a jour directe
+ * (form/choose, "marquer comme paye hors ligne") a ete retiree - plus aucune
+ * auto-activation sans preuve de paiement. FedaPay et crypto restent les
+ * deux seuls moyens d'activer un abonnement, verifies cote serveur, chacun
+ * affiche seulement s'il est reellement configure sur ce serveur (voir
+ * payment.fedapay_available / payment.crypto_wallet_address).
  */
 const props = defineProps({
   orgUnit: Object,
@@ -26,15 +27,6 @@ const page = usePage()
 // voyait donc aucun message et ne pouvait s'en apercevoir qu'en relisant
 // l'historique des paiements plus bas.
 const flashError = computed(() => page.props.flash?.error)
-
-const form = useForm({
-  plan_id: props.subscription.plan_id,
-})
-
-function choose(planId) {
-  form.plan_id = planId
-  form.put(`/org-units/${props.orgUnit.id}/abonnement`)
-}
 
 function payWithFedapay(planId) {
   router.post(`/org-units/${props.orgUnit.id}/abonnement/fedapay`, { plan_id: planId })
@@ -165,10 +157,6 @@ function formatUsdt(value) {
               class="w-full glass-panel-light rounded-xl py-2.5 font-medium text-sm text-white/80 hover:border-gold/40 hover:text-gold-soft transition">
               <template v-if="plan.usdt_estimate != null">Payer en crypto (≈ {{ formatUsdt(plan.usdt_estimate) }} USDT)</template>
               <template v-else>Payer en crypto (USDT/BNB)</template>
-            </button>
-            <button type="button" :disabled="form.processing" @click="choose(plan.id)"
-              class="w-full rounded-xl py-2.5 text-sm font-medium text-white/50 transition hover:bg-white/10 hover:text-white">
-              Marquer comme payé hors ligne
             </button>
 
             <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
