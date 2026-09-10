@@ -135,9 +135,12 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     // Abonnement et facturation (point 15) : reglage unique par ministere,
     // ecran reserve a la racine de l'arbre - meme droit que les titres
-    // honorifiques et la gouvernance des acces ci-dessus.
+    // honorifiques et la gouvernance des acces ci-dessus. Reforme du
+    // 2026-09-10 : plus aucune auto-activation sans preuve de paiement -
+    // seuls les deux moyens de paiement verifies ci-dessous (FedaPay,
+    // crypto) peuvent desormais activer un abonnement (voir
+    // SubscriptionController, la route 'update' a ete retiree).
     Route::get('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'edit'])->name('subscription.edit');
-    Route::put('/org-units/{orgUnit}/abonnement', [SubscriptionController::class, 'update'])->name('subscription.update');
     Route::post('/org-units/{orgUnit}/abonnement/fedapay', [SubscriptionFedapayController::class, 'checkout'])->name('subscription.fedapay.checkout');
     Route::post('/org-units/{orgUnit}/abonnement/crypto', [SubscriptionCryptoController::class, 'store'])->name('subscription.crypto.store');
 
