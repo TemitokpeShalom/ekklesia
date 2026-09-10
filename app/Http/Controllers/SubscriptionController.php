@@ -5,22 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\OrgUnit;
 use App\Models\Plan;
 use App\Services\ExchangeRateService;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Abonnement et facturation (point 15). update() reste la mise a jour
- * directe d'origine (aucune preuve de paiement exigee) : elle sert
- * desormais au traitement d'un paiement recu hors ligne (virement, especes
- * - frequent pour ce type d'organisation), exactement comme avant. Les deux
- * moyens de paiement en ligne (FedaPay pour l'Afrique de l'Ouest/Centrale,
- * crypto pour la diaspora) sont branches separement - voir
- * SubscriptionFedapayController et SubscriptionCryptoController - et
- * mettent a jour le meme etat sur Ministry une fois le paiement verifie.
- * Reserve a la racine de l'arbre (rang 0), meme droit que la gouvernance
- * des acces.
+ * Abonnement et facturation (point 15). Reforme du 2026-09-10 : plus aucune
+ * activation sans preuve de paiement verifiee - l'ancienne methode update()
+ * qui laissait un responsable de ministere s'auto-activer directement
+ * (pensee a l'origine pour un paiement recu hors ligne, virement/especes) a
+ * ete retiree, ainsi que sa route ('subscription.update'). Les deux seuls
+ * moyens d'activer desormais un abonnement sont FedaPay (Afrique de
+ * l'Ouest/Centrale) et crypto (diaspora) - voir SubscriptionFedapayController
+ * et SubscriptionCryptoController - chacun verifie reellement le paiement
+ * avant de mettre a jour l'etat sur Ministry. Reserve a la racine de l'arbre
+ * (rang 0), meme droit que la gouvernance des acces.
  */
 class SubscriptionController extends Controller
 {
@@ -75,23 +73,5 @@ class SubscriptionController extends Controller
                 ->limit(10)
                 ->get(['id', 'plan_id', 'provider', 'status', 'amount', 'currency', 'created_at']),
         ]);
-    }
-
-    public function update(Request $request, OrgUnit $orgUnit): RedirectResponse
-    {
-        $this->authorize('manageMembers', $orgUnit);
-        abort_unless($orgUnit->level_rank === OrgUnit::RANK_MINISTERE, 404);
-
-        $data = $request->validate([
-            'plan_id' => ['required', 'uuid', 'exists:plans,id'],
-        ]);
-
-        $orgUnit->ministry->update([
-            'plan_id' => $data['plan_id'],
-            'subscription_status' => 'active',
-            'current_period_ends_at' => now()->addMonth(),
-        ]);
-
-        return redirect()->route('subscription.edit', ['orgUnit' => $orgUnit->id]);
     }
 }
