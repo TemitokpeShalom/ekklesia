@@ -52,13 +52,19 @@ function submitCrypto() {
 }
 
 function formatPrice(price, currency) {
+  // Correction du 2026-09-10 : price_monthly null = palier "sur devis"
+  // (voir Plan::NATIONAL), a distinguer de 0 = "Gratuit".
+  if (price === null || price === undefined) return 'Sur devis'
   const n = Number(price)
   if (n === 0) return 'Gratuit'
   return new Intl.NumberFormat('fr-FR').format(n) + ' ' + (currency || 'FCFA') + ' / mois'
 }
 
-function formatMembers(max) {
-  return max ? `Jusqu'à ${max} membres` : 'Membres illimités'
+// Correction du 2026-09-10 (point 15) : le palier se lit desormais au
+// nombre d'eglises locales rattachees, plus au nombre de membres - voir
+// la migration 2026_09_10_000011 pour la raison de ce changement.
+function formatChurches(max) {
+  return max ? `Jusqu'à ${max} églises locales` : 'Églises locales illimitées'
 }
 
 function formatDate(iso) {
@@ -123,13 +129,15 @@ function formatUsdt(value) {
         </p>
       </div>
 
-      <div class="grid sm:grid-cols-3 gap-5 animate-[fadeInUp_0.6s_ease-out_both]">
+      <!-- Correction du 2026-09-10 : 4 paliers desormais (ajout de National,
+      sur devis) - grille elargie en consequence. -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-[fadeInUp_0.6s_ease-out_both]">
         <div v-for="plan in plans" :key="plan.id"
           class="glass-panel rounded-3xl p-6 flex flex-col"
           :class="plan.id === subscription.plan_id ? 'border-forest/50 ring-1 ring-forest/30' : ''">
           <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold mb-1">{{ plan.name }}</p>
           <p class="font-serif text-2xl text-white mb-1">{{ formatPrice(plan.price_monthly, plan.currency) }}</p>
-          <p class="text-sm text-white/45 mb-4">{{ formatMembers(plan.max_members) }}</p>
+          <p class="text-sm text-white/45 mb-4">{{ formatChurches(plan.max_local_churches) }}</p>
 
           <ul class="space-y-2 text-sm text-white/75 mb-6 flex-1">
             <li v-for="(feature, i) in plan.features" :key="i" class="flex items-start gap-2">
@@ -158,6 +166,13 @@ function formatUsdt(value) {
               <template v-if="plan.usdt_estimate != null">Payer en crypto (≈ {{ formatUsdt(plan.usdt_estimate) }} USDT)</template>
               <template v-else>Payer en crypto (USDT/BNB)</template>
             </button>
+
+            <!-- Correction du 2026-09-10 : palier "sur devis" (price_monthly
+            null, ex. National) - pas de paiement en ligne possible, un
+            plafond fixe n'a pas de sens au-delà de 110 églises locales. -->
+            <p v-if="plan.price_monthly === null" class="text-xs text-white/50 text-center px-2 py-2.5">
+              Contactez l'équipe Ekklesia pour activer ce palier.
+            </p>
 
             <div v-if="cryptoOpenFor === plan.id" class="mt-3 space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
               <p v-if="plan.usdt_estimate != null" class="text-sm text-gold-soft font-semibold">
