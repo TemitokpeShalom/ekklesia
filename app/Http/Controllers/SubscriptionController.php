@@ -39,9 +39,9 @@ class SubscriptionController extends Controller
         $exchangeRates = filled($cryptoWalletAddress) ? new ExchangeRateService : null;
 
         $plans = Plan::orderBy('sort_order')
-            ->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_members', 'features'])
+            ->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_local_churches', 'features'])
             ->map(function (Plan $plan) use ($exchangeRates) {
-                $data = $plan->only(['id', 'code', 'name', 'price_monthly', 'currency', 'max_members', 'features']);
+                $data = $plan->only(['id', 'code', 'name', 'price_monthly', 'currency', 'max_local_churches', 'features']);
 
                 $data['usdt_estimate'] = ($exchangeRates && $plan->currency === 'XOF' && (float) $plan->price_monthly > 0)
                     ? $exchangeRates->usdtEstimateForXof((float) $plan->price_monthly)
