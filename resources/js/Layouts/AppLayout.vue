@@ -53,7 +53,21 @@ defineProps({
         <!-- Seul vestige decoratif de l'identite "Vitrail" : un lisere vin -> or, discret, en haut de chaque ecran. -->
         <div class="h-1 bg-gradient-to-r from-sanctuary via-sanctuary-light to-gold" aria-hidden="true"></div>
 
-        <header class="relative z-10 sticky top-0 border-b border-graphite/10 glass-panel">
+        <!--
+            Correction du 2026-09-11 : le menu "profil" (bouton + liste
+            deroulante ci-dessous) vit dans l'en-tete, mais l'en-tete et le
+            contenu principal (<main>) avaient tous les deux z-10 - a
+            priorite egale, c'est l'ordre d'apparition dans le code qui
+            décide, et <main> vient APRES <header> : sur les pages ou le
+            menu deroulant depasse la hauteur de l'en-tete (ex. /profil,
+            liste courte au-dessus), le contenu de la page se peignait donc
+            PAR-DESSUS le bas du menu ("Aide", "Se deconnecter"), les
+            rendant a la fois invisibles et incliquables (signale par le
+            ministere). L'en-tete passe a z-30, strictement au-dessus de
+            tout le reste de la page (z-10), pour que le menu deroulant
+            reste toujours visible et cliquable en entier.
+        -->
+        <header class="relative z-30 sticky top-0 border-b border-graphite/10 glass-panel">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
                 <Link :href="orgUnit ? `/org-units/${orgUnit.id}` : '/'" class="flex items-center gap-3 min-w-0 group">
                     <span class="shrink-0 w-9 h-9 rounded-xl bg-white p-1 shadow-glow-gold flex items-center justify-center group-hover:scale-105 transition-transform duration-300"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-lg" /></span>
