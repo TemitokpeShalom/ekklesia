@@ -47,9 +47,21 @@ class CultesController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
+        // Corrige le 2026-09-11 (retour du ministere) : un culte etait
+        // toujours cree "Planifie", meme quand sa date etait deja passee
+        // (ex. saisie retroactive d'un culte du mois dernier, avec ses
+        // presences deja connues) - or seuls les cultes "Termine" alimentent
+        // la Bibliotheque (voir BibliothequeController), donc un tel culte
+        // restait invisible tant que personne ne pensait a aller changer
+        // manuellement son statut depuis l'ecran Modifier. Un culte dont la
+        // date est aujourd'hui ou deja passee est donc desormais cree
+        // directement "Termine" ; seule une date future reste "Planifie"
+        // (rien n'a encore eu lieu, il n'y a donc rien a archiver).
+        $status = $data['service_date'] <= now()->toDateString() ? 'termine' : 'planifie';
+
         $orgUnit->cultes()->create($data + [
             'ministry_id' => $orgUnit->ministry_id,
-            'status' => 'planifie',
+            'status' => $status,
         ]);
 
         return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id]);

@@ -156,6 +156,9 @@ function submit() {
                     </button>
                 </div>
             </form>
+
+            <!-- Note discrete (2026-09-11), uniquement visible a l'impression : le logo Oikonema est masque sur le rapport (voir AppLayout.vue), seule cette mention texte, tres petite, rappelle qui a genere le document. -->
+            <p class="hidden print:block text-center text-[9px] text-graphite/40">Document généré par Oikonema</p>
         </div>
     </AppLayout>
 </template>

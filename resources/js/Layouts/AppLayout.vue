@@ -67,7 +67,22 @@ defineProps({
             tout le reste de la page (z-10), pour que le menu deroulant
             reste toujours visible et cliquable en entier.
         -->
-        <header class="relative z-30 sticky top-0 border-b border-graphite/10 glass-panel">
+        <!--
+            Corrige le 2026-09-11 : sur un rapport (finances, activites),
+            le ministere ne veut voir apparaitre QUE l'en-tete propre du
+            ministere (MinistryLetterhead : son nom, son sigle, son logo...),
+            jamais le logo/nom "Oikonema" de la plateforme elle-meme
+            ("le logo de l'application ne doit pas apparaître le rapport").
+            Aucune fonction d'export PDF n'existe encore sur la plateforme :
+            la seule facon, aujourd'hui, d'obtenir un rapport "papier" est
+            l'impression du navigateur (Ctrl+P / "Enregistrer en PDF"). On
+            masque donc l'habillage de l'application (en-tete avec le logo
+            Oikonema, pied de page) uniquement a l'impression (print:hidden,
+            variante Tailwind native pour @media print) : a l'ecran, rien ne
+            change ; imprimee, n'importe quelle page - rapport y compris -
+            ne montre plus que son propre contenu.
+        -->
+        <header class="print:hidden relative z-30 sticky top-0 border-b border-graphite/10 glass-panel">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
                 <Link :href="orgUnit ? `/org-units/${orgUnit.id}` : '/'" class="flex items-center gap-3 min-w-0 group">
                     <span class="shrink-0 w-9 h-9 rounded-xl bg-white p-1 shadow-glow-gold flex items-center justify-center group-hover:scale-105 transition-transform duration-300"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-lg" /></span>
@@ -135,7 +150,7 @@ defineProps({
             <slot />
         </main>
 
-        <footer class="relative z-10 max-w-6xl mx-auto px-6 pb-10 pt-4">
+        <footer class="print:hidden relative z-10 max-w-6xl mx-auto px-6 pb-10 pt-4">
             <p class="text-xs text-graphite/55 text-center">Oikonema, plateforme de gestion de ministère</p>
         </footer>
     </div>
