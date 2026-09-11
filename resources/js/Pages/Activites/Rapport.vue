@@ -11,7 +11,6 @@ const props = defineProps({
     month: String,
     report: Object,
     cultes: Array,
-    effectifs: Object,
     canManage: Boolean,
 })
 
@@ -27,6 +26,11 @@ const form = useForm({
 function monthLabel(value) {
     const [year, month] = value.split('-')
     return new Date(year, month - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+}
+
+function dateLabel(value) {
+    const [year, month, day] = value.split('-')
+    return new Date(year, month - 1, day).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function changeMonth(event) {
@@ -60,23 +64,46 @@ function submit() {
                 />
             </div>
 
+            <!--
+                Corrige le 2026-09-11 (retour du ministere) : une v1 de cet
+                encart affichait un total "Adultes"/"Enfants" obtenu en
+                additionnant les effectifs de chaque culte du mois - retire
+                ensuite entierement, a la demande explicite du ministere :
+                une meme personne presente a plusieurs cultes dans le mois y
+                est comptee autant de fois, ce total n'a donc aucun sens et
+                fausse la lecture ("la meme personne... sera comptee trois
+                fois"). Contrairement aux finances (ou un bilan global a du
+                sens, une devise ne se "represente" pas deux fois), les
+                effectifs ne se totalisent JAMAIS sur plusieurs cultes -
+                seul le nombre de cultes tenus est un total legitime.
+            -->
             <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.55s_ease-out_both]">
-                <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Effectifs (calculés depuis les cultes du mois)</h3>
-                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    <div>
-                        <p class="text-xs uppercase tracking-widest text-graphite/62">Adultes</p>
-                        <p class="mt-1 text-xl font-serif text-graphite">{{ effectifs.adultes }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs uppercase tracking-widest text-graphite/62">Enfants</p>
-                        <p class="mt-1 text-xl font-serif text-graphite">{{ effectifs.enfants }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs uppercase tracking-widest text-graphite/62">Cultes</p>
-                        <p class="mt-1 text-xl font-serif text-graphite">{{ cultes.length }}</p>
-                    </div>
-                </div>
-                <p class="mt-4 text-xs text-graphite/58">Ces chiffres viennent directement du module Cultes, ils ne sont jamais ressaisis ici.</p>
+                <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Cultes tenus ce mois</h3>
+                <p class="text-xl font-serif text-graphite">{{ cultes.length }}</p>
+                <p class="mt-4 text-xs text-graphite/58">Le détail (date, présences) de chaque culte est ci-dessous. Aucun total d'effectifs n'est calculé : une même personne présente à plusieurs cultes du mois y serait comptée plusieurs fois.</p>
+            </section>
+
+            <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.57s_ease-out_both]">
+                <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Détail par culte</h3>
+                <div v-if="cultes.length === 0" class="text-sm text-graphite/62">Aucun culte enregistré ce mois-ci.</div>
+                <table v-else class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-graphite/10 text-left text-xs uppercase tracking-widest text-graphite/55">
+                            <th class="py-2 font-semibold">Date</th>
+                            <th class="py-2 font-semibold">Culte</th>
+                            <th class="py-2 font-semibold text-right">Adultes</th>
+                            <th class="py-2 font-semibold text-right">Enfants</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="culte in cultes" :key="culte.id" class="border-b border-graphite/10 last:border-0">
+                            <td class="py-2 text-graphite/70 whitespace-nowrap">{{ dateLabel(culte.service_date) }}</td>
+                            <td class="py-2 text-graphite/87">{{ culte.title }}</td>
+                            <td class="py-2 text-right text-graphite">{{ culte.attendance_adults ?? '—' }}</td>
+                            <td class="py-2 text-right text-graphite">{{ culte.attendance_children ?? '—' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
 
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.6s_ease-out_both]">
