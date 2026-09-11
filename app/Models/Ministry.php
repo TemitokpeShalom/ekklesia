@@ -6,6 +6,7 @@ use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * L'annuaire des ministeres (point 03). Un ministere = un tenant = la
@@ -91,5 +92,31 @@ class Ministry extends Model
         return $this->onTrial()
             || ($this->subscription_status === 'active'
                 && ($this->current_period_ends_at === null || $this->current_period_ends_at->isFuture()));
+    }
+
+    /**
+     * En-tête officiel du ministère (2026-09-11) : demande explicite du
+     * ministère - le nom, le sigle, le n° d'autorisation, l'adresse, les
+     * coordonnées et le logo saisis via Settings/MinistryInfo doivent
+     * pouvoir s'afficher, bien centrés, en haut de l'espace de travail
+     * (Dashboard) et de chaque document généré (rapport financier, rapport
+     * d'activités) - comme un en-tête de courrier officiel. Toutes les
+     * valeurs sont nullables : un ministère qui n'a encore rien renseigné
+     * (ex. le compte de démonstration) obtient un en-tête minimal (le nom
+     * seul), jamais une page cassée - voir MinistryLetterhead.vue, qui
+     * consomme exactement cette forme.
+     */
+    public function letterhead(): array
+    {
+        return [
+            'name' => $this->name,
+            'acronym' => $this->acronym,
+            'registration_number' => $this->registration_number,
+            'headquarters_address' => $this->headquarters_address,
+            'phone' => $this->phone,
+            'email' => $this->email,
+            'website' => $this->website,
+            'logo_url' => $this->logo_path ? Storage::disk('public')->url($this->logo_path) : null,
+        ];
     }
 }

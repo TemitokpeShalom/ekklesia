@@ -1,6 +1,7 @@
 <script setup>
 import { useForm, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
 
 /**
  * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
@@ -9,6 +10,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 const props = defineProps({
     orgUnit: Object,
     month: String,
+    ministry: Object,
     report: Object,
     cultes: Array,
     canManage: Boolean,
@@ -55,6 +57,8 @@ function submit() {
         </template>
 
         <div class="max-w-3xl mx-auto space-y-8">
+            <MinistryLetterhead :ministry="ministry" />
+
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <input
                     type="month"

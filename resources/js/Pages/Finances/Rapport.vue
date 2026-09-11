@@ -1,6 +1,7 @@
 <script setup>
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
 
 /**
  * Point 08 (rapports consolidés multidevises, 10/09/2026) : ce rapport
@@ -13,6 +14,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
 const props = defineProps({
     orgUnit: Object,
     month: String,
+    ministry: Object,
     devises: Array,
 })
 
@@ -46,6 +48,8 @@ function changeMonth(event) {
         </template>
 
         <div class="max-w-3xl mx-auto space-y-8">
+            <MinistryLetterhead :ministry="ministry" />
+
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <input
                     type="month"

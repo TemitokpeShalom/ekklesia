@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
 
 /**
  * v4 "Constellation" (2026-09-10) : demande du ministere de revoir
@@ -23,6 +24,7 @@ import AppLayout from '@/Layouts/AppLayout.vue'
  */
 defineProps({
     orgUnit: Object,
+    ministry: Object,
     children: Array,
     activeAffectations: Array,
     canAccessLibrary: Boolean,
@@ -178,6 +180,8 @@ const modules = [
         </template>
 
         <div class="space-y-14">
+            <MinistryLetterhead :ministry="ministry" />
+
             <section v-if="activeAffectations.length" class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <h2 class="text-xs font-semibold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
                 <div class="flex flex-wrap gap-2">

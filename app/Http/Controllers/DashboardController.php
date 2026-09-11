@@ -21,6 +21,10 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard/Index', [
             'orgUnit' => $orgUnit->only(['id', 'name', 'level_label', 'level_rank', 'code']),
+            // En-tete officiel du ministere (2026-09-11, voir Ministry::letterhead())
+            // - visible des l'entree dans l'espace de travail, quel que soit
+            // le niveau consulte (le ministere reste le meme).
+            'ministry' => $orgUnit->ministry->letterhead(),
             'children' => $orgUnit->children()
                 ->orderBy('name')
                 ->get(['id', 'name', 'level_label', 'level_rank', 'code']),

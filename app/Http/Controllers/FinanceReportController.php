@@ -61,6 +61,10 @@ class FinanceReportController extends Controller
         return Inertia::render('Finances/Rapport', [
             'orgUnit' => $orgUnit,
             'month' => $month,
+            // En-tete officiel du ministere (2026-09-11, voir
+            // Ministry::letterhead()) - ce rapport est un document, il porte
+            // desormais l'identite du ministere comme un en-tete de courrier.
+            'ministry' => $orgUnit->ministry->letterhead(),
             'devises' => $devises,
         ]);
     }
