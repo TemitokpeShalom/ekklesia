@@ -25,15 +25,17 @@ class ActivityReportController extends Controller
             ->orderBy('service_date')
             ->get(['id', 'title', 'service_date', 'attendance_adults', 'attendance_children']);
 
+        // Retire le 2026-09-11 (retour du ministere) : un total d'effectifs
+        // obtenu en additionnant "attendance_adults"/"attendance_children"
+        // sur plusieurs cultes du mois compte plusieurs fois une meme
+        // personne presente a plus d'un culte - ce total n'a jamais de sens
+        // et ne doit plus etre calcule ni envoye a la vue. Seul le detail
+        // culte par culte (deja dans $cultes) est affiche desormais.
         return Inertia::render('Activites/Rapport', [
             'orgUnit' => $orgUnit,
             'month' => $month,
             'report' => $report,
             'cultes' => $cultes,
-            'effectifs' => [
-                'adultes' => (int) $cultes->sum('attendance_adults'),
-                'enfants' => (int) $cultes->sum('attendance_children'),
-            ],
             'canManage' => $request->user()->can('manageCultes', $orgUnit),
         ]);
     }
