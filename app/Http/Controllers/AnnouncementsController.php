@@ -8,6 +8,7 @@ use App\Models\OrgUnit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -74,7 +75,12 @@ class AnnouncementsController extends Controller
             'author_id' => $request->user()->id,
         ]);
 
-        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere, valable pour TOUS les
+        // modules d'enregistrement) : chaque enregistrement doit confirmer
+        // clairement sa reussite - le bandeau est deja vert (jamais rouge,
+        // reserve aux erreurs), voir AppLayout.vue.
+        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Annonce publiée.');
     }
 
     public function edit(OrgUnit $orgUnit, Announcement $announcement): Response
@@ -111,7 +117,8 @@ class AnnouncementsController extends Controller
 
         $announcement->update($data);
 
-        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Annonce mise à jour.');
     }
 
     public function destroy(OrgUnit $orgUnit, Announcement $announcement): RedirectResponse
@@ -125,7 +132,8 @@ class AnnouncementsController extends Controller
 
         $announcement->delete();
 
-        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('annonces.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Annonce supprimée.');
     }
 
     /**
@@ -145,14 +153,50 @@ class AnnouncementsController extends Controller
         return back();
     }
 
+    /**
+     * Corrige le 2026-09-12 (retour du ministere) : "dès qu'on joint un
+     * fichier... la publication ne fonctionne plus". Deux vrais problèmes
+     * distincts, aucun visible avant :
+     *
+     * 1) Quand un fichier depasse `upload_max_filesize` (reglage PHP du
+     *    serveur, jamais configure jusqu'ici pour ce module), PHP rejette
+     *    SEULEMENT ce fichier - les autres champs (titre, message...)
+     *    arrivent intacts. `$request->hasFile()` renvoie alors false SANS
+     *    LA MOINDRE ERREUR : l'annonce se publiait donc en silence, sans
+     *    la piece jointe, ce qui pouvait ressembler a "ca ne marche pas"
+     *    pour quelqu'un qui s'attend a voir son image/PDF joint. Detecte
+     *    ici explicitement (le fichier est present mais invalide) pour
+     *    afficher un vrai message d'erreur au lieu de publier a moitie.
+     * 2) Quand la piece jointe (+ le reste du formulaire) depasse
+     *    `post_max_size` (autre reglage PHP, plus bas que ca par defaut
+     *    sur une installation neuve), TOUTE la requete est rejetee avant
+     *    meme d'atteindre ce code - voir resources/views/errors/413.blade.php
+     *    pour la page d'erreur claire ajoutee a ce niveau.
+     *
+     * Le vrai correctif de fond reste cote serveur (voir LISEZ-MOI de
+     * cette livraison) : `upload_max_filesize`/`post_max_size` doivent
+     * être relevés au-dessus des 10 Mo déjà annoncés par
+     * MAX_ATTACHMENT_KB - sans ça, un fichier de plus de 2 Mo (reglage
+     * par defaut de PHP, jamais personnalise sur ce serveur) echouera
+     * toujours, quoi que fasse le code applicatif.
+     */
     private function validateAnnouncement(Request $request): array
     {
+        if ($request->file('attachment') && ! $request->file('attachment')->isValid()) {
+            throw ValidationException::withMessages([
+                'attachment' => "Le fichier joint n'a pas pu être reçu par le serveur (probablement trop volumineux pour la configuration actuelle du serveur) - réessayez avec un fichier plus petit, ou signalez-le à l'administrateur.",
+            ]);
+        }
+
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['nullable', 'string'],
             'important' => ['nullable', 'boolean'],
             'expires_at' => ['nullable', 'date'],
-            'attachment' => ['nullable', 'file', 'max:'.self::MAX_ATTACHMENT_KB],
+            // Types precises ici (correspondant enfin au texte deja
+            // affiche sous le champ - "Image, PDF, document Word ou
+            // audio" - qui n'etait jusqu'ici jamais verifie).
+            'attachment' => ['nullable', 'file', 'max:'.self::MAX_ATTACHMENT_KB, 'mimes:jpg,jpeg,png,webp,gif,pdf,doc,docx,mp3,wav,m4a,ogg'],
         ]);
 
         unset($data['attachment']);

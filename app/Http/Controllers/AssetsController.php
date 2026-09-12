@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetInventoryValidation;
 use App\Models\OrgUnit;
 use App\Services\AccountingStandardResolver;
 use Illuminate\Http\RedirectResponse;
@@ -72,7 +73,11 @@ class AssetsController extends Controller
             'code' => $this->nextCode($orgUnit, $data['category']),
         ]);
 
-        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere, valable pour TOUS les
+        // modules d'enregistrement) : confirmer clairement la reussite,
+        // toujours en vert - jamais en rouge, reserve aux erreurs.
+        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Bien enregistré.');
     }
 
     public function edit(OrgUnit $orgUnit, Asset $asset): Response
@@ -97,7 +102,8 @@ class AssetsController extends Controller
 
         $asset->update($data);
 
-        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Bien mis à jour.');
     }
 
     public function destroy(OrgUnit $orgUnit, Asset $asset): RedirectResponse
@@ -109,7 +115,8 @@ class AssetsController extends Controller
         // jamais reutilise, meme apres le retrait d'un bien.
         $asset->delete();
 
-        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('inventaire.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Bien retiré.');
     }
 
     public function rapport(Request $request, OrgUnit $orgUnit): Response
@@ -118,7 +125,85 @@ class AssetsController extends Controller
 
         $date = $request->query('date', now()->format('Y-m-d'));
         $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : now()->format('Y-m-d');
+        $year = (int) date('Y', strtotime($date));
 
+        $parCategorie = $this->consolidatedAssets($orgUnit, $date);
+
+        $validation = AssetInventoryValidation::where('org_unit_id', $orgUnit->id)
+            ->where('year', $year)
+            ->with('validator:id,name')
+            ->first();
+
+        return Inertia::render('Inventaire/Rapport', [
+            'orgUnit' => $orgUnit,
+            'date' => $date,
+            'year' => $year,
+            'parCategorie' => $parCategorie,
+            // Devise du pays du noeud consulte - une consolidation qui remonte
+            // au-dela d'un seul pays melange donc des devises differentes dans
+            // ce total, comme deja le cas avant le point 18 (aucune conversion
+            // de change n'existe dans l'application).
+            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
+            // En-tete officiel + bloc "position" (retour du ministere,
+            // 2026-09-12 : "un peu comme sur les rapports [...] au niveau
+            // qui suit les informations sur l'eglise") - meme convention que
+            // Finances/Activites.
+            'ministry' => $orgUnit->ministry->letterhead(),
+            'ancestry' => $orgUnit->ancestryChain(),
+            'pastorName' => $orgUnit->pastorName(),
+            'validation' => $validation ? [
+                'validated_at' => $validation->validated_at,
+                'validator_name' => $validation->validator?->name,
+            ] : null,
+            'canManage' => $request->user()->can('manageFinances', $orgUnit),
+        ]);
+    }
+
+    /**
+     * Chantier "module Inventaire" (2026-09-12, retour du ministere) :
+     * "c'est un bouton qui manque et c'est un document qui manque" - meme
+     * principe que FinanceReportController::validateReport : "valider" ne
+     * fait qu'attester que l'annee a ete verifiee et peut etre
+     * archivee/imprimee depuis Documents > Rapports ; cela ne bloque pas
+     * l'enregistrement d'un bien pour cette annee (memes limites deja
+     * acceptees pour les Finances - verrouiller la saisie serait un
+     * chantier a part, plus lourd).
+     */
+    public function validateReport(Request $request, OrgUnit $orgUnit): RedirectResponse
+    {
+        $this->authorize('manageFinances', $orgUnit);
+
+        $year = (int) $request->input('year', now()->format('Y'));
+
+        AssetInventoryValidation::updateOrCreate(
+            ['org_unit_id' => $orgUnit->id, 'year' => $year],
+            ['ministry_id' => $orgUnit->ministry_id, 'validated_at' => now(), 'validated_by' => $request->user()->id]
+        );
+
+        return redirect()->route('inventaire.rapport', ['orgUnit' => $orgUnit->id, 'date' => "{$year}-12-31"])
+            ->with('success', "Fiche d'inventaire {$year} validée et archivée.");
+    }
+
+    public function unlock(Request $request, OrgUnit $orgUnit): RedirectResponse
+    {
+        $this->authorize('manageFinances', $orgUnit);
+
+        $year = (int) $request->input('year', now()->format('Y'));
+
+        AssetInventoryValidation::where('org_unit_id', $orgUnit->id)->where('year', $year)->delete();
+
+        return redirect()->route('inventaire.rapport', ['orgUnit' => $orgUnit->id, 'date' => "{$year}-12-31"])
+            ->with('success', "Fiche d'inventaire {$year} déverrouillée.");
+    }
+
+    /**
+     * Extrait de rapport() (2026-09-12) pour etre reutilise tel quel par
+     * l'archive imprimable (RapportsArchiveController::inventaire) une
+     * fois l'annee validee - mêmes chiffres partout, jamais recalcules
+     * differemment d'un endroit a l'autre.
+     */
+    public function consolidatedAssets(OrgUnit $orgUnit, string $date)
+    {
         // Fiche consolidee = biens propres + biens de tous les descendants
         // (point 12, "activite propre"), a la date choisie.
         $orgUnitIds = OrgUnit::descendantsOf($orgUnit)->pluck('id');
@@ -132,20 +217,9 @@ class AssetsController extends Controller
             ->orderBy('code')
             ->get();
 
-        $parCategorie = $assets->groupBy('category')->map(fn ($group) => [
+        return $assets->groupBy('category')->map(fn ($group) => [
             'items' => $group->values(),
             'total' => (float) $group->sum('acquisition_value'),
-        ]);
-
-        return Inertia::render('Inventaire/Rapport', [
-            'orgUnit' => $orgUnit,
-            'date' => $date,
-            'parCategorie' => $parCategorie,
-            // Devise du pays du noeud consulte - une consolidation qui remonte
-            // au-dela d'un seul pays melange donc des devises differentes dans
-            // ce total, comme deja le cas avant le point 18 (aucune conversion
-            // de change n'existe dans l'application).
-            'currency' => AccountingStandardResolver::currencyFor($orgUnit),
         ]);
     }
 

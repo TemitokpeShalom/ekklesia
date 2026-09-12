@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FinancialTransaction;
+use App\Models\FinancialReportValidation;
 use App\Models\OrgUnit;
-use App\Services\AccountingStandardResolver;
+use App\Services\FinanceReportBuilder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class FinanceReportController extends Controller
 {
-    /** Libelles universels (point 18) utilises quand le pays de l'org_unit n'a pas encore de norme documentee. */
-    private const TYPE_LABELS = [
-        'dime' => 'Dîmes',
-        'offrande' => 'Offrandes',
-        'action_de_grace' => 'Action de grâce',
-        'don' => 'Dons',
-        'depense' => 'Dépenses',
-    ];
+    public function __construct(private FinanceReportBuilder $reportBuilder)
+    {
+    }
 
     /**
      * Point 08 (rapports consolidés multidevises) : vue consolidée = les
@@ -30,7 +25,9 @@ class FinanceReportController extends Controller
      * change n'existe dans l'application (meme principe deja applique a
      * l'inventaire, point 19), le rapport ne totalise jamais deux devises
      * ensemble : chaque devise rencontree obtient son propre bloc, avec son
-     * propre detail et son propre solde.
+     * propre detail et son propre solde. Le calcul lui-meme vit desormais
+     * dans FinanceReportBuilder (chantier "module Documents", 2026-09-12),
+     * partage avec l'archive imprimable une fois le mois valide.
      */
     public function show(Request $request, OrgUnit $orgUnit): Response
     {
@@ -44,19 +41,12 @@ class FinanceReportController extends Controller
         $start = $month.'-01';
         $end = date('Y-m-t', strtotime($start));
 
-        $orgUnitIds = OrgUnit::descendantsOf($orgUnit)->pluck('id');
+        $devises = $this->reportBuilder->build($orgUnit, $start, $end);
 
-        $transactions = FinancialTransaction::whereIn('org_unit_id', $orgUnitIds)
-            ->whereBetween('transaction_date', [$start, $end])
-            ->with('orgUnit')
-            ->orderBy('transaction_date')
-            ->get();
-
-        $devises = $transactions
-            ->groupBy('currency')
-            ->map(fn ($group, $currency) => $this->buildDeviseBlock($currency, $group))
-            ->sortKeys()
-            ->values();
+        $validation = FinancialReportValidation::where('org_unit_id', $orgUnit->id)
+            ->where('period', $start)
+            ->with('validator:id,name')
+            ->first();
 
         return Inertia::render('Finances/Rapport', [
             'orgUnit' => $orgUnit,
@@ -65,55 +55,60 @@ class FinanceReportController extends Controller
             // Ministry::letterhead()) - ce rapport est un document, il porte
             // desormais l'identite du ministere comme un en-tete de courrier.
             'ministry' => $orgUnit->ministry->letterhead(),
+            // Bloc "position" (retour du ministere, 2026-09-12 : "la
+            // position de l'eglise concernee... et le nom du pasteur") -
+            // deja present sur l'archive imprimable, ajoute ici pour que
+            // le rapport "vivant" (avant validation) le montre aussi.
+            'ancestry' => $orgUnit->ancestryChain(),
+            'pastorName' => $orgUnit->pastorName(),
             'devises' => $devises,
+            'validation' => $validation ? [
+                'validated_at' => $validation->validated_at,
+                'validator_name' => $validation->validator?->name,
+            ] : null,
+            'canManage' => $request->user()->can('manageFinances', $orgUnit),
         ]);
     }
 
     /**
-     * Le detail par compte comptable n'a de sens que si TOUTES les lignes
-     * de cette devise viennent du meme plan de comptes (account_code deja
-     * renseigne a la saisie, voir FinanceTransactionsController) - des que
-     * la devise melange des mouvements avec et sans compte comptable, on
-     * retombe sur la seule nature universelle (type), jamais un compte
-     * invente ou mélangé entre deux normes.
+     * Chantier "module Documents" (2026-09-12) : contrairement au rapport
+     * d'activites, il n'y a pas de ligne a verrouiller ici (voir
+     * FinancialReportValidation) - "valider" ne fait qu'attester que ce
+     * mois a ete verifie et peut etre archive/imprime depuis Documents >
+     * Rapports ; cela ne bloque pas la saisie d'un mouvement pour ce mois
+     * (verrouiller la saisie elle-meme serait un chantier a part, plus
+     * lourd - voir LISEZ-MOI de cette livraison).
      */
-    private function buildDeviseBlock(string $currency, Collection $group): array
+    public function validateReport(Request $request, OrgUnit $orgUnit): RedirectResponse
     {
-        $hasStandard = $group->every(fn ($t) => $t->account_code !== null);
-        $groupKey = $hasStandard ? 'account_code' : 'type';
+        $this->authorize('manageFinances', $orgUnit);
 
-        $encaissements = $this->groupLines($group->where('nature', 'encaissement'), $groupKey, $hasStandard);
-        $decaissements = $this->groupLines($group->where('nature', 'decaissement'), $groupKey, $hasStandard);
+        $month = $request->input('month', now()->format('Y-m'));
+        if (! preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = now()->format('Y-m');
+        }
 
-        $totalEncaissements = $encaissements->sum('total');
-        $totalDecaissements = $decaissements->sum('total');
+        FinancialReportValidation::updateOrCreate(
+            ['org_unit_id' => $orgUnit->id, 'period' => $month.'-01'],
+            ['ministry_id' => $orgUnit->ministry_id, 'validated_at' => now(), 'validated_by' => $request->user()->id]
+        );
 
-        $standard = $hasStandard ? AccountingStandardResolver::forOrgUnit($group->first()->orgUnit) : null;
-
-        return [
-            'currency' => $currency,
-            'accountingStandardLabel' => $standard['label'] ?? null,
-            'encaissements' => $encaissements,
-            'decaissements' => $decaissements,
-            'totalEncaissements' => $totalEncaissements,
-            'totalDecaissements' => $totalDecaissements,
-            'solde' => $totalEncaissements - $totalDecaissements,
-        ];
+        return redirect()->route('finances.rapport', ['orgUnit' => $orgUnit->id, 'mois' => $month])
+            ->with('success', 'Rapport financier validé et archivé.');
     }
 
-    private function groupLines(Collection $transactions, string $groupKey, bool $hasStandard): Collection
+    public function unlock(Request $request, OrgUnit $orgUnit): RedirectResponse
     {
-        return $transactions
-            ->groupBy($groupKey)
-            ->map(function ($group) use ($hasStandard) {
-                $first = $group->first();
+        $this->authorize('manageFinances', $orgUnit);
 
-                return [
-                    'account_code' => $hasStandard ? $first->account_code : null,
-                    'account_label' => $hasStandard ? $first->account_label : (self::TYPE_LABELS[$first->type] ?? $first->type),
-                    'total' => $group->sum('amount'),
-                ];
-            })
-            ->values();
+        $month = $request->input('month', now()->format('Y-m'));
+        if (! preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = now()->format('Y-m');
+        }
+
+        FinancialReportValidation::where('org_unit_id', $orgUnit->id)->where('period', $month.'-01')->delete();
+
+        return redirect()->route('finances.rapport', ['orgUnit' => $orgUnit->id, 'mois' => $month])
+            ->with('success', 'Rapport financier déverrouillé.');
     }
 }

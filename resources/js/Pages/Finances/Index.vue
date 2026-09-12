@@ -1,5 +1,6 @@
 <script setup>
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, useForm } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
@@ -7,6 +8,13 @@ import AppLayout from '@/Layouts/AppLayout.vue'
  * partagee AppLayout, sans aucun changement fonctionnel (memes props,
  * memes routes, meme logique) - seul l'habillage passe du blanc/ardoise
  * a la coquille sombre en verre depoli.
+ *
+ * Corrige le 2026-09-12 (retour du ministere, chantier "module Finances") :
+ * boutons recolores en azur (comme tous les autres modules deja corriges) ;
+ * "Rapport d'activités du mois" retire d'ici - ce rapport a deja sa propre
+ * tuile independante sur le tableau de bord ("Rapport d'activités",
+ * key: 'rapport'), ce lien-ci etait un doublon ; ajout du selecteur de
+ * norme comptable ("il faut... choisir la norme comptable").
  */
 const props = defineProps({
     orgUnit: Object,
@@ -15,7 +23,20 @@ const props = defineProps({
     totals: Object,
     currency: String,
     accountingStandardLabel: String,
+    canManage: Boolean,
+    accountingStandard: Object,
 })
+
+const standardMenuOpen = ref(false)
+const standardForm = useForm({ standard: null })
+
+function chooseStandard(code) {
+    standardForm.standard = code
+    standardForm.post(`/org-units/${props.orgUnit.id}/finances/norme-comptable`, {
+        preserveScroll: true,
+        onSuccess: () => { standardMenuOpen.value = false },
+    })
+}
 
 function typeLabel(type) {
     return {
@@ -65,6 +86,40 @@ function changeMonth(event) {
                 <p v-if="!accountingStandardLabel" class="mt-2 text-xs text-sanctuary/90">
                     Aucune norme comptable n'est encore configurée pour ce pays : les mouvements sont enregistrés sans compte comptable, ce qui n'empêche pas leur saisie.
                 </p>
+
+                <div v-if="canManage" class="relative mt-4 inline-block">
+                    <button type="button" @click="standardMenuOpen = !standardMenuOpen"
+                        class="inline-flex items-center gap-1.5 text-xs font-medium text-azure bg-azure/10 hover:bg-azure/15 border border-azure/20 rounded-full px-3.5 py-1.5 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-3.5 w-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.766.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.273-.807.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.107-1.204l-.527-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                        Norme comptable : {{ accountingStandardLabel ?? 'aucune (universelle)' }}
+                        <span v-if="accountingStandard?.isOverride" class="text-azure/70">(forcée)</span>
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    <button v-if="standardMenuOpen" type="button" tabindex="-1" aria-hidden="true"
+                        @click="standardMenuOpen = false" class="fixed inset-0 z-10 cursor-default"></button>
+
+                    <div v-if="standardMenuOpen"
+                        class="absolute left-0 mt-2 w-80 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
+                        <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Choisir la norme comptable</p>
+                        <button type="button" @click="chooseStandard(null)"
+                            class="w-full text-left block px-4 py-2 hover:bg-graphite/5">
+                            <p class="text-sm font-medium text-graphite">Détection automatique</p>
+                            <p class="text-xs text-graphite/60">Selon le pays de cette entité</p>
+                        </button>
+                        <button v-for="option in accountingStandard.available" :key="option.code" type="button" @click="chooseStandard(option.code)"
+                            class="w-full text-left block px-4 py-2 hover:bg-graphite/5">
+                            <p class="text-sm font-medium text-graphite">{{ option.label }}</p>
+                            <p class="text-xs text-graphite/60">Forcer cette norme pour cette entité et ses niveaux descendants</p>
+                        </button>
+                        <p class="px-4 pt-2 pb-1 text-xs text-graphite/50 border-t border-graphite/10 mt-1">
+                            D'autres normes (Nigeria, Ghana, Afrique du Sud, États-Unis, Inde, Suisse, République tchèque, France, Rwanda...) apparaîtront ici dès que leurs documents comptables officiels seront fournis.
+                        </p>
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -78,7 +133,7 @@ function changeMonth(event) {
                 />
                 <Link
                     :href="`/org-units/${orgUnit.id}/finances/nouveau`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -102,18 +157,20 @@ function changeMonth(event) {
                 </div>
             </div>
 
+            <!--
+                Corrige le 2026-09-12 (retour du ministere) : "Rapport
+                d'activités du mois" retire d'ici - c'est un doublon, ce
+                rapport a deja sa propre tuile independante sur le tableau
+                de bord ("Rapport d'activités"), sans lien avec le module
+                Finances. Seul reste ici ce qui concerne vraiment les
+                finances.
+            -->
             <div class="flex flex-wrap gap-3 text-sm animate-[fadeInUp_0.65s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/finances-rapport?mois=${month}`"
-                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 font-medium text-graphite/87 hover:border-gold/40 hover:text-sanctuary transition"
+                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 font-medium text-graphite/87 hover:border-azure/40 hover:text-azure transition"
                 >
                     Rapport financier du mois
-                </Link>
-                <Link
-                    :href="`/org-units/${orgUnit.id}/rapport-activites?mois=${month}`"
-                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 font-medium text-graphite/87 hover:border-gold/40 hover:text-sanctuary transition"
-                >
-                    Rapport d'activités du mois
                 </Link>
             </div>
 

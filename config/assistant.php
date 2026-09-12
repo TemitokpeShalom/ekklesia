@@ -34,6 +34,19 @@ return [
     // etat : tout l'historique garde est renvoye a chaque appel).
     'history_window' => (int) env('ASSISTANT_HISTORY_WINDOW', 16),
 
+    // Corrige le 2026-09-12 (retour du ministere, "il n'arrive pas a
+    // reconnaitre qu'on a change de sujet") : sans ce garde-fou, la
+    // conversation "active" d'un utilisateur pouvait rester la meme
+    // indefiniment (des heures, des jours) tant qu'il ne cliquait pas
+    // lui-meme sur "Nouvelle discussion" - tout l'historique d'un ancien
+    // sujet restait alors renvoye a l'IA a chaque nouveau message, meme
+    // sans aucun rapport avec ce qui est demande maintenant. Au-dela de ce
+    // delai d'inactivite (en heures) depuis le dernier message, une
+    // nouvelle conversation demarre automatiquement au prochain message -
+    // sans que l'utilisateur ait a y penser (voir
+    // AssistantService::activeConversation).
+    'conversation_idle_hours' => (int) env('ASSISTANT_CONVERSATION_IDLE_HOURS', 3),
+
     // Garde-fou de cout (point 5 de la demande) : plafond de messages
     // utilisateur par JOUR et par MINISTERE, tous utilisateurs confondus -
     // la cle API est celle de Martin, partagee par tous les ministeres de

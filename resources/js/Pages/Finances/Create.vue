@@ -61,7 +61,7 @@ function submit() {
 </script>
 
 <template>
-    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/finances`" back-label="Annuler">
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/finances`" back-label="Retour">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
@@ -75,7 +75,7 @@ function submit() {
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Nature du mouvement</h2>
+                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Nature du mouvement</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Type</label>
@@ -101,7 +101,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Montant</h2>
+                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Montant</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Montant ({{ currency }})</label>
@@ -117,7 +117,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Mode de règlement (optionnel)</h2>
+                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Mode de règlement (optionnel)</h2>
                     <select v-model="form.payment_method" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
                         <option value="" class="bg-white text-graphite">Non précisé</option>
                         <option v-for="method in paymentMethods" :key="method" :value="method" class="bg-white text-graphite">{{ paymentMethodLabels[method] ?? method }}</option>
@@ -126,7 +126,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Détails</h2>
+                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Détails</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">De la part de / Payé à (optionnel)</label>
@@ -143,7 +143,7 @@ function submit() {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
+                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />

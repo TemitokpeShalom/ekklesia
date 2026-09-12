@@ -11,8 +11,15 @@ defineProps({
     cultes: Array,
 })
 
+/**
+ * Corrige le 2026-09-12 (retour du ministere : "une fois que c'est
+ * enregistré, ça ne doit pas se présenter comme un culte planifié, ça doit
+ * se présenter comme un culte enregistré") : le statut interne "planifie"
+ * (date future, rien a archiver pour l'instant - voir CultesController)
+ * reste inchangé en base, seul son intitulé affiché change.
+ */
 function statusLabel(status) {
-    return { planifie: 'Planifié', termine: 'Terminé', annule: 'Annulé' }[status] ?? status
+    return { planifie: 'Enregistré', termine: 'Terminé', annule: 'Annulé' }[status] ?? status
 }
 
 function statusClass(status) {
@@ -49,14 +56,15 @@ function formatDate(value) {
 
         <div class="space-y-8">
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
+                <!-- Corrige le 2026-09-12 (retour du ministere) : "Ajouter un culte" -> "Enregistrer un culte", et couleur or -> bleu azur (comme les autres boutons de commande deja corriges module par module). -->
                 <Link
                     :href="`/org-units/${orgUnit.id}/cultes/nouveau`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    Ajouter un culte
+                    Enregistrer un culte
                 </Link>
             </div>
 

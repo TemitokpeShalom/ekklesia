@@ -36,6 +36,7 @@ class FinanceTransactionsController extends Controller
         $totalDecaissements = $transactions->where('nature', 'decaissement')->sum('amount');
 
         $standard = AccountingStandardResolver::forOrgUnit($orgUnit);
+        $canManage = $request->user()->can('manageFinances', $orgUnit);
 
         return Inertia::render('Finances/Index', [
             'orgUnit' => $orgUnit,
@@ -49,6 +50,17 @@ class FinanceTransactionsController extends Controller
             'currency' => AccountingStandardResolver::currencyFor($orgUnit),
             'accountingStandardLabel' => $standard['label'] ?? null,
             'paymentMethods' => self::PAYMENT_METHODS,
+            'canManage' => $canManage,
+            // Chantier "module Finances" (2026-09-12, retour du ministere) :
+            // "un bouton... pour choisir la norme comptable" - seulement
+            // propose a qui peut deja gerer les finances de cette entite.
+            'accountingStandard' => $canManage ? [
+                'currentCode' => $standard['code'] ?? null,
+                'isOverride' => AccountingStandardResolver::overrideFor($orgUnit) !== null,
+                'available' => collect(config('finance.standards'))
+                    ->map(fn ($def, $code) => ['code' => $code, 'label' => $def['label']])
+                    ->values(),
+            ] : null,
         ]);
     }
 
@@ -78,7 +90,11 @@ class FinanceTransactionsController extends Controller
             'recorded_by' => $request->user()->id,
         ]);
 
-        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere, valable pour TOUS les
+        // modules d'enregistrement) : confirmer clairement la reussite,
+        // toujours en vert - jamais en rouge, reserve aux erreurs.
+        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Mouvement enregistré.');
     }
 
     public function edit(OrgUnit $orgUnit, FinancialTransaction $transaction): Response
@@ -107,7 +123,8 @@ class FinanceTransactionsController extends Controller
 
         $transaction->update($data);
 
-        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Mouvement mis à jour.');
     }
 
     public function destroy(OrgUnit $orgUnit, FinancialTransaction $transaction): RedirectResponse
@@ -117,7 +134,8 @@ class FinanceTransactionsController extends Controller
 
         $transaction->delete();
 
-        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('finances.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Mouvement supprimé.');
     }
 
     private function resolveMonth(Request $request): string

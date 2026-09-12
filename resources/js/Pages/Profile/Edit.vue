@@ -35,10 +35,23 @@ function submitPassword() {
         onSuccess: () => passwordForm.reset(),
     })
 }
+
+// Corrige le 2026-09-12 (retour du ministere, valable pour TOUTES les
+// pages) : cette page n'a aucun bouton "Retour" - meme mecanisme que
+// Aide/Index.vue et Aide/Show.vue, deux ecrans hors contexte d'un OrgUnit
+// precis comme celui-ci.
+function goBack() {
+    window.history.back()
+}
 </script>
 
 <template>
     <AppLayout>
+        <template #actions>
+            <button type="button" @click="goBack" class="text-sm text-graphite/80 hover:text-graphite bg-graphite/5 hover:bg-graphite/10 border border-graphite/10 rounded-full px-4 py-2 transition-colors">
+                Retour
+            </button>
+        </template>
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">

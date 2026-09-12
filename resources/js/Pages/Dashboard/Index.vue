@@ -45,13 +45,17 @@ const modules = [
         icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m5-5.13a4 4 0 100-8 4 4 0 000 8zm6 3a4 4 0 10-3-6.65',
     },
     {
-        key: 'trombinoscope', label: 'Trombinoscope', desc: 'Grille de photos, imprimable',
+        // Corrige le 2026-09-12 (retour du ministere : "garder le
+        // trombinoscope comme un module a part entiere hors du module
+        // document") : sorti du hub Documents, devient un module du
+        // tableau de bord comme les autres. Route inchangee.
+        key: 'trombinoscope', label: 'Trombinoscope', desc: 'Grille de photos des membres actifs, imprimable',
         path: 'trombinoscope', badge: 'from-gold to-gold-dark', glow: 'hover:shadow-glow-gold',
         icon: 'M3 9a2 2 0 012-2h.5l1-1.5h11l1 1.5H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z',
         icon2: 'M12 13m-3.2 0a3.2 3.2 0 106.4 0a3.2 3.2 0 10-6.4 0',
     },
     {
-        key: 'documents', label: 'Documents', desc: 'Affiche et calendrier annuel imprimables',
+        key: 'documents', label: 'Documents', desc: "Rapports validés, affiche, calendrier, archives",
         path: 'documents', badge: 'from-sanctuary to-sanctuary-dark', glow: 'hover:shadow-glow-sanctuary',
         icon: 'M4 4h16v16H4V4zM4 9h16M9 4v16',
     },
@@ -77,8 +81,15 @@ const modules = [
         icon: 'M18 18.72a9.09 9.09 0 003.74-.48 3 3 0 00-4.68-2.72M12 12.75a5.99 5.99 0 015.06 2.77m0 0a3 3 0 014.68 2.72 8.99 8.99 0 01-3.74.48M12 12.75a5.99 5.99 0 00-5.06 2.77m0 0a3 3 0 00-4.68 2.72 8.99 8.99 0 003.74.48m5.99-3.2A5.97 5.97 0 006 18.72M15 6.75a3 3 0 11-6 0 3 3 0 016 0z',
     },
     {
+        // Corrige le 2026-09-12 (retour du ministere : "ce module soit
+        // visible partout dans le ministere... au niveau de la region... du
+        // district... des eglises locales... des cellules de priere") :
+        // n'est plus reserve au niveau Ministere (requiresRoot retire) -
+        // visible a tout niveau, uniquement pour les comptes qui prechent
+        // (requiresLibrary, deja calcule par DashboardController a tout
+        // niveau : voir hasPreachingAffectation()).
         key: 'bibliotheque', label: 'Bibliothèque ministérielle', desc: 'Prédications, thèmes, résumés',
-        path: 'bibliotheque', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue', requiresRoot: true, requiresLibrary: true,
+        path: 'bibliotheque', badge: 'from-slateblue to-slateblue/70', glow: 'hover:shadow-glow-slateblue', requiresLibrary: true,
         icon: 'M12 6.25C10.5 5 8.5 4.5 6 4.5c-1 0-2 .1-3 .4v13.6c1-.3 2-.4 3-.4 2.5 0 4.5.5 6 1.75m0-13.6c1.5-1.25 3.5-1.75 6-1.75 1 0 2 .1 3 .4v13.6c-1-.3-2-.4-3-.4-2.5 0-4.5.5-6 1.75m0-13.6v13.6',
     },
     {
@@ -113,7 +124,7 @@ const modules = [
 </script>
 
 <template>
-    <AppLayout :org-unit="orgUnit">
+    <AppLayout :org-unit="orgUnit" :back-href="orgUnit.parent_id ? `/org-units/${orgUnit.parent_id}` : null" back-label="Retour">
         <template #actions>
             <div v-if="canManageAccess || canTransform" class="relative">
                 <button type="button" @click="governanceMenuOpen = !governanceMenuOpen"
@@ -196,23 +207,36 @@ const modules = [
             <section>
                 <h2 class="font-serif text-2xl text-graphite mb-1">Modules</h2>
                 <p class="text-sm text-graphite/70 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!--
+                    Corrige le 2026-09-12 (retour du ministere : "l'espace
+                    qu'occupe chaque module est un peu grand... les boutons
+                    sont un peu larges", "la taille des ecritures... un peu
+                    augmenter") : une 4e colonne apparait sur tres grand ecran
+                    (xl) pour que chaque carte reste compacte au lieu de
+                    s'etirer sur toute la largeur disponible, le padding
+                    interne et l'icone sont legerement reduits, et le texte
+                    (libelle + description) est legerement agrandi. Meme
+                    presentation en cartes qu'avant (deja repensee plusieurs
+                    fois avec le ministere) : changement de gabarit, pas de
+                    refonte.
+                -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <template v-for="(m, i) in modules" :key="m.key">
-                        <a v-if="!m.requiresRoot || (orgUnit.level_rank === 0 && (!m.requiresLibrary || canAccessLibrary))"
+                        <a v-if="!m.requiresLibrary || canAccessLibrary"
                             :href="`/org-units/${orgUnit.id}/${m.path}`"
                             :class="m.glow"
-                            class="group relative glass-panel rounded-3xl p-6 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+                            class="group relative glass-panel rounded-3xl p-5 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
                             :style="{ animationDelay: `${i * 60}ms` }">
-                            <span :class="m.badge" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <span :class="m.badge" class="inline-flex items-center justify-center w-10 h-10 rounded-2xl mb-3 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                     <circle v-if="m.circle" cx="12" cy="12" r="8.5" stroke-linecap="round" stroke-linejoin="round" />
                                     <path stroke-linecap="round" stroke-linejoin="round" :d="m.icon" />
                                     <path v-if="m.icon2" stroke-linecap="round" stroke-linejoin="round" :d="m.icon2" />
                                 </svg>
                             </span>
-                            <p class="font-semibold text-graphite text-[15px]">{{ m.label }}</p>
-                            <p class="text-xs text-graphite/70 mt-1">{{ m.desc }}</p>
-                            <svg class="absolute top-6 right-6 w-4 h-4 text-graphite/62 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <p class="font-semibold text-graphite text-base">{{ m.label }}</p>
+                            <p class="text-[13px] text-graphite/70 mt-1">{{ m.desc }}</p>
+                            <svg class="absolute top-5 right-5 w-4 h-4 text-graphite/62 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                         </a>

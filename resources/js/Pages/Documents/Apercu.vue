@@ -1,17 +1,19 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
 
+/**
+ * Revu le 2026-09-12 : ne sert plus que l'Affiche - le Calendrier annuel a
+ * desormais son propre gabarit (voir Documents/Calendrier.vue), trop
+ * different (vraie grille de jours) pour rester derriere ce meme
+ * composant partage.
+ */
 const props = defineProps({
     orgUnit: Object,
     ministry: Object,
     template: String,
-    year: Number,
     leaders: { type: Array, default: () => [] },
     memberCount: { type: Number, default: 0 },
-    months: { type: Array, default: () => [] },
 })
-
-const titles = { affiche: 'Affiche', calendrier: 'Calendrier annuel' }
 
 function print() {
     window.print()
@@ -32,7 +34,7 @@ function print() {
                 <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
-                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour au générateur</Link>
+                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour aux documents</Link>
                 <button @click="print"
                     class="rounded-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night px-5 py-2 text-sm font-semibold shadow-md shadow-gold/20">
                     Imprimer
@@ -41,11 +43,10 @@ function print() {
         </header>
 
         <main class="max-w-3xl mx-auto px-6 py-10 print:max-w-none print:px-0 print:py-0">
-            <p class="text-sm text-white/50 mb-6 print:hidden">{{ titles[template] }} · {{ orgUnit.name }}</p>
+            <p class="text-sm text-white/50 mb-6 print:hidden">Affiche · {{ orgUnit.name }}</p>
 
             <!-- Affiche : une page unique, identite de l'entite. -->
-            <section v-if="template === 'affiche'"
-                class="relative overflow-hidden rounded-3xl print:rounded-none bg-gradient-to-br from-sanctuary-dark via-sanctuary to-coffee-dark text-white px-10 py-14 print:min-h-screen flex flex-col items-center text-center">
+            <section class="relative overflow-hidden rounded-3xl print:rounded-none bg-gradient-to-br from-sanctuary-dark via-sanctuary to-coffee-dark text-white px-10 py-14 print:min-h-screen flex flex-col items-center text-center">
                 <div class="absolute -top-24 -right-16 w-96 h-96 bg-gold/25 rounded-full blur-3xl" aria-hidden="true"></div>
                 <div class="absolute -bottom-32 -left-16 w-96 h-96 bg-slateblue/20 rounded-full blur-3xl" aria-hidden="true"></div>
 
@@ -79,29 +80,6 @@ function print() {
 
                 <p class="relative text-sm text-white/70">{{ memberCount }} membre(s) actif(s)</p>
             </section>
-
-            <!-- Calendrier annuel : 12 pages, une par mois. -->
-            <div v-if="template === 'calendrier'" class="space-y-6 print:space-y-0">
-                <section v-for="(m, i) in months" :key="m.number"
-                    class="bg-white border border-coffee/10 rounded-3xl print:rounded-none print:border-0 p-8 print:min-h-screen print:flex print:flex-col"
-                    :class="{ 'print:break-after-page': i < months.length - 1 }">
-                    <div class="flex items-baseline justify-between border-b border-gold-soft pb-4 mb-6">
-                        <h2 class="font-serif text-3xl text-ink">{{ m.label }}</h2>
-                        <span class="text-sm text-coffee-light">{{ orgUnit.name }} · {{ year }}</span>
-                    </div>
-
-                    <div v-if="m.members.length === 0" class="text-sm text-coffee-light italic print:hidden">
-                        Aucun anniversaire enregistré ce mois-ci.
-                    </div>
-                    <ul v-else class="space-y-2">
-                        <li v-for="mem in m.members" :key="mem.id"
-                            class="flex items-center gap-4 rounded-xl px-4 py-2.5 odd:bg-parchment">
-                            <span class="font-serif text-xl text-gold-dark w-8 text-right shrink-0">{{ mem.day }}</span>
-                            <span class="text-ink">{{ mem.name }}</span>
-                        </li>
-                    </ul>
-                </section>
-            </div>
         </main>
     </div>
 </template>

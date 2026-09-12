@@ -57,8 +57,9 @@ function submit() {
                 Se souvenir de moi
             </label>
 
+            <!-- Corrige le 2026-09-12 : bouton de commande passe de l'or au bleu marine du logo (voir tailwind.config.js, couleur "azure") -- demande explicite du ministere. -->
             <button type="submit" :disabled="form.processing"
-                class="w-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                class="w-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                 Se connecter
             </button>
 

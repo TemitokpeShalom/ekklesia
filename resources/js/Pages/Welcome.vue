@@ -75,9 +75,10 @@ const atouts = [
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-5">Bienvenue</p>
                 <p class="text-sm text-graphite/70 mb-8 -mt-2">Administrer tout ce qui vous est confié — membres, finances, vie pastorale, patrimoine — en un seul endroit.</p>
 
+                <!-- Corrige le 2026-09-12 : bouton de commande principal passe de l'or au bleu marine du logo (voir tailwind.config.js, couleur "azure") -- demande explicite du ministere. -->
                 <div class="space-y-3">
                     <Link href="/connexion"
-                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20">
+                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20">
                         Se connecter à mon espace de travail
                     </Link>
                     <Link href="/ministeres/nouveau"
@@ -102,17 +103,18 @@ const atouts = [
                     <h2 class="font-serif text-2xl sm:text-3xl text-graphite">Une seule administration, pour toute la vie du ministère</h2>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Corrige le 2026-09-12 : memes ajustements de gabarit que Dashboard/Index.vue (cartes plus compactes, texte legerement agrandi) pour rester coherent avec l'ecran de travail. -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <div v-for="m in modules" :key="m.label"
-                        class="glass-panel rounded-3xl p-6">
-                        <span :class="['inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md', m.badge]">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        class="glass-panel rounded-3xl p-5">
+                        <span :class="['inline-flex items-center justify-center w-10 h-10 rounded-2xl mb-3 bg-gradient-to-br text-white shadow-md', m.badge]">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" :d="m.icon" />
                                 <path v-if="m.icon2" stroke-linecap="round" stroke-linejoin="round" :d="m.icon2" />
                             </svg>
                         </span>
-                        <p class="font-semibold text-graphite text-[15px]">{{ m.label }}</p>
-                        <p class="text-xs text-graphite/60 mt-1">{{ m.desc }}</p>
+                        <p class="font-semibold text-graphite text-base">{{ m.label }}</p>
+                        <p class="text-[13px] text-graphite/60 mt-1">{{ m.desc }}</p>
                     </div>
                 </div>
 

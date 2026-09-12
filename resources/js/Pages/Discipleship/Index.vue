@@ -17,7 +17,9 @@ defineProps({
 
 const badgeClasses = {
     nouveau_converti: 'bg-graphite/10 text-graphite/73',
+    en_consolidation: 'bg-gold-soft/20 text-sanctuary',
     baptise: 'bg-sanctuary/15 text-sanctuary-light',
+    membre: 'bg-azure/15 text-azure',
     en_formation: 'bg-gold/15 text-sanctuary',
     engage_service: 'bg-slateblue/15 text-slateblue',
     envoye_leader: 'bg-forest/15 text-forest',
@@ -45,7 +47,7 @@ function formatDate(value) {
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/parcours/nouveau`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

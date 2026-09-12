@@ -41,17 +41,45 @@ class AccountingStandardResolver
     }
 
     /**
-     * Le code de norme documentee pour cet org_unit (via le pays dont il
-     * depend), ou null si ce pays n'a pas encore de norme codee.
+     * Le code de norme documentee pour cet org_unit : un choix explicite
+     * (voir overrideFor()) prevaut toujours sur la detection automatique
+     * par pays - c'est ce choix explicite que sert le bouton "Norme
+     * comptable" du module Finances (retour du ministere, 2026-09-12 :
+     * "il faut... choisir la norme comptable auquel la zone... obeit").
      */
     public static function codeFor(OrgUnit $orgUnit): ?string
     {
+        if ($override = self::overrideFor($orgUnit)) {
+            return $override;
+        }
+
         $country = self::countryUnitFor($orgUnit);
         if (! $country) {
             return null;
         }
 
         return config('finance.country_standards.'.self::normalizeCountryName($country->name));
+    }
+
+    /**
+     * Norme explicitement choisie (accounting_standard_override) sur ce
+     * noeud ou le plus proche de ses ancetres qui en porte une - meme
+     * regle "le plus specifique gagne" que le reste de l'architecture
+     * (jamais deux valeurs contradictoires appliquees a la fois). Null si
+     * aucun noeud de la chaine n'a de choix explicite : codeFor() retombe
+     * alors sur la detection automatique par pays.
+     */
+    public static function overrideFor(OrgUnit $orgUnit): ?string
+    {
+        if (! $orgUnit->path) {
+            return $orgUnit->accounting_standard_override;
+        }
+
+        return OrgUnit::where('ministry_id', $orgUnit->ministry_id)
+            ->whereNotNull('accounting_standard_override')
+            ->where(fn ($q) => $q->whereRaw('path @> ?::ltree', [$orgUnit->path])->orWhere('id', $orgUnit->id))
+            ->orderByRaw('nlevel(path) DESC')
+            ->value('accounting_standard_override');
     }
 
     /**

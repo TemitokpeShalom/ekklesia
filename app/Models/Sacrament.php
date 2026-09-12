@@ -11,7 +11,7 @@ class Sacrament extends Model
     use HasUuid;
 
     protected $fillable = [
-        'ministry_id', 'org_unit_id', 'type', 'member_id', 'spouse_member_id',
+        'ministry_id', 'org_unit_id', 'type', 'member_id', 'member_name', 'spouse_member_id',
         'spouse_name', 'event_date', 'officiant', 'location', 'notes', 'metadata',
     ];
 

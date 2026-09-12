@@ -29,6 +29,7 @@ class OrgUnit extends Model
     protected $fillable = [
         'ministry_id', 'parent_id', 'level_rank', 'level_label',
         'name', 'code', 'metadata', 'status', 'path',
+        'accounting_standard_override',
     ];
 
     protected $casts = [
@@ -59,6 +60,47 @@ class OrgUnit extends Model
     public function affectations(): HasMany
     {
         return $this->hasMany(Affectation::class);
+    }
+
+    /**
+     * Nom du/de la titulaire du role Pasteur affecte EXACTEMENT sur ce
+     * noeud (jamais un ancetre/descendant - point 05 : le meme role
+     * s'affecte a tout niveau, un pasteur de cellule est un Pasteur
+     * affecte sur cette cellule). Sert au bloc "position" des rapports
+     * (chantier "module Finances", 2026-09-12 : "il faut... le nom du
+     * pasteur de l'eglise concernee"). Null si aucun titulaire actif -
+     * jamais bloquant pour generer le rapport.
+     */
+    public function pastorName(): ?string
+    {
+        return $this->affectations()
+            ->where('status', 'active')
+            ->whereHas('role', fn ($q) => $q->where('code', Role::PASTEUR))
+            ->with('user:id,name')
+            ->first()
+            ?->user?->name;
+    }
+
+    /**
+     * Chaine hierarchique du sommet vers ce noeud, SANS le Ministere
+     * lui-meme (deja porte par l'en-tete/letterhead) - extrait de
+     * RapportsArchiveController (chantier "module Documents", 2026-09-12)
+     * pour servir aussi bien au rapport financier "vivant" qu'a son
+     * archive imprimable, une seule version de ce calcul.
+     */
+    public function ancestryChain(): array
+    {
+        $chain = [];
+        $node = $this;
+
+        while ($node) {
+            if ($node->level_rank !== self::RANK_MINISTERE) {
+                $chain[] = ['label' => $node->level_label, 'name' => $node->name];
+            }
+            $node = $node->parent;
+        }
+
+        return array_reverse($chain);
     }
 
     /**
@@ -174,5 +216,15 @@ class OrgUnit extends Model
     public function scopeDescendantsOf($query, self $node)
     {
         return $query->whereRaw('path <@ ?::ltree', [$node->path]);
+    }
+
+    /**
+     * Archives propres a ce noeud precis (chantier "module Documents",
+     * 2026-09-12) - jamais celles d'un descendant ou d'un ancetre, voir
+     * OrgUnitDocumentsController.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(OrgUnitDocument::class);
     }
 }

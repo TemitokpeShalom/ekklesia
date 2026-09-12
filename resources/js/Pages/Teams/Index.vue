@@ -1,15 +1,26 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
  * Equipes et benevolat (point 08), ecran construit directement dans le
  * style v3 "Vitrail".
+ *
+ * Corrige le 2026-09-12 (retour du ministere) : "quand je clique dessus, ça
+ * ne réagit pas... il faut cliquer sur modifier pour que ça puisse réagir"
+ * - la ligne de l'équipe se comporte désormais comme un bouton et ouvre
+ * directement la gestion de ses membres (l'action la plus fréquente), sans
+ * toucher au lien "Modifier" séparé (nom/description de l'équipe) - @click.stop
+ * dessus l'empêche de déclencher aussi la navigation de la ligne.
  */
 defineProps({
     orgUnit: Object,
     teams: Array,
 })
+
+function openTeam(orgUnit, team) {
+    router.visit(`/org-units/${orgUnit.id}/equipes/${team.id}/membres`)
+}
 </script>
 
 <template>
@@ -29,7 +40,7 @@ defineProps({
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/equipes/nouvelle`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -52,7 +63,8 @@ defineProps({
                 <div
                     v-for="(team, i) in teams"
                     :key="team.id"
-                    class="flex items-center gap-4 glass-panel rounded-2xl p-5 hover:border-graphite/20 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
+                    @click="openTeam(orgUnit, team)"
+                    class="flex items-center gap-4 glass-panel rounded-2xl p-5 hover:border-graphite/20 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both] cursor-pointer"
                     :style="{ animationDelay: `${Math.min(i, 10) * 40}ms` }"
                 >
                     <div class="min-w-0 flex-1">
@@ -67,6 +79,7 @@ defineProps({
 
                     <Link
                         :href="`/org-units/${orgUnit.id}/equipes/${team.id}/modifier`"
+                        @click.stop
                         class="flex-shrink-0 self-center rounded-lg px-3 py-1.5 text-sm font-medium text-graphite/68 transition hover:bg-graphite/10 hover:text-graphite"
                     >
                         Modifier

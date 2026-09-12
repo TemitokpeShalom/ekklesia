@@ -39,7 +39,7 @@ function submit() {
 </script>
 
 <template>
-    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/membres`" back-label="Annuler">
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/membres`" back-label="Retour">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">

@@ -53,6 +53,21 @@ export default {
                 ink: '#241a16',
                 slateblue: '#2e4c6d',
                 forest: '#2f6b4f',
+                // Corrige le 2026-09-12 (retour du ministere : "je veux que
+                // les boutons de commande soient en bleu ou en noir") --
+                // bleu marine echantillonne directement sur le vrai logo
+                // Oikonema (public/images/oikonema-logo.png, dominante
+                // #003080 environ) plutot qu'invente : les boutons de
+                // commande des ecrans publics (accueil, connexion) portent
+                // desormais cette couleur, jamais plus l'or. Distinct de
+                // "slateblue" (deja utilise comme couleur de badge de
+                // module, plus grise/discrete) pour que les boutons restent
+                // visuellement plus affirmes que ces badges.
+                azure: {
+                    light: '#0a4aa0',
+                    DEFAULT: '#003080',
+                    dark: '#001c50',
+                },
                 // v3 : toile de fond sombre chaleureuse, teintee de vert plutot
                 // que grise ou violette (jamais un noir pur/froid).
                 night: {
@@ -95,6 +110,7 @@ export default {
                 'glow-sanctuary': '0 0 50px -12px rgba(143,48,73,0.55)',
                 'glow-forest': '0 0 50px -14px rgba(47,107,79,0.5)',
                 'glow-slateblue': '0 0 50px -14px rgba(46,76,109,0.5)',
+                'glow-azure': '0 0 50px -12px rgba(0,48,128,0.55)',
                 'inner-glow': 'inset 0 1px 0 0 rgba(255,255,255,0.06)',
                 // v4 : ombre neutre discrete pour les cartes sur fond clair
                 // (remplace l'effet "verre depoli sur fond sombre" -- les

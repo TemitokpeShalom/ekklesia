@@ -89,15 +89,45 @@ return [
      * de cette liste reste utilisable normalement : seule la couche
      * universelle s'applique, sans compte code, jusqu'a l'ajout de sa
      * norme a la demande.
+     *
+     * Corrige le 2026-09-12 (retour du ministere : "il faut integrer en
+     * meme temps... les autres pays de l'Afrique de l'Ouest") : complete
+     * ici aux 17 Etats membres de l'espace OHADA - un fait stable et
+     * verifiable (traite fondateur), jamais une norme inventee : ces pays
+     * partagent tous EXACTEMENT le meme plan SYSCOHADA deja documente
+     * ci-dessus, donc les y rattacher n'ajoute aucun compte comptable
+     * fabrique, seulement une reconnaissance correcte d'un perimetre deja
+     * la. Les autres zones citees par le ministere (Nigeria, Ghana,
+     * Afrique du Sud, Etats-Unis, Inde, Suisse, Republique tcheque,
+     * France, Rwanda) n'ont pas de plan comptable numerote unique
+     * documente ici : voir le doc-comment de 'standards' ci-dessus - la
+     * politique du fichier reste de ne jamais ecrire un plan sans
+     * documents reels fournis.
      */
     'country_standards' => [
+        // Afrique de l'Ouest (UEMOA + hors zone UEMOA, tous membres OHADA)
         'benin' => 'SYSCOHADA',
-        'togo' => 'SYSCOHADA',
+        'burkina faso' => 'SYSCOHADA',
         'cote d ivoire' => 'SYSCOHADA',
-        'tchad' => 'SYSCOHADA',
-        'gabon' => 'SYSCOHADA',
+        'guinee' => 'SYSCOHADA',
+        'guinee bissau' => 'SYSCOHADA',
+        'mali' => 'SYSCOHADA',
+        'niger' => 'SYSCOHADA',
+        'senegal' => 'SYSCOHADA',
+        'togo' => 'SYSCOHADA',
+        // Afrique centrale (CEMAC + hors zone CEMAC, tous membres OHADA)
+        'cameroun' => 'SYSCOHADA',
         'centrafrique' => 'SYSCOHADA',
         'republique centrafricaine' => 'SYSCOHADA',
+        'congo' => 'SYSCOHADA',
+        'republique du congo' => 'SYSCOHADA',
+        'gabon' => 'SYSCOHADA',
+        'guinee equatoriale' => 'SYSCOHADA',
+        'tchad' => 'SYSCOHADA',
+        // Autres membres OHADA
+        'comores' => 'SYSCOHADA',
+        'republique democratique du congo' => 'SYSCOHADA',
+        'rd congo' => 'SYSCOHADA',
     ],
 
     /*
@@ -107,13 +137,29 @@ return [
      * retombe sur 'default_currency' plus haut.
      */
     'country_currencies' => [
+        // Franc CFA UEMOA (Afrique de l'Ouest)
         'benin' => 'XOF',
-        'togo' => 'XOF',
+        'burkina faso' => 'XOF',
         'cote d ivoire' => 'XOF',
-        'tchad' => 'XOF',
-        'gabon' => 'XOF',
-        'centrafrique' => 'XOF',
-        'republique centrafricaine' => 'XOF',
+        'guinee bissau' => 'XOF',
+        'mali' => 'XOF',
+        'niger' => 'XOF',
+        'senegal' => 'XOF',
+        'togo' => 'XOF',
+        // Franc CFA CEMAC (Afrique centrale)
+        'cameroun' => 'XAF',
+        'centrafrique' => 'XAF',
+        'republique centrafricaine' => 'XAF',
+        'congo' => 'XAF',
+        'republique du congo' => 'XAF',
+        'gabon' => 'XAF',
+        'guinee equatoriale' => 'XAF',
+        'tchad' => 'XAF',
+        // Devises propres, hors zone CFA
+        'guinee' => 'GNF',
+        'comores' => 'KMF',
+        'republique democratique du congo' => 'CDF',
+        'rd congo' => 'CDF',
     ],
 
 ];

@@ -13,6 +13,7 @@ use App\Http\Controllers\CultesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscipleshipController;
 use App\Http\Controllers\DocumentGeneratorController;
+use App\Http\Controllers\AccountingStandardController;
 use App\Http\Controllers\FinanceReportController;
 use App\Http\Controllers\FinanceTransactionsController;
 use App\Http\Controllers\HelpController;
@@ -21,7 +22,9 @@ use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MinistryInfoController;
+use App\Http\Controllers\OrgUnitDocumentsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RapportsArchiveController;
 use App\Http\Controllers\SacramentsController;
 use App\Http\Controllers\SignalementsController;
 use App\Http\Controllers\SubscriptionController;
@@ -152,12 +155,29 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::post('/org-units/{orgUnit}/abonnement/fedapay', [SubscriptionFedapayController::class, 'checkout'])->name('subscription.fedapay.checkout');
     Route::post('/org-units/{orgUnit}/abonnement/crypto', [SubscriptionCryptoController::class, 'store'])->name('subscription.crypto.store');
 
+    // Devenu un module a part entiere du tableau de bord (retour du
+    // ministere, 2026-09-12 - "garder le trombinoscope comme un module a
+    // part entiere hors du module document"), route inchangee.
     Route::get('/org-units/{orgUnit}/trombinoscope', [TrombinoscopeController::class, 'index'])->name('trombinoscope.index');
 
-    // Generateur de documents (reliquat du point 08) : hub + gabarits
-    // affiche/calendrier, le trombinoscope ci-dessus restant sur sa propre
-    // route deja en place.
+    // Generateur de documents (reliquat du point 08, revu le 2026-09-12) :
+    // hub -> Affiche + Calendrier annuel + Rapports (archive) + Archives
+    // (documents libres). Le calendrier et les rapports ont chacun leur
+    // propre route (gabarits trop differents pour rester derriere le
+    // {template} generique), l'affiche seule reste dessus.
     Route::get('/org-units/{orgUnit}/documents', [DocumentGeneratorController::class, 'index'])->name('documents.index');
+    Route::get('/org-units/{orgUnit}/documents/calendrier', [DocumentGeneratorController::class, 'calendrier'])->name('documents.calendrier');
+    Route::get('/org-units/{orgUnit}/documents/rapports', [RapportsArchiveController::class, 'index'])->name('documents.rapports.index');
+    Route::get('/org-units/{orgUnit}/documents/rapports/activite/{period}', [RapportsArchiveController::class, 'activite'])->name('documents.rapports.activite');
+    Route::get('/org-units/{orgUnit}/documents/rapports/finance/{period}', [RapportsArchiveController::class, 'finance'])->name('documents.rapports.finance');
+    Route::get('/org-units/{orgUnit}/documents/rapports/inventaire/{year}', [RapportsArchiveController::class, 'inventaire'])->name('documents.rapports.inventaire');
+    Route::get('/org-units/{orgUnit}/documents/archives', [OrgUnitDocumentsController::class, 'index'])->name('documents.archives.index');
+    Route::post('/org-units/{orgUnit}/documents/archives', [OrgUnitDocumentsController::class, 'store'])->name('documents.archives.store');
+    Route::get('/org-units/{orgUnit}/documents/archives/{document}/telecharger', [OrgUnitDocumentsController::class, 'download'])->name('documents.archives.download');
+    Route::delete('/org-units/{orgUnit}/documents/archives/{document}', [OrgUnitDocumentsController::class, 'destroy'])->name('documents.archives.destroy');
+    // Route generique en dernier : sinon "calendrier"/"rapports"/"archives"
+    // seraient captures ici en tant que {template} et ne matcheraient
+    // jamais les routes specifiques ci-dessus.
     Route::get('/org-units/{orgUnit}/documents/{template}', [DocumentGeneratorController::class, 'show'])->name('documents.show');
 
     Route::get('/org-units/{orgUnit}/cultes', [CultesController::class, 'index'])->name('cultes.index');
@@ -187,6 +207,11 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/equipes/{equipe}/modifier', [TeamsController::class, 'edit'])->name('teams.edit');
     Route::put('/org-units/{orgUnit}/equipes/{equipe}', [TeamsController::class, 'update'])->name('teams.update');
     Route::delete('/org-units/{orgUnit}/equipes/{equipe}', [TeamsController::class, 'destroy'])->name('teams.destroy');
+    // Corrige le 2026-09-12 (retour du ministere) : la gestion des membres
+    // d'une equipe a desormais son propre ecran (Teams/Membres.vue),
+    // atteint en cliquant directement sur l'equipe dans la liste - separe
+    // de "teams.edit" qui ne gere plus que le nom/la description.
+    Route::get('/org-units/{orgUnit}/equipes/{equipe}/membres', [TeamMembersController::class, 'index'])->name('team-members.index');
     Route::post('/org-units/{orgUnit}/equipes/{equipe}/membres', [TeamMembersController::class, 'store'])->name('team-members.store');
     Route::delete('/org-units/{orgUnit}/equipes/{equipe}/membres/{membre}', [TeamMembersController::class, 'destroy'])->name('team-members.destroy');
 
@@ -199,10 +224,16 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::put('/org-units/{orgUnit}/finances/{transaction}', [FinanceTransactionsController::class, 'update'])->name('finances.update');
     Route::delete('/org-units/{orgUnit}/finances/{transaction}', [FinanceTransactionsController::class, 'destroy'])->name('finances.destroy');
 
+    Route::post('/org-units/{orgUnit}/finances/norme-comptable', [AccountingStandardController::class, 'update'])->name('finances.norme.update');
+
     Route::get('/org-units/{orgUnit}/finances-rapport', [FinanceReportController::class, 'show'])->name('finances.rapport');
+    Route::post('/org-units/{orgUnit}/finances-rapport/valider', [FinanceReportController::class, 'validateReport'])->name('finances.rapport.valider');
+    Route::post('/org-units/{orgUnit}/finances-rapport/deverrouiller', [FinanceReportController::class, 'unlock'])->name('finances.rapport.deverrouiller');
 
     Route::get('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'edit'])->name('activites.rapport');
     Route::post('/org-units/{orgUnit}/rapport-activites', [ActivityReportController::class, 'update'])->name('activites.update');
+    Route::post('/org-units/{orgUnit}/rapport-activites/valider', [ActivityReportController::class, 'validateReport'])->name('activites.rapport.valider');
+    Route::post('/org-units/{orgUnit}/rapport-activites/deverrouiller', [ActivityReportController::class, 'unlock'])->name('activites.rapport.deverrouiller');
 
     Route::get('/org-units/{orgUnit}/inventaire', [AssetsController::class, 'index'])->name('inventaire.index');
     Route::get('/org-units/{orgUnit}/inventaire/nouveau', [AssetsController::class, 'create'])->name('inventaire.create');
@@ -211,6 +242,8 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::put('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'update'])->name('inventaire.update');
     Route::delete('/org-units/{orgUnit}/inventaire/{asset}', [AssetsController::class, 'destroy'])->name('inventaire.destroy');
     Route::get('/org-units/{orgUnit}/inventaire-rapport', [AssetsController::class, 'rapport'])->name('inventaire.rapport');
+    Route::post('/org-units/{orgUnit}/inventaire-rapport/valider', [AssetsController::class, 'validateReport'])->name('inventaire.valider');
+    Route::post('/org-units/{orgUnit}/inventaire-rapport/deverrouiller', [AssetsController::class, 'unlock'])->name('inventaire.deverrouiller');
 
     Route::get('/org-units/{orgUnit}/annonces', [AnnouncementsController::class, 'index'])->name('annonces.index');
     Route::get('/org-units/{orgUnit}/annonces/nouvelle', [AnnouncementsController::class, 'create'])->name('annonces.create');

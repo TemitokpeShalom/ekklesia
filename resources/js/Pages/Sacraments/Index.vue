@@ -20,9 +20,17 @@ function typeBadgeClass(type) {
     return type === 'mariage' ? 'bg-sanctuary/15 text-sanctuary-light' : 'bg-forest/15 text-forest'
 }
 
-function memberName(member) {
-    if (!member) return 'Membre retiré'
-    return `${member.first_name} ${member.last_name}`
+/**
+ * Corrige le 2026-09-12 (retour du ministere) : la personne concernée
+ * n'est pas toujours un membre enregistré (voir Sacraments/Create.vue,
+ * member_name) - sans repli, ces sacrements affichaient à tort "Membre
+ * retiré", alors que la personne n'a jamais été supprimée puisqu'elle
+ * n'a jamais été enregistrée. On distingue donc bien les deux cas.
+ */
+function memberName(member, fallbackName) {
+    if (member) return `${member.first_name} ${member.last_name}`
+    if (fallbackName) return fallbackName
+    return 'Membre retiré'
 }
 
 function dayNumber(value) {
@@ -55,7 +63,7 @@ function formatDate(value) {
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/sacrements/nouveau`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -89,7 +97,7 @@ function formatDate(value) {
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center justify-between gap-3">
                             <p class="truncate font-semibold text-graphite text-[15px]">
-                                {{ memberName(s.member) }}
+                                {{ memberName(s.member, s.member_name) }}
                                 <span v-if="s.type === 'mariage'" class="text-graphite/65 font-normal">
                                     &amp; {{ s.spouse_member ? memberName(s.spouse_member) : (s.spouse_name || 'conjoint(e) non enregistré(e)') }}
                                 </span>

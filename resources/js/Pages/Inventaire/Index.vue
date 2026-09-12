@@ -64,8 +64,8 @@ function filterBy(categorie) {
     <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}`">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
-                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                <p class="text-xs uppercase tracking-widest text-azure/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
                 <h1 class="font-serif text-3xl text-graphite mt-2">Immobilier et mobilier</h1>
@@ -77,7 +77,7 @@ function filterBy(categorie) {
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/inventaire/nouveau`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -101,26 +101,26 @@ function filterBy(categorie) {
                 <div class="flex gap-2 text-sm">
                     <button
                         @click="filterBy(null)"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', !categorie ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', !categorie ? 'bg-gradient-to-r from-azure to-azure-dark text-white' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Tous
                     </button>
                     <button
                         @click="filterBy('immobilier')"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'immobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'immobilier' ? 'bg-gradient-to-r from-azure to-azure-dark text-white' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Immobilier
                     </button>
                     <button
                         @click="filterBy('mobilier')"
-                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'mobilier' ? 'bg-gradient-to-r from-gold to-gold-dark text-night' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
+                        :class="['rounded-full px-4 py-1.5 font-medium transition', categorie === 'mobilier' ? 'bg-gradient-to-r from-azure to-azure-dark text-white' : 'glass-panel-light text-graphite/80 hover:text-graphite']"
                     >
                         Mobilier
                     </button>
                 </div>
                 <Link
                     :href="`/org-units/${orgUnit.id}/inventaire-rapport`"
-                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 text-sm font-medium text-graphite/87 hover:border-gold/40 hover:text-sanctuary transition"
+                    class="inline-flex items-center gap-1.5 glass-panel-light rounded-full px-4 py-2 text-sm font-medium text-graphite/87 hover:border-azure/40 hover:text-azure transition"
                 >
                     Fiche d'inventaire consolidée
                 </Link>

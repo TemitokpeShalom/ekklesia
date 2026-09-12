@@ -68,7 +68,11 @@ class SignalementsController extends Controller
             'status' => Signalement::STATUT_NOUVEAU,
         ]);
 
-        return redirect()->route('signalements.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere, valable pour TOUS les
+        // modules d'enregistrement) : confirmer clairement la reussite,
+        // toujours en vert - jamais en rouge, reserve aux erreurs.
+        return redirect()->route('signalements.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Signalement envoyé.');
     }
 
     public function updateStatus(Request $request, OrgUnit $orgUnit, Signalement $signalement): RedirectResponse
@@ -88,6 +92,7 @@ class SignalementsController extends Controller
 
         $signalement->update($data);
 
-        return redirect()->route('signalements.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('signalements.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Statut mis à jour.');
     }
 }

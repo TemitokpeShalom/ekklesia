@@ -58,11 +58,11 @@ function destroy() {
 </script>
 
 <template>
-    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/inventaire`" back-label="Annuler">
+    <AppLayout :org-unit="orgUnit" :back-href="`/org-units/${orgUnit.id}/inventaire`" back-label="Retour">
         <template #title>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
-                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                <p class="text-xs uppercase tracking-widest text-azure/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
                 <h1 class="font-serif text-3xl text-graphite mt-2">Modifier le bien</h1>
@@ -73,7 +73,7 @@ function destroy() {
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Identification</h2>
+                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Identification</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Catégorie</label>
@@ -98,7 +98,7 @@ function destroy() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Acquisition</h2>
+                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Acquisition</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Date d'acquisition</label>
@@ -128,7 +128,7 @@ function destroy() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">État et observation</h2>
+                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">État et observation</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">État du bien</label>
@@ -148,7 +148,7 @@ function destroy() {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
+                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />

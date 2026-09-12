@@ -4,35 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\OrgUnit;
+use App\Support\FrenchCalendar;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Carbon;
 
 /**
- * Generateur de documents (reliquat du point 08) : hub qui regroupe les
- * trois gabarits imprimables prevus a l'architecture. Le trombinoscope
- * existe deja (TrombinoscopeController, route inchangee) ; ce controleur
- * ajoute l'affiche et le calendrier annuel, construits sur la meme
- * traversee d'arbre (path <@ ce noeud, membres actifs uniquement).
- *
- * Le calendrier s'appuie sur birth_date (deja present sur Member) plutot
- * que sur un nouveau modele "evenements" : l'architecture ne demande pas
- * explicitement un calendrier d'evenements, seulement un support imprime
- * par mois, et les dates de naissance suffisent a le remplir utilement
- * des aujourd'hui - un vrai modele d'evenements pourra venir plus tard
- * sans remettre en cause ce gabarit.
+ * Generateur de documents (reliquat du point 08, revu le 2026-09-12). Ce
+ * hub ne regroupe plus que l'Affiche et le Calendrier annuel : le
+ * Trombinoscope est devenu un module a part entiere du tableau de bord
+ * (retour du ministere - "pour moi le role de ce grand module document
+ * reste incompris... garder le trombinoscope comme un module a part
+ * entiere hors du module document"), et l'archive des rapports valides vit
+ * desormais dans RapportsArchiveController (sous-module "Rapports").
  */
 class DocumentGeneratorController extends Controller
 {
     private const MAX_MEMBERS = 500;
 
-    private const TEMPLATES = ['affiche', 'calendrier'];
-
-    private const MOIS = [
-        1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
-        5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
-        9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
-    ];
+    private const TEMPLATES = ['affiche'];
 
     public function index(OrgUnit $orgUnit): Response
     {
@@ -57,43 +48,88 @@ class DocumentGeneratorController extends Controller
             ->limit(self::MAX_MEMBERS)
             ->get(['id', 'first_name', 'last_name', 'title', 'phone', 'birth_date', 'org_unit_id']);
 
-        $payload = [
+        $leaders = $members
+            ->filter(fn ($m) => filled($m->title))
+            ->map(fn ($m) => [
+                'id' => $m->id,
+                'title' => $m->title,
+                'name' => "{$m->first_name} {$m->last_name}",
+            ])
+            ->values();
+
+        return Inertia::render('Documents/Apercu', [
             'orgUnit' => $orgUnit->only(['id', 'name', 'level_label']),
             'ministry' => $orgUnit->ministry->only(['id', 'name']),
             'template' => $template,
-            'year' => now()->year,
-        ];
+            'leaders' => $leaders,
+            'memberCount' => $members->count(),
+        ]);
+    }
 
-        if ($template === 'affiche') {
-            $payload['leaders'] = $members
-                ->filter(fn ($m) => filled($m->title))
-                ->map(fn ($m) => [
-                    'id' => $m->id,
-                    'title' => $m->title,
-                    'name' => "{$m->first_name} {$m->last_name}",
-                ])
-                ->values();
-            $payload['memberCount'] = $members->count();
-        }
+    /**
+     * Calendrier annuel (refait le 2026-09-12, retour du ministere : "je
+     * voulais un calendrier normal avec les trente, trente-et-un jours du
+     * mois comme tout autre calendrier... et aussi renseigner le pasteur
+     * sur les evenements de chaque jour, si c'est l'anniversaire d'un
+     * fidele"). Vraie grille de 12 mois (jours 1..N, alignes sur le bon
+     * jour de la semaine), pas seulement une liste triee comme avant.
+     * S'appuie toujours sur birth_date (voir doc-comment historique
+     * ci-dessous, valable pour le principe general meme si le gabarit a
+     * change) plutot qu'un nouveau modele "evenements".
+     */
+    public function calendrier(OrgUnit $orgUnit): Response
+    {
+        $this->authorize('view', $orgUnit);
 
-        if ($template === 'calendrier') {
-            $payload['months'] = collect(self::MOIS)->map(function ($label, $num) use ($members) {
-                return [
-                    'number' => $num,
-                    'label' => $label,
-                    'members' => $members
-                        ->filter(fn ($m) => $m->birth_date && (int) $m->birth_date->format('n') === $num)
-                        ->sortBy(fn ($m) => (int) $m->birth_date->format('j'))
-                        ->map(fn ($m) => [
-                            'id' => $m->id,
-                            'name' => trim("{$m->title} {$m->first_name} {$m->last_name}"),
-                            'day' => (int) $m->birth_date->format('j'),
-                        ])
-                        ->values(),
+        $members = Member::whereHas('orgUnit', function ($q) use ($orgUnit) {
+            $q->whereRaw('org_units.path <@ ?::ltree', [$orgUnit->path]);
+        })
+            ->where('status', 'active')
+            ->whereNotNull('birth_date')
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->limit(self::MAX_MEMBERS)
+            ->get(['id', 'first_name', 'last_name', 'title', 'phone', 'birth_date']);
+
+        $year = (int) now()->year;
+
+        $months = collect(FrenchCalendar::MOIS)->map(function ($label, $num) use ($members, $year) {
+            $firstOfMonth = Carbon::create($year, $num, 1);
+            $daysInMonth = $firstOfMonth->daysInMonth;
+            // ISO : 1 = lundi ... 7 = dimanche, aligne sur FrenchCalendar::JOURS.
+            $leadingBlanks = $firstOfMonth->dayOfWeekIso - 1;
+
+            $byDay = $members
+                ->filter(fn ($m) => (int) $m->birth_date->format('n') === $num)
+                ->groupBy(fn ($m) => (int) $m->birth_date->format('j'));
+
+            $days = [];
+            for ($d = 1; $d <= $daysInMonth; $d++) {
+                $days[] = [
+                    'day' => $d,
+                    'birthdays' => ($byDay->get($d) ?? collect())->map(fn ($m) => [
+                        'id' => $m->id,
+                        'first_name' => $m->first_name,
+                        'name' => trim("{$m->title} {$m->first_name} {$m->last_name}"),
+                        'phone' => $m->phone,
+                    ])->values(),
                 ];
-            })->values();
-        }
+            }
 
-        return Inertia::render('Documents/Apercu', $payload);
+            return [
+                'number' => $num,
+                'label' => $label,
+                'leadingBlanks' => $leadingBlanks,
+                'days' => $days,
+            ];
+        })->values();
+
+        return Inertia::render('Documents/Calendrier', [
+            'orgUnit' => $orgUnit->only(['id', 'name', 'level_label']),
+            'ministry' => $orgUnit->ministry->letterhead(),
+            'year' => $year,
+            'months' => $months,
+            'joursSemaine' => FrenchCalendar::JOURS,
+        ]);
     }
 }

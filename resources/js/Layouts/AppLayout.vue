@@ -94,7 +94,22 @@ defineProps({
                 </Link>
                 <nav class="flex items-center gap-2 shrink-0">
                     <slot name="actions" />
-                    <Link v-if="backHref" :href="backHref" class="text-sm text-graphite/70 hover:text-graphite bg-graphite/5 hover:bg-graphite/10 border border-graphite/10 rounded-full px-4 py-2 transition-colors">{{ backLabel }}</Link>
+                    <!--
+                        Corrige le 2026-09-12 (retour du ministere, valable pour
+                        TOUS les modules) : ce lien ramène à la page précédente
+                        (annonces, cultes, membres...), mais portait presque
+                        partout le texte "Annuler" - trompeur, puisqu'il ne
+                        s'agit pas d'annuler quoi que ce soit, seulement de
+                        revenir en arrière. Chaque page qui utilisait "Annuler"
+                        comme back-label est passée à "Retour" ; ce lien porte
+                        en plus, désormais et partout, une flèche de retour.
+                    -->
+                    <Link v-if="backHref" :href="backHref" class="inline-flex items-center gap-1.5 text-sm text-graphite/70 hover:text-graphite bg-graphite/5 hover:bg-graphite/10 border border-graphite/10 rounded-full px-4 py-2 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5 shrink-0">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                        {{ backLabel }}
+                    </Link>
 
                     <!--
                         Menu "profil" (2026-09-10) : remplace les trois

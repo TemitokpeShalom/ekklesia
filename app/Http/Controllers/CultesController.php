@@ -64,7 +64,13 @@ class CultesController extends Controller
             'status' => $status,
         ]);
 
-        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere) : aucun message de
+        // confirmation ne s'affichait apres l'enregistrement - on ne
+        // savait pas si l'action avait reussi. Le bandeau (vert, jamais
+        // rouge - reserve aux erreurs) est deja gere globalement par
+        // AppLayout.vue, il suffisait de lui fournir le message.
+        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Culte enregistré.');
     }
 
     public function edit(OrgUnit $orgUnit, Culte $culte): Response
@@ -97,7 +103,8 @@ class CultesController extends Controller
 
         $culte->update($data);
 
-        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Culte mis à jour.');
     }
 
     public function destroy(OrgUnit $orgUnit, Culte $culte): RedirectResponse
@@ -107,6 +114,7 @@ class CultesController extends Controller
 
         $culte->delete();
 
-        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('cultes.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Culte retiré.');
     }
 }

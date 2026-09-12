@@ -12,7 +12,16 @@ use Inertia\Response;
 /**
  * Equipes de service et benevolat (point 08). La composition de chaque
  * equipe (ajout/retrait d'un membre) est geree par TeamMembersController,
- * directement depuis l'ecran d'edition d'une equipe.
+ * sur son propre ecran (Teams/Membres.vue) - separe de celui-ci, qui ne
+ * gere plus que l'identite de l'equipe (nom, description).
+ *
+ * Corrige le 2026-09-12 (retour du ministere) : jusqu'ici, cliquer sur une
+ * equipe dans la liste ne faisait rien ("il faut cliquer sur modifier pour
+ * que ça puisse réagir") et "modifier" combinait a tort deux choses tres
+ * differentes (renommer l'equipe / gerer ses membres) sur un seul ecran.
+ * Desormais : cliquer sur une equipe dans la liste ouvre directement la
+ * gestion de ses membres (l'action la plus frequente) ; "Modifier" reste un
+ * lien separe, reserve au nom/a la description de l'equipe.
  */
 class TeamsController extends Controller
 {
@@ -53,7 +62,11 @@ class TeamsController extends Controller
             'ministry_id' => $orgUnit->ministry_id,
         ]);
 
-        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id]);
+        // Corrige le 2026-09-12 (retour du ministere, valable pour TOUS les
+        // modules d'enregistrement) : confirmer clairement la reussite,
+        // toujours en vert - jamais en rouge, reserve aux erreurs.
+        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Équipe créée.');
     }
 
     public function edit(OrgUnit $orgUnit, Team $equipe): Response
@@ -63,8 +76,7 @@ class TeamsController extends Controller
 
         return Inertia::render('Teams/Edit', [
             'orgUnit' => $orgUnit,
-            'equipe' => $equipe->load('teamMembers.member'),
-            'members' => $orgUnit->members()->orderBy('last_name')->orderBy('first_name')->get(),
+            'equipe' => $equipe,
         ]);
     }
 
@@ -80,7 +92,8 @@ class TeamsController extends Controller
 
         $equipe->update($data);
 
-        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Équipe mise à jour.');
     }
 
     public function destroy(OrgUnit $orgUnit, Team $equipe): RedirectResponse
@@ -90,6 +103,7 @@ class TeamsController extends Controller
 
         $equipe->delete();
 
-        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id]);
+        return redirect()->route('teams.index', ['orgUnit' => $orgUnit->id])
+            ->with('success', 'Équipe supprimée.');
     }
 }

@@ -132,6 +132,18 @@ class OrgUnitPolicy
         return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
     }
 
+    /**
+     * Archives de documents propres a une entite (chantier "module
+     * Documents", 2026-09-12) : meme regle que les autres modules de
+     * gestion - il faut un role habilite a gerer des personnes
+     * (can_manage_users), sur ce noeud ou un de ses ancetres. La lecture
+     * (liste, telechargement) suit view(), plus permissive.
+     */
+    public function manageDocuments(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
     private function hasAffectationOverridingDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
     {
         return $user->activeAffectations()

@@ -46,11 +46,33 @@ class AssistantService
             ->orderByDesc('last_message_at')
             ->first();
 
-        if ($conversation) {
+        if ($conversation && ! $this->isIdle($conversation)) {
             return $conversation;
         }
 
         return $this->startConversation($user, $ministry, $orgUnit);
+    }
+
+    /**
+     * Corrige le 2026-09-12 : au-dela d'un long silence, on repart d'une
+     * conversation neuve plutot que de continuer a trainer (et re-facturer)
+     * l'historique d'un sujet probablement termine - voir
+     * config('assistant.conversation_idle_hours'). L'ancienne conversation
+     * n'est jamais supprimee, seulement laissee de cote.
+     */
+    private function isIdle(AssistantConversation $conversation): bool
+    {
+        if (! $conversation->last_message_at) {
+            return false;
+        }
+
+        $idleHours = max(0, (int) config('assistant.conversation_idle_hours'));
+
+        if ($idleHours === 0) {
+            return false;
+        }
+
+        return $conversation->last_message_at->lt(now()->subHours($idleHours));
     }
 
     public function startConversation(User $user, Ministry $ministry, ?OrgUnit $orgUnit): AssistantConversation
