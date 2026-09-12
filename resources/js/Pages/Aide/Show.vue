@@ -34,7 +34,7 @@ function goBack() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     {{ article.module }}
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">{{ article.title }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ article.title }}</h1>
             </div>
         </template>
 
@@ -42,7 +42,7 @@ function goBack() {
             <nav class="print:hidden">
                 <Link href="/aide" class="text-sm font-medium text-sanctuary hover:text-gold">Manuel complet</Link>
                 <div v-for="(items, moduleName) in modules" :key="moduleName" class="mt-5">
-                    <h2 class="text-xs font-semibold text-graphite/62 uppercase tracking-widest mb-2">{{ moduleName }}</h2>
+                    <h2 class="text-2xl font-bold text-graphite/62 uppercase tracking-widest mb-2">{{ moduleName }}</h2>
                     <ul class="space-y-1">
                         <li v-for="item in items" :key="item.slug">
                             <Link

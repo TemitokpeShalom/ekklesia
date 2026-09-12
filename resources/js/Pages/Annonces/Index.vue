@@ -38,7 +38,7 @@ function attachmentUrl(announcement) {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Annonces
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Annonces</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Annonces</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Diffusées depuis {{ orgUnit.name }} et tous les niveaux au-dessus.</p>
             </div>
         </template>

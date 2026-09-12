@@ -42,7 +42,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Paramètres
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Titres honorifiques</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Titres honorifiques</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Cette liste alimente le champ « titre » du formulaire membre, pour tout le ministère.
                 </p>

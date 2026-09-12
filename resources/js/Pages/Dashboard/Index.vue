@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
 
@@ -22,7 +23,7 @@ import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
  * point 17 de la feuille de route, ouvert a quiconque voit ce noeud (pas
  * de requiresRoot), comme decrit dans le point.
  */
-defineProps({
+const props = defineProps({
     orgUnit: Object,
     ministry: Object,
     children: Array,
@@ -30,9 +31,56 @@ defineProps({
     canAccessLibrary: Boolean,
     canManageAccess: Boolean,
     canTransform: Boolean,
+    canCreateChild: Boolean,
+    subscription: Object,
 })
 
 const governanceMenuOpen = ref(false)
+
+// Creation directe d'une entite enfant a ce noeud (retour du ministere,
+// 2026-09-12, point 03) - remplace le mecanisme par code de rattachement :
+// on reste sur cette page, un formulaire s'ouvre, on nomme la nouvelle
+// entite et on choisit son niveau (forcement en dessous de celui-ci), elle
+// se rattache automatiquement ici, sans code a generer ni a transmettre.
+const LEVEL_NAMES = ['Ministère', 'Continent', 'Pays', 'Région', 'District', 'Église locale', 'Cellule']
+const showCreateForm = ref(false)
+const availableChildRanks = computed(() =>
+    LEVEL_NAMES
+        .map((label, rank) => ({ rank, label }))
+        .filter(({ rank }) => rank > props.orgUnit.level_rank)
+)
+
+const page = usePage()
+const createdOrgUnitId = computed(() => page.props.flash?.created_org_unit_id)
+const createdOrgUnitName = computed(() => page.props.flash?.created_org_unit_name)
+
+const createForm = useForm({
+    name: '',
+    level_rank: '',
+})
+
+// Point 28/29 (retour du ministere, 2026-09-12 : "ce n'est pas seulement
+// eglise locale qu'il faut regarder... tout est decompte en meme temps,
+// quel que soit le niveau") - rappel du quota d'abonnement (nombre
+// d'entites autorisees, TOUS niveaux confondus) visible des l'ouverture de
+// ce formulaire, quel que soit le niveau choisi - plus seulement pour
+// "Eglise locale" (Ministry::assertCanCreateOrgUnit s'applique a tous).
+const orgUnitsRemainingLabel = computed(() => {
+    const limit = props.subscription?.orgUnitsLimit
+    if (limit === null || limit === undefined) return null
+    const remaining = Math.max(0, limit - (props.subscription?.orgUnitsCount ?? 0))
+    return `${remaining} sur ${limit} entité(s) restante(s) (tous niveaux confondus) sur l'offre « ${props.subscription?.planName ?? 'actuelle'} ».`
+})
+
+function submitCreate() {
+    createForm.post(`/org-units/${props.orgUnit.id}/entites`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            createForm.reset()
+            showCreateForm.value = false
+        },
+    })
+}
 
 // Un module par carte : badge en degrade (une nuance vers une nuance plus
 // sombre de la meme couleur, jamais un arc-en-ciel), icone, courte
@@ -149,9 +197,22 @@ const modules = [
                             <p class="text-sm font-medium text-graphite">Inviter un titulaire</p>
                             <p class="text-xs text-graphite/60">Un nouveau responsable</p>
                         </a>
-                        <a :href="`/org-units/${orgUnit.id}/code-de-rattachement`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                            <p class="text-sm font-medium text-graphite">Code de rattachement</p>
-                            <p class="text-xs text-graphite/60">Créer une entité rattachée</p>
+                        <!--
+                            Corrige le 2026-09-12 (retour du ministere : "il
+                            faut le laisser dans le menu deroulant de gerer la
+                            gouvernance... pas ramener ca comme un module
+                            affiche en meme temps") : remplace l'ancien "Code
+                            de rattachement" ICI MEME, au meme endroit dans ce
+                            menu - pas de bouton permanent affiche ailleurs sur
+                            la page. Un clic ferme le menu et ouvre le
+                            formulaire (toujours sur ce meme tableau de bord,
+                            juste plus bas, section "Entites rattachees") -
+                            plus aucun code a generer ni a transmettre.
+                        -->
+                        <a v-if="canCreateChild" href="#" @click.prevent="showCreateForm = true; governanceMenuOpen = false"
+                            class="block px-4 py-2 hover:bg-graphite/5">
+                            <p class="text-sm font-medium text-graphite">Créer une entité rattachée</p>
+                            <p class="text-xs text-graphite/60">Directement à ce nœud, sans code</p>
                         </a>
                         <template v-if="orgUnit.level_rank === 0">
                             <a :href="`/org-units/${orgUnit.id}/informations-ministere`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
@@ -186,7 +247,7 @@ const modules = [
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <h1 class="font-serif text-3xl sm:text-4xl text-graphite mt-2">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-6xl sm:text-7xl font-bold text-graphite mt-2">{{ orgUnit.name }}</h1>
             </div>
         </template>
 
@@ -194,7 +255,7 @@ const modules = [
             <MinistryLetterhead :ministry="ministry" />
 
             <section v-if="activeAffectations.length" class="animate-[fadeInUp_0.5s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
+                <h2 class="text-2xl font-bold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
                 <div class="flex flex-wrap gap-2">
                     <span v-for="a in activeAffectations" :key="a.id"
                         class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3 pr-4 py-1.5 text-sm">
@@ -205,7 +266,7 @@ const modules = [
             </section>
 
             <section>
-                <h2 class="font-serif text-2xl text-graphite mb-1">Modules</h2>
+                <h2 class="font-serif text-5xl font-bold text-graphite mb-1">Modules</h2>
                 <p class="text-sm text-graphite/70 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
                 <!--
                     Corrige le 2026-09-12 (retour du ministere : "l'espace
@@ -251,10 +312,71 @@ const modules = [
             </section>
 
             <section>
-                <h2 class="font-serif text-2xl text-graphite mb-1">
+                <h2 class="font-serif text-5xl font-bold text-graphite mb-1">
                     {{ children.length ? 'Entités directement rattachées' : "Aucune entité rattachée pour l'instant" }}
                 </h2>
                 <p v-if="children.length" class="text-sm text-graphite/70 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
+
+                <!--
+                    Bandeau de succes apres creation directe (retour du
+                    ministere, 2026-09-12, point 03) : propose immediatement
+                    d'inviter le titulaire (Pasteur) de la nouvelle entite -
+                    desormais le seul "code"/lien restant a transmettre,
+                    via le mecanisme d'invitation deja existant (point 11).
+                -->
+                <div v-if="createdOrgUnitId" class="glass-panel rounded-2xl p-5 border-forest/40 mb-6 animate-[fadeInUp_0.4s_ease-out_both]">
+                    <p class="text-sm font-medium text-forest mb-3">« {{ createdOrgUnitName }} » a été créée et rattachée ici. Vous pouvez maintenant en inviter le/la titulaire :</p>
+                    <a :href="`/org-units/${createdOrgUnitId}/inviter`"
+                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-4 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20">
+                        Inviter le/la titulaire de « {{ createdOrgUnitName }} »
+                    </a>
+                </div>
+
+                <!--
+                    Formulaire de creation directe (retour du ministere,
+                    2026-09-12, point 03) : remplace le code de rattachement.
+                    On reste sur ce tableau de bord ; le niveau ne propose que
+                    des rangs strictement inferieurs a celui-ci, et
+                    parent/ministere/chemin sont herites du noeud courant,
+                    jamais saisis - meme regle qu'avant, sans code a generer.
+                -->
+                <form v-if="showCreateForm" @submit.prevent="submitCreate"
+                    class="glass-panel rounded-3xl p-6 space-y-4 mb-6 animate-[fadeInUp_0.3s_ease-out_both]">
+                    <h3 class="text-2xl font-bold text-graphite/62 uppercase tracking-widest">Nouvelle entité rattachée à {{ orgUnit.name }}</h3>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Nom</label>
+                            <input v-model="createForm.name" type="text" required placeholder="Ex. « Église APC Cotonou »"
+                                class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/45 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
+                            <p v-if="createForm.errors.name" class="mt-1 text-xs text-rose-600">{{ createForm.errors.name }}</p>
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-sm font-medium text-graphite/87">Niveau</label>
+                            <select v-model="createForm.level_rank" required class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
+                                <option value="" disabled class="bg-white text-graphite">Choisir un niveau</option>
+                                <option v-for="opt in availableChildRanks" :key="opt.rank" :value="opt.rank" class="bg-white text-graphite">{{ opt.label }}</option>
+                            </select>
+                            <p v-if="createForm.errors.level_rank" class="mt-1 text-xs text-rose-600">{{ createForm.errors.level_rank }}</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-graphite/58">Se rattache automatiquement à {{ orgUnit.name }} : aucun code à générer.</p>
+                    <p v-if="orgUnitsRemainingLabel"
+                        class="text-xs rounded-lg px-3 py-2"
+                        :class="subscription.orgUnitsCount >= (subscription.orgUnitsLimit ?? Infinity) ? 'text-rose-700 bg-rose-50 border border-rose-200' : 'text-graphite/70 bg-graphite/5 border border-graphite/10'">
+                        {{ orgUnitsRemainingLabel }}
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="submit" :disabled="createForm.processing"
+                            class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                            Créer et rattacher ici
+                        </button>
+                        <button type="button" @click="showCreateForm = false; createForm.reset()"
+                            class="inline-flex items-center gap-1.5 text-graphite/60 hover:text-graphite text-sm font-medium px-2 py-2">
+                            Annuler
+                        </button>
+                    </div>
+                </form>
+
                 <div v-if="children.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <a v-for="child in children" :key="child.id" :href="`/org-units/${child.id}`"
                         class="group glass-panel rounded-3xl p-6 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300">
@@ -262,7 +384,7 @@ const modules = [
                         <p class="font-semibold text-graphite text-[15px]">{{ child.name }}</p>
                     </a>
                 </div>
-                <p v-else class="text-sm text-graphite/70">
+                <p v-else-if="!showCreateForm" class="text-sm text-graphite/70">
                     Les prochaines entités rattachées à {{ orgUnit.name }} apparaîtront ici.
                 </p>
             </section>

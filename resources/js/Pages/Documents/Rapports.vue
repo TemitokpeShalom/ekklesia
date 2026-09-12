@@ -45,13 +45,13 @@ function periodLabel(value) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Documents · Rapports
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Rapports validés</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Rapports validés</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Un mois n'apparaît disponible ici qu'une fois son rapport validé — validez-le d'abord depuis le module Finances ou Activités pour l'archiver.</p>
             </div>
         </template>
 
         <div v-if="childReports?.length" class="max-w-3xl mx-auto mb-8 animate-[fadeInUp_0.5s_ease-out_both]">
-            <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-3">Rapports transmis par les entités en dessous</h2>
+            <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-3">Rapports transmis par les entités en dessous</h2>
             <div class="space-y-2">
                 <a v-for="(r, i) in childReports" :key="i"
                     :href="`/org-units/${r.org_unit.id}/documents/rapports/${r.type}/${r.period}`"
@@ -99,7 +99,7 @@ function periodLabel(value) {
             propre bloc puisque sa cadence est annuelle.
         -->
         <div v-if="inventoryYears?.length" class="max-w-3xl mx-auto mt-10 animate-[fadeInUp_0.58s_ease-out_both]">
-            <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-3">Fiches d'inventaire annuelles</h2>
+            <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-3">Fiches d'inventaire annuelles</h2>
             <div class="space-y-3">
                 <div v-for="y in inventoryYears" :key="y.year" class="glass-panel rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
                     <p class="font-serif text-lg text-graphite shrink-0">{{ y.year }}</p>

@@ -40,14 +40,14 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Parcours de disciple
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Enregistrer une étape</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Enregistrer une étape</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Membre concerné</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Membre concerné</h2>
                     <!-- Corrige le 2026-09-12 (retour du ministere) : la personne concernée n'est pas toujours déjà enregistrée sur la plateforme - même mécanisme que Sacrements (membre OU nom). Ici, un nom saisi crée une fiche membre minimale, complétable ensuite depuis le module Membres, pour que la personne reste suivie partout (et pas seulement ici). -->
                     <div class="space-y-4">
                         <div>
@@ -67,7 +67,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Étape franchie</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Étape franchie</h2>
                     <select v-model="form.stage" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60">
                         <option v-for="(label, key) in stages" :key="key" :value="key" class="bg-white text-graphite">{{ label }}</option>
                     </select>
@@ -75,13 +75,13 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Date</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Date</h2>
                     <input v-model="form.reached_at" type="date" class="w-full bg-graphite/5 border border-graphite/15 text-graphite rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
                     <p v-if="form.errors.reached_at" class="mt-1 text-sm text-rose-600">{{ form.errors.reached_at }}</p>
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Notes</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Notes</h2>
                     <textarea v-model="form.notes" rows="3" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                 </section>
 

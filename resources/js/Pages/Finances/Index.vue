@@ -81,7 +81,7 @@ function changeMonth(event) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Finances
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Dîmes, offrandes et dépenses</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Dîmes, offrandes et dépenses</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Enregistrées et consultables mois par mois, sans jamais être ressaisies ailleurs.</p>
                 <p v-if="!accountingStandardLabel" class="mt-2 text-xs text-sanctuary/90">
                     Aucune norme comptable n'est encore configurée pour ce pays : les mouvements sont enregistrés sans compte comptable, ce qui n'empêche pas leur saisie.

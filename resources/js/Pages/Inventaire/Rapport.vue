@@ -102,7 +102,7 @@ function unlock() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Fiche d'inventaire consolidée</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Fiche d'inventaire consolidée</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Biens propres de {{ orgUnit.name }} et de tous les niveaux qu'il regroupe, à la date choisie. Choisissez le 31 décembre d'une année pour produire le document de fin d'année à archiver.
                 </p>
@@ -158,7 +158,7 @@ function unlock() {
                 :style="{ animationDelay: `${0.1 + i * 0.05}s` }"
             >
                 <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-azure uppercase tracking-widest">{{ cat.label }}</h3>
+                    <h3 class="text-2xl font-bold text-azure uppercase tracking-widest">{{ cat.label }}</h3>
                     <p class="text-sm font-semibold text-graphite">{{ formatAmount(groupFor(cat.key).total) }}</p>
                 </div>
                 <div v-if="groupFor(cat.key).items.length === 0" class="text-sm text-graphite/62">Aucun bien dans cette catégorie.</div>

@@ -38,7 +38,7 @@ function formatDate(value) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Parcours de disciple
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Croissance spirituelle des membres</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Croissance spirituelle des membres</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">L'étape la plus récente de chaque membre, du nouveau converti à l'envoi en service.</p>
             </div>
         </template>

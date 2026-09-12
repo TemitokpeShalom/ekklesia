@@ -54,7 +54,7 @@ function telHref(phone) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Membres
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">{{ members.length }} membre{{ members.length > 1 ? 's' : '' }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ members.length }} membre{{ members.length > 1 ? 's' : '' }}</h1>
             </div>
         </template>
 

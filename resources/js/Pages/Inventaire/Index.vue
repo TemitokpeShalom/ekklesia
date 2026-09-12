@@ -68,7 +68,7 @@ function filterBy(categorie) {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Immobilier et mobilier</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Immobilier et mobilier</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Avec code d'identification automatique, jamais réattribué même après retrait.</p>
             </div>
         </template>

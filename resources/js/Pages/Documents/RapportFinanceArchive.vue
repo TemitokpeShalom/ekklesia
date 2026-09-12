@@ -54,12 +54,12 @@ function formatLedgerDate(value) {
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}/documents/rapports`" class="text-white/60 hover:text-white transition">Retour aux rapports</Link>
                 <button @click="print"
-                    class="rounded-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night px-5 py-2 text-sm font-semibold shadow-md shadow-gold/20">
+                    class="rounded-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white px-5 py-2 text-sm font-semibold shadow-md shadow-azure/20">
                     Imprimer / Télécharger
                 </button>
             </nav>
@@ -71,7 +71,7 @@ function formatLedgerDate(value) {
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Rapport financier</p>
-                    <h2 class="font-serif text-2xl text-ink mt-1 capitalize">{{ monthLabel }}</h2>
+                    <h2 class="font-serif text-5xl font-bold text-ink mt-1 capitalize">{{ monthLabel }}</h2>
 
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>
                     <p v-if="ancestry.length" class="text-xs text-coffee-light/80 mt-1">
@@ -84,7 +84,7 @@ function formatLedgerDate(value) {
                 <div v-if="devises.length === 0" class="text-center text-sm text-coffee-light py-8">Aucun mouvement enregistré ce mois-ci, sur ce niveau ou ses descendants.</div>
 
                 <div v-for="devise in devises" :key="devise.currency" class="border-t border-coffee/10 pt-6 mb-6 space-y-5">
-                    <h3 class="text-sm font-semibold text-sanctuary/90 uppercase tracking-widest">{{ devise.currency }}</h3>
+                    <h3 class="text-[1.75rem] font-bold text-sanctuary/90 uppercase tracking-widest">{{ devise.currency }}</h3>
 
                     <div class="grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
                         <div>
@@ -110,7 +110,7 @@ function formatLedgerDate(value) {
                     </div>
 
                     <div>
-                        <h4 class="mb-2 text-xs font-semibold text-azure uppercase tracking-widest">Répartition</h4>
+                        <h4 class="mb-2 text-2xl font-bold text-azure uppercase tracking-widest">Répartition</h4>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 print:grid-cols-3">
                             <div>
                                 <p class="mb-1.5 text-[11px] text-coffee-light">Encaissements / décaissements</p>
@@ -131,7 +131,7 @@ function formatLedgerDate(value) {
                     </div>
 
                     <div>
-                        <h4 class="mb-2 text-xs font-semibold text-azure uppercase tracking-widest">Journal du mois, jour par jour</h4>
+                        <h4 class="mb-2 text-2xl font-bold text-azure uppercase tracking-widest">Journal du mois, jour par jour</h4>
                         <div v-if="devise.ledger.length === 0" class="text-sm text-coffee-light">Aucun mouvement ce mois-ci.</div>
                         <table v-else class="w-full text-sm">
                             <thead>
@@ -161,7 +161,7 @@ function formatLedgerDate(value) {
                     </div>
 
                     <div>
-                        <h4 class="mb-2 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Encaissements</h4>
+                        <h4 class="mb-2 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Encaissements</h4>
                         <div v-if="devise.encaissements.length === 0" class="text-sm text-coffee-light">Aucun encaissement ce mois-ci.</div>
                         <table v-else class="w-full text-sm">
                             <tbody>
@@ -175,7 +175,7 @@ function formatLedgerDate(value) {
                     </div>
 
                     <div>
-                        <h4 class="mb-2 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Décaissements</h4>
+                        <h4 class="mb-2 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Décaissements</h4>
                         <div v-if="devise.decaissements.length === 0" class="text-sm text-coffee-light">Aucun décaissement ce mois-ci.</div>
                         <table v-else class="w-full text-sm">
                             <tbody>

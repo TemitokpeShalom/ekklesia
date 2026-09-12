@@ -44,7 +44,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Transformation
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Transformer cette entité</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Transformer cette entité</h1>
             </div>
         </template>
 
@@ -107,7 +107,7 @@ function submit() {
             </p>
 
             <section>
-                <h2 class="mb-3 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Historique</h2>
+                <h2 class="mb-3 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Historique</h2>
                 <div v-if="history.length === 0" class="glass-panel rounded-2xl px-4 py-6 text-center text-sm text-graphite/62">
                     Aucune transformation enregistrée pour l'instant.
                 </div>

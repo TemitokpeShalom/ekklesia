@@ -105,7 +105,7 @@ function print() {
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}/documents/rapports`" class="text-white/60 hover:text-white transition">Retour aux rapports</Link>
@@ -122,7 +122,7 @@ function print() {
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Fiche d'inventaire</p>
-                    <h2 class="font-serif text-2xl text-ink mt-1">Exercice {{ year }} — au 31 décembre {{ year }}</h2>
+                    <h2 class="font-serif text-5xl font-bold text-ink mt-1">Exercice {{ year }} — au 31 décembre {{ year }}</h2>
 
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>
                     <p v-if="ancestry.length" class="text-xs text-coffee-light/80 mt-1">
@@ -139,7 +139,7 @@ function print() {
 
                 <div v-for="cat in categories" :key="cat.key" class="border-t border-coffee/10 pt-6 mb-6">
                     <div class="mb-3 flex items-center justify-between">
-                        <h3 class="text-xs font-semibold text-azure uppercase tracking-widest">{{ cat.label }}</h3>
+                        <h3 class="text-2xl font-bold text-azure uppercase tracking-widest">{{ cat.label }}</h3>
                         <p class="text-sm font-semibold text-ink">{{ formatAmount(groupFor(cat.key).total) }}</p>
                     </div>
                     <div v-if="groupFor(cat.key).items.length === 0" class="text-sm text-coffee-light">Aucun bien dans cette catégorie.</div>

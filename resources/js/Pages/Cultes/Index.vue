@@ -49,7 +49,7 @@ function formatDate(value) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Cultes
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">{{ cultes.length }} culte{{ cultes.length > 1 ? 's' : '' }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ cultes.length }} culte{{ cultes.length > 1 ? 's' : '' }}</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Historique des cultes, messages prêchés et assistance.</p>
             </div>
         </template>

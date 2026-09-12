@@ -76,7 +76,7 @@ function formatDate(iso) {
           <span class="inline-block w-6 h-px bg-azure/40"></span>
           Canal de signalement
         </p>
-        <h1 class="font-serif text-3xl text-graphite mt-2">Une préoccupation à remonter ?</h1>
+        <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Une préoccupation à remonter ?</h1>
         <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
           Visible depuis {{ orgUnit.name }} et tout niveau au-dessus, jamais ailleurs (exactement l'inverse du chemin suivi par les annonces).
         </p>
@@ -111,7 +111,7 @@ function formatDate(iso) {
       </form>
 
       <div>
-        <h3 class="font-serif text-xl text-graphite mb-4">
+        <h3 class="font-serif text-[2.5rem] font-bold text-graphite mb-4">
           {{ localSignalements.length ? 'Signalements reçus' : "Aucun signalement pour l'instant" }}
         </h3>
 

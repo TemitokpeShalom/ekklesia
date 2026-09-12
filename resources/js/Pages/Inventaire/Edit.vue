@@ -65,7 +65,7 @@ function destroy() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Modifier le bien</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Modifier le bien</h1>
                 <p class="mt-1 font-mono text-xs text-graphite/58">{{ asset.code }}</p>
             </div>
         </template>
@@ -73,7 +73,7 @@ function destroy() {
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Identification</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Identification</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Catégorie</label>
@@ -98,7 +98,7 @@ function destroy() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Acquisition</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Acquisition</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Date d'acquisition</label>
@@ -128,7 +128,7 @@ function destroy() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">État et observation</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">État et observation</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">État du bien</label>

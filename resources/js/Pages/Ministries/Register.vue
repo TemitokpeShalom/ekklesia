@@ -58,7 +58,7 @@ function submit() {
             class="relative w-full max-w-lg glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
             <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">Nouveau ministère</p>
-            <h1 class="font-serif text-2xl text-graphite mb-1">Créer votre espace</h1>
+            <h1 class="font-serif text-5xl font-bold text-graphite mb-1">Créer votre espace</h1>
             <p class="text-sm text-graphite/70 mb-6">Votre ministère est créé immédiatement, avec un essai gratuit de 30 jours.</p>
 
             <p class="text-xs uppercase tracking-widest text-graphite/55 font-semibold mb-3">Informations officielles du ministère</p>

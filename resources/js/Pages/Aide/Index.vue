@@ -54,7 +54,7 @@ function moduleSlug(name) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Documentation
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Manuel d'utilisation</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Manuel d'utilisation</h1>
             </div>
         </template>
 
@@ -79,7 +79,7 @@ function moduleSlug(name) {
             </form>
 
             <section v-if="query" class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.5s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-3">
+                <h2 class="text-2xl font-bold text-sanctuary/80 uppercase tracking-widest mb-3">
                     Résultats pour « {{ query }} »
                 </h2>
                 <p v-if="!results.length" class="text-sm text-graphite/70">
@@ -97,7 +97,7 @@ function moduleSlug(name) {
             </section>
 
             <nav class="mb-10 glass-panel rounded-3xl p-6 print:hidden animate-[fadeInUp_0.55s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-3">Sommaire</h2>
+                <h2 class="text-2xl font-bold text-sanctuary/80 uppercase tracking-widest mb-3">Sommaire</h2>
                 <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-1">
                     <li v-for="(items, moduleName) in modules" :key="moduleName">
                         <a :href="`#${moduleSlug(moduleName)}`" class="text-sm text-graphite/80 hover:text-sanctuary">{{ moduleName }}</a>
@@ -111,9 +111,9 @@ function moduleSlug(name) {
                 :id="moduleSlug(moduleName)"
                 class="mb-10 break-inside-avoid-page glass-panel rounded-3xl p-6 print:bg-transparent print:border-0 print:p-0 animate-[fadeInUp_0.5s_ease-out_both]"
             >
-                <h2 class="text-base font-semibold text-graphite border-b border-graphite/10 pb-2 mb-4 print:text-black print:border-slate-300">{{ moduleName }}</h2>
+                <h2 class="text-[2rem] font-bold text-graphite border-b border-graphite/10 pb-2 mb-4 print:text-black print:border-slate-300">{{ moduleName }}</h2>
                 <article v-for="item in items" :key="item.slug" class="mb-8 break-inside-avoid-page">
-                    <h3 class="text-sm font-semibold text-graphite/90 mb-2 print:text-black">{{ item.title }}</h3>
+                    <h3 class="text-[1.75rem] font-bold text-graphite/90 mb-2 print:text-black">{{ item.title }}</h3>
                     <p v-for="(paragraph, i) in item.body.split('\n\n')" :key="i" class="text-sm text-graphite/70 mb-2 print:text-slate-700">
                         {{ paragraph }}
                     </p>

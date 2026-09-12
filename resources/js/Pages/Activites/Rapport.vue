@@ -104,7 +104,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Rapport d'activités
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2 capitalize">{{ monthLabel(month) }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2 capitalize">{{ monthLabel(month) }}</h1>
             </div>
         </template>
 
@@ -162,7 +162,7 @@ function submit() {
                 seul le nombre de cultes tenus est un total legitime.
             -->
             <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.55s_ease-out_both]">
-                <h3 class="mb-4 text-xs font-bold text-azure uppercase tracking-widest">Cultes tenus ce mois</h3>
+                <h3 class="mb-4 text-2xl font-bold text-azure uppercase tracking-widest">Cultes tenus ce mois</h3>
                 <p class="text-xl font-serif text-graphite">{{ cultes.length }}</p>
                 <p class="mt-4 text-xs text-graphite/58">Le détail (date, présences) de chaque culte est ci-dessous. Aucun total d'effectifs n'est calculé : une même personne présente à plusieurs cultes du mois y serait comptée plusieurs fois.</p>
             </section>
@@ -174,12 +174,12 @@ function submit() {
                 les effectifs evoluent chaque dimanche").
             -->
             <section v-if="cultes.length > 0" class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.56s_ease-out_both]">
-                <h3 class="mb-4 text-xs font-bold text-azure uppercase tracking-widest">Évolution des effectifs</h3>
+                <h3 class="mb-4 text-2xl font-bold text-azure uppercase tracking-widest">Évolution des effectifs</h3>
                 <LineChart :labels="attendanceLabels" :series="attendanceSeries" />
             </section>
 
             <section class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.57s_ease-out_both]">
-                <h3 class="mb-4 text-xs font-bold text-azure uppercase tracking-widest">Détail par culte</h3>
+                <h3 class="mb-4 text-2xl font-bold text-azure uppercase tracking-widest">Détail par culte</h3>
                 <div v-if="cultes.length === 0" class="text-sm text-graphite/62">Aucun culte enregistré ce mois-ci.</div>
                 <table v-else class="w-full text-sm">
                     <thead>
@@ -205,7 +205,7 @@ function submit() {
                 <p v-if="isValidated" class="text-xs text-graphite/55 -mt-2">Ce rapport est validé et verrouillé : déverrouillez-le ci-dessus pour modifier les champs ci-dessous.</p>
                 <fieldset :disabled="!canManage || isValidated" class="space-y-8">
                     <section>
-                        <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Baptêmes et nouveaux convertis</h2>
+                        <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Baptêmes et nouveaux convertis</h2>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="mb-1 block text-sm font-medium text-graphite/87">Baptêmes</label>
@@ -224,17 +224,17 @@ function submit() {
                     </section>
 
                     <section class="border-t border-graphite/10 pt-6">
-                        <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Activités du mois</h2>
+                        <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Activités du mois</h2>
                         <textarea v-model="form.activities_notes" rows="3" placeholder="Évangélisations, réveils, événements particuliers..." class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                     </section>
 
                     <section class="border-t border-graphite/10 pt-6">
-                        <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Remarques et suggestions</h2>
+                        <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Remarques et suggestions</h2>
                         <textarea v-model="form.remarks" rows="3" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                     </section>
 
                     <section class="border-t border-graphite/10 pt-6">
-                        <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Situation du responsable</h2>
+                        <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Situation du responsable</h2>
                         <textarea v-model="form.leader_notes" rows="3" class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/55 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"></textarea>
                         <p class="mt-1 text-xs text-graphite/58">Réservé à la hiérarchie pastorale directe, jamais visible dans une consolidation générale.</p>
                     </section>

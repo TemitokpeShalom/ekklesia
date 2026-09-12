@@ -54,12 +54,12 @@ const attendanceSeries = computed(() => [
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}/documents/rapports`" class="text-white/60 hover:text-white transition">Retour aux rapports</Link>
                 <button @click="print"
-                    class="rounded-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night px-5 py-2 text-sm font-semibold shadow-md shadow-gold/20">
+                    class="rounded-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white px-5 py-2 text-sm font-semibold shadow-md shadow-azure/20">
                     Imprimer / Télécharger
                 </button>
             </nav>
@@ -71,7 +71,7 @@ const attendanceSeries = computed(() => [
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Rapport d'activités</p>
-                    <h2 class="font-serif text-2xl text-ink mt-1 capitalize">{{ monthLabel }}</h2>
+                    <h2 class="font-serif text-5xl font-bold text-ink mt-1 capitalize">{{ monthLabel }}</h2>
 
                     <!-- Eglise concernee et sa lignee hierarchique complete, juste apres l'entete, comme demande. -->
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>
@@ -82,7 +82,7 @@ const attendanceSeries = computed(() => [
                 </div>
 
                 <section class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-3 text-xs font-semibold text-azure uppercase tracking-widest">Baptêmes et nouveaux convertis</h3>
+                    <h3 class="mb-3 text-2xl font-bold text-azure uppercase tracking-widest">Baptêmes et nouveaux convertis</h3>
                     <div class="grid grid-cols-2 gap-4 text-sm">
                         <p><span class="text-coffee-light">Baptêmes : </span><span class="font-medium text-ink">{{ report.baptisms_count ?? '—' }}</span></p>
                         <p><span class="text-coffee-light">Nouveaux convertis : </span><span class="font-medium text-ink">{{ report.new_converts_count ?? '—' }}</span></p>
@@ -90,12 +90,12 @@ const attendanceSeries = computed(() => [
                 </section>
 
                 <section v-if="cultes.length > 0" class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-3 text-xs font-semibold text-azure uppercase tracking-widest">Évolution des effectifs</h3>
+                    <h3 class="mb-3 text-2xl font-bold text-azure uppercase tracking-widest">Évolution des effectifs</h3>
                     <LineChart :labels="attendanceLabels" :series="attendanceSeries" />
                 </section>
 
                 <section class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-3 text-xs font-semibold text-azure uppercase tracking-widest">Cultes tenus ce mois ({{ cultes.length }})</h3>
+                    <h3 class="mb-3 text-2xl font-bold text-azure uppercase tracking-widest">Cultes tenus ce mois ({{ cultes.length }})</h3>
                     <div v-if="cultes.length === 0" class="text-sm text-coffee-light">Aucun culte enregistré ce mois-ci.</div>
                     <table v-else class="w-full text-sm">
                         <thead>
@@ -118,17 +118,17 @@ const attendanceSeries = computed(() => [
                 </section>
 
                 <section v-if="report.activities_notes" class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-2 text-xs font-semibold text-azure uppercase tracking-widest">Activités du mois</h3>
+                    <h3 class="mb-2 text-2xl font-bold text-azure uppercase tracking-widest">Activités du mois</h3>
                     <p class="text-sm text-ink whitespace-pre-line">{{ report.activities_notes }}</p>
                 </section>
 
                 <section v-if="report.remarks" class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-2 text-xs font-semibold text-azure uppercase tracking-widest">Remarques et suggestions</h3>
+                    <h3 class="mb-2 text-2xl font-bold text-azure uppercase tracking-widest">Remarques et suggestions</h3>
                     <p class="text-sm text-ink whitespace-pre-line">{{ report.remarks }}</p>
                 </section>
 
                 <section v-if="report.leader_notes" class="border-t border-coffee/10 pt-6 mb-6">
-                    <h3 class="mb-2 text-xs font-semibold text-azure uppercase tracking-widest">Situation du responsable</h3>
+                    <h3 class="mb-2 text-2xl font-bold text-azure uppercase tracking-widest">Situation du responsable</h3>
                     <p class="text-sm text-ink whitespace-pre-line">{{ report.leader_notes }}</p>
                     <p class="mt-1 text-[11px] text-coffee-light/70">Réservé à la hiérarchie pastorale directe, jamais visible dans une consolidation générale.</p>
                 </section>

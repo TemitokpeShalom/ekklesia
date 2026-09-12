@@ -38,7 +38,7 @@ function submit() {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
             </span>
-            <h1 class="font-serif text-2xl text-graphite mb-2">Invitation invalide</h1>
+            <h1 class="font-serif text-5xl font-bold text-graphite mb-2">Invitation invalide</h1>
             <p class="text-sm text-graphite/70">{{ error }}</p>
         </div>
 
@@ -46,7 +46,7 @@ function submit() {
             class="relative w-full max-w-sm glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
             <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">Bienvenue</p>
-            <h1 class="font-serif text-2xl text-graphite mb-1">Créer votre compte</h1>
+            <h1 class="font-serif text-5xl font-bold text-graphite mb-1">Créer votre compte</h1>
             <p class="text-sm text-graphite/70 mb-7">
                 Ce compte est personnel : il vous appartient, même si votre poste change plus tard.
             </p>

@@ -32,6 +32,21 @@ class OrgUnitPolicy
     }
 
     /**
+     * Création directe d'une entité enfant à ce nœud (retour du ministère,
+     * 2026-09-12 : remplace le mécanisme par code, point 03) - même règle
+     * que les autres modules de gestion : un rôle habilité à gérer des
+     * personnes (can_manage_users), sur ce nœud OU un de ses ancêtres, pas
+     * seulement exactement sur ce nœud (contrairement à l'ancienne
+     * habilitation issueAttachmentCode, plus utilisée depuis le menu) - un
+     * responsable descend depuis son propre niveau jusqu'au nœud voulu, il
+     * n'a pas forcément une affectation exactement sur ce nœud précis.
+     */
+    public function createChild(User $user, OrgUnit $orgUnit): bool
+    {
+        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+    }
+
+    /**
      * Gestion des membres (fideles) : meme regle que l'invitation d'un
      * titulaire de role - il faut un role habilite a gerer des personnes
      * (can_manage_users), sur ce noeud ou un de ses ancetres.

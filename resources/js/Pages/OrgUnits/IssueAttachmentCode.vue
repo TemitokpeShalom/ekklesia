@@ -46,7 +46,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Rattachement
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Émettre un code de rattachement</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Émettre un code de rattachement</h1>
             </div>
         </template>
 

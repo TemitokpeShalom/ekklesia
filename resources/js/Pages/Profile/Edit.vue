@@ -58,13 +58,13 @@ function goBack() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Mon profil
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">{{ profileUser.name }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ profileUser.name }}</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto space-y-8">
             <section v-if="affectations.length" class="glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.5s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest mb-4">Mes affectations</h2>
+                <h2 class="text-2xl font-bold text-sanctuary/80 uppercase tracking-widest mb-4">Mes affectations</h2>
                 <div class="flex flex-wrap gap-2">
                     <span v-for="a in affectations" :key="a.id"
                         class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3 pr-4 py-1.5 text-sm">
@@ -75,7 +75,7 @@ function goBack() {
             </section>
 
             <form @submit.prevent="submitInfo" class="glass-panel rounded-3xl p-6 md:p-7 space-y-5 animate-[fadeInUp_0.55s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Informations</h2>
+                <h2 class="text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Informations</h2>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-graphite/87">Nom complet</label>
@@ -107,7 +107,7 @@ function goBack() {
             </form>
 
             <form @submit.prevent="submitPassword" class="glass-panel rounded-3xl p-6 md:p-7 space-y-5 animate-[fadeInUp_0.6s_ease-out_both]">
-                <h2 class="text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Mot de passe</h2>
+                <h2 class="text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Mot de passe</h2>
 
                 <div>
                     <label class="mb-1 block text-sm font-medium text-graphite/87">Mot de passe actuel</label>

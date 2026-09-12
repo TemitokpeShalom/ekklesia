@@ -45,7 +45,7 @@ function formatDate(value) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Bibliothèque
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Bibliothèque ministérielle</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Bibliothèque ministérielle</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Messages prêchés dans tout le ministère, accès réservé à ceux qui prêchent.</p>
             </div>
         </template>

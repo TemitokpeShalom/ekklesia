@@ -31,7 +31,7 @@ function print() {
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour aux documents</Link>
@@ -64,7 +64,7 @@ function print() {
                 </svg>
 
                 <p class="relative text-xs uppercase tracking-[0.3em] text-gold-soft/90 font-semibold">{{ ministry.name }}</p>
-                <h2 class="relative font-serif text-5xl mt-4 mb-2">{{ orgUnit.name }}</h2>
+                <h2 class="relative font-serif text-8xl font-bold mt-4 mb-2">{{ orgUnit.name }}</h2>
                 <p class="relative text-white/80">{{ orgUnit.level_label }}</p>
 
                 <div class="relative w-16 h-px bg-gold-soft/50 my-8"></div>

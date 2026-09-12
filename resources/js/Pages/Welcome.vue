@@ -100,7 +100,7 @@ const atouts = [
             <div class="relative mx-auto w-full max-w-5xl mt-20 animate-[fadeInUp_0.7s_ease-out_both]">
                 <div class="text-center mb-10">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-2">Ce que la plateforme administre</p>
-                    <h2 class="font-serif text-2xl sm:text-3xl text-graphite">Une seule administration, pour toute la vie du ministère</h2>
+                    <h2 class="font-serif text-5xl sm:text-6xl font-bold text-graphite">Une seule administration, pour toute la vie du ministère</h2>
                 </div>
 
                 <!-- Corrige le 2026-09-12 : memes ajustements de gabarit que Dashboard/Index.vue (cartes plus compactes, texte legerement agrandi) pour rester coherent avec l'ecran de travail. -->

@@ -115,6 +115,18 @@ class AttachmentCodeService
             // middleware web).
             DB::statement("SET LOCAL app.current_ministry_id = '{$issuingUnit->ministry_id}'");
 
+            // Controle de quota d'abonnement (point 15/28/29, retour du
+            // ministere 2026-09-12) - meme regle qu'OrgUnitService::
+            // createChild : AUCUNE entite, quel que soit son niveau, ne
+            // doit pouvoir se creer au-dela du plafond du palier en cours,
+            // ce chemin par code restant techniquement actif sur le
+            // serveur meme retire du menu Gouvernance. DOIT rester APRES
+            // le SET LOCAL ci-dessus : assertCanCreateOrgUnit() compte via
+            // org_units, table protegee par RLS - sans le contexte
+            // ministere deja pose, ce compte verrait toujours zero ligne
+            // (meme categorie de bug que le point 26).
+            $issuingUnit->ministry->assertCanCreateOrgUnit();
+
             if (! $usedBy) {
                 $usedBy = User::firstWhere('email', $newAccount['email']) ?? User::create([
                     'name' => $newAccount['name'],

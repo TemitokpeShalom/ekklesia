@@ -220,12 +220,12 @@ watch(open, (isOpen) => {
         >
             <div
                 v-if="open"
-                class="w-[22rem] max-w-[92vw] h-[32rem] max-h-[75vh] rounded-2xl overflow-hidden flex flex-col shadow-glow-gold border border-white/10"
+                class="w-[22rem] max-w-[92vw] h-[32rem] max-h-[75vh] rounded-2xl overflow-hidden flex flex-col shadow-glow-azure border border-white/10"
                 style="background: rgba(26,32,28,0.97); backdrop-filter: blur(20px);"
             >
                 <!-- En-tete -->
                 <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-white/[0.03]">
-                    <span class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-night font-serif font-bold text-[13px]">{{ initials }}</span>
+                    <span class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-azure to-azure-dark flex items-center justify-center text-white font-serif font-bold text-[13px]">{{ initials }}</span>
                     <div class="min-w-0 flex-1">
                         <p class="font-serif text-white text-[14px] leading-tight truncate">{{ assistantName }}</p>
                         <p class="text-[11px] text-white/50 truncate">{{ assistantTagline || 'Assistant Oikonema' }}</p>
@@ -233,12 +233,12 @@ watch(open, (isOpen) => {
                     <button
                         type="button"
                         title="Signaler un problème ou une idée à l'équipe technique"
-                        class="text-white/40 hover:text-gold-soft p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                        class="text-white/40 hover:text-azure-light p-1.5 rounded-lg hover:bg-white/5 transition-colors"
                         @click="flagging = !flagging; flagSent = false"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path d="M3 2.75a.75.75 0 0 1 1.5 0v.443c1.11-.36 2.318-.55 3.5-.55 1.32 0 2.62.24 3.816.71a.75.75 0 0 0 .684-.05l.176-.107a5.5 5.5 0 0 1 4.286-.62.75.75 0 0 1 .538.72v6.208a.75.75 0 0 1-1.038.694 4 4 0 0 0-3.106.45l-.176.107a2.25 2.25 0 0 1-2.052.15A8.03 8.03 0 0 0 8 9.643c-1.06 0-2.1.163-3 .48V17.25a.75.75 0 0 1-1.5 0V2.75Z" /></svg>
                     </button>
-                    <button type="button" title="Nouvelle discussion" class="text-white/40 hover:text-gold-soft p-1.5 rounded-lg hover:bg-white/5 transition-colors" @click="startNewConversation">
+                    <button type="button" title="Nouvelle discussion" class="text-white/40 hover:text-azure-light p-1.5 rounded-lg hover:bg-white/5 transition-colors" @click="startNewConversation">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
                     </button>
                     <button type="button" title="Fermer" class="text-white/40 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors" @click="open = false">
@@ -249,10 +249,10 @@ watch(open, (isOpen) => {
                 <!-- Panneau "signaler" -->
                 <div v-if="flagging" class="px-4 py-3 border-b border-white/10 bg-white/[0.02] space-y-2">
                     <p class="text-[12px] text-white/60">Décrivez le problème ou l'idée à transmettre à l'équipe technique :</p>
-                    <textarea v-model="flagText" rows="2" class="w-full text-[13px] rounded-lg bg-white/5 border border-white/10 text-white/90 px-2.5 py-2 focus:outline-none focus:border-gold/60 resize-none" placeholder="Ex. je ne trouve pas où modifier une annonce déjà publiée..."></textarea>
+                    <textarea v-model="flagText" rows="2" class="w-full text-[13px] rounded-lg bg-white/5 border border-white/10 text-white/90 px-2.5 py-2 focus:outline-none focus:border-azure/60 resize-none" placeholder="Ex. je ne trouve pas où modifier une annonce déjà publiée..."></textarea>
                     <div class="flex justify-end gap-2">
                         <button type="button" class="text-[12px] text-white/50 hover:text-white px-2 py-1" @click="flagging = false">Annuler</button>
-                        <button type="button" class="text-[12px] text-night bg-gold hover:bg-gold-dark rounded-full px-3 py-1 font-medium" @click="sendFlag">Envoyer</button>
+                        <button type="button" class="text-[12px] text-white bg-azure hover:bg-azure-dark rounded-full px-3 py-1 font-medium" @click="sendFlag">Envoyer</button>
                     </div>
                 </div>
                 <div v-if="flagSent" class="px-4 py-2 border-b border-white/10 bg-forest/10">
@@ -271,7 +271,7 @@ watch(open, (isOpen) => {
                         <div
                             class="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed whitespace-pre-wrap break-words"
                             :class="message.role === 'user'
-                                ? 'bg-gradient-to-br from-gold to-gold-dark text-night rounded-br-sm'
+                                ? 'bg-gradient-to-br from-azure to-azure-dark text-white rounded-br-sm'
                                 : 'bg-white/[0.06] text-white/90 border border-white/10 rounded-bl-sm'"
                         >
                             <div v-if="message.attachments?.length" class="flex flex-wrap gap-1.5 mb-1.5">
@@ -292,7 +292,7 @@ watch(open, (isOpen) => {
                     </div>
 
                     <p v-if="errorMessage" class="text-[12px] text-rose-400 bg-rose-400/10 border border-rose-400/30 rounded-xl px-3 py-2">{{ errorMessage }}</p>
-                    <p v-if="dailyLimitReached" class="text-[12px] text-gold-soft bg-gold/10 border border-gold/30 rounded-xl px-3 py-2">Le quota de messages du jour pour votre ministère est atteint. Réessayez demain.</p>
+                    <p v-if="dailyLimitReached" class="text-[12px] text-azure-light bg-azure/10 border border-azure/30 rounded-xl px-3 py-2">Le quota de messages du jour pour votre ministère est atteint. Réessayez demain.</p>
                 </div>
 
                 <!-- Pieces jointes en attente -->
@@ -306,7 +306,7 @@ watch(open, (isOpen) => {
                 <!-- Saisie -->
                 <form class="p-3 border-t border-white/10 flex items-end gap-2" @submit.prevent="sendMessage">
                     <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" multiple class="hidden" @change="onFilesChosen" />
-                    <button type="button" title="Joindre une image ou un document" class="shrink-0 text-white/50 hover:text-gold-soft p-2 rounded-lg hover:bg-white/5 transition-colors" :disabled="dailyLimitReached" @click="pickFiles">
+                    <button type="button" title="Joindre une image ou un document" class="shrink-0 text-white/50 hover:text-azure-light p-2 rounded-lg hover:bg-white/5 transition-colors" :disabled="dailyLimitReached" @click="pickFiles">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M15.621 4.379a3 3 0 0 0-4.242 0l-7 7a3 3 0 0 0 4.241 4.243h.001l.497-.5a.75.75 0 0 1 1.064 1.057l-.498.501-.002.002a4.5 4.5 0 0 1-6.364-6.364l7-7a4.5 4.5 0 0 1 6.368 6.36l-3.455 3.553A2.625 2.625 0 1 1 9.52 9.52l3.45-3.451a.75.75 0 1 1 1.061 1.06l-3.45 3.451a1.125 1.125 0 0 0 1.587 1.595l3.454-3.553a3 3 0 0 0 0-4.242Z" clip-rule="evenodd" /></svg>
                     </button>
                     <textarea
@@ -314,12 +314,12 @@ watch(open, (isOpen) => {
                         rows="1"
                         :disabled="dailyLimitReached"
                         placeholder="Écrivez votre message…"
-                        class="flex-1 resize-none text-[13.5px] bg-white/5 border border-white/10 rounded-2xl px-3.5 py-2.5 text-white/90 placeholder-white/30 focus:outline-none focus:border-gold/60 max-h-28"
+                        class="flex-1 resize-none text-[13.5px] bg-white/5 border border-white/10 rounded-2xl px-3.5 py-2.5 text-white/90 placeholder-white/30 focus:outline-none focus:border-azure/60 max-h-28"
                         @keydown.enter.exact.prevent="sendMessage"
                     ></textarea>
                     <button
                         type="submit"
-                        class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-night disabled:opacity-40 transition-opacity"
+                        class="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-azure to-azure-dark flex items-center justify-center text-white disabled:opacity-40 transition-opacity"
                         :disabled="sending || dailyLimitReached || (!draft.trim() && pendingFiles.length === 0)"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" /></svg>
@@ -331,7 +331,7 @@ watch(open, (isOpen) => {
         <!-- Bouton flottant -->
         <button
             type="button"
-            class="w-14 h-14 rounded-full bg-gradient-to-br from-gold to-gold-dark shadow-glow-gold flex items-center justify-center text-night hover:scale-105 transition-transform"
+            class="w-14 h-14 rounded-full bg-gradient-to-br from-azure to-azure-dark shadow-glow-azure flex items-center justify-center text-white hover:scale-105 transition-transform"
             :aria-label="open ? 'Fermer l\'assistant' : 'Ouvrir l\'assistant Oikonema'"
             @click="toggleOpen"
         >

@@ -25,12 +25,12 @@ function print() {
         -->
         <header class="border-b border-white/10 glass-panel px-6 py-4 flex items-center justify-between print:hidden">
             <div>
-                <p class="text-xs uppercase tracking-wide text-gold-soft/80">{{ orgUnit.level_label }}</p>
-                <h1 class="text-lg font-semibold text-white">{{ orgUnit.name }}</h1>
+                <p class="text-xs uppercase tracking-wide text-azure/80">{{ orgUnit.level_label }}</p>
+                <h1 class="text-4xl font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}`" class="text-white/60 hover:text-white">Retour au tableau de bord</Link>
-                <button @click="print" class="rounded-lg bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 px-4 py-2 text-sm font-semibold text-night">
+                <button @click="print" class="rounded-lg bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 px-4 py-2 text-sm font-semibold text-white">
                     Imprimer
                 </button>
             </nav>
@@ -38,7 +38,7 @@ function print() {
 
         <main class="max-w-4xl mx-auto px-6 py-8 print:max-w-none print:px-0 print:py-0">
             <div class="mb-6 print:mb-4">
-                <h2 class="text-lg font-semibold text-white print:text-slate-900">Trombinoscope</h2>
+                <h2 class="text-4xl font-bold text-white print:text-slate-900">Trombinoscope</h2>
                 <p class="text-sm text-white/50 print:text-slate-500">{{ orgUnit.name }} · {{ members.length }} membre(s)</p>
             </div>
 

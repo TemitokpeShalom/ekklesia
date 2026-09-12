@@ -49,7 +49,7 @@ const templates = [
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Documents
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Documents du ministère</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Documents du ministère</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Les rapports validés, l'affiche et le calendrier du ministère, et les archives propres à cette entité.</p>
             </div>
         </template>

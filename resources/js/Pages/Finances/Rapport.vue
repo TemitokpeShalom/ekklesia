@@ -95,7 +95,7 @@ function changeMonth(event) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Finances
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2 capitalize">Rapport financier · {{ monthLabel(month) }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2 capitalize">Rapport financier · {{ monthLabel(month) }}</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Vue consolidée de ce niveau et de tous ses niveaux descendants. Aucune conversion de change n'existant dans l'application, chaque devise rencontrée est présentée dans son propre bloc, jamais mélangée à une autre.
                 </p>
@@ -150,7 +150,7 @@ function changeMonth(event) {
             <div v-for="devise in devises" :key="devise.currency" class="space-y-6 animate-[fadeInUp_0.55s_ease-out_both]">
                 <div class="flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
-                    <h2 class="text-sm font-semibold text-sanctuary/90 uppercase tracking-widest">{{ devise.currency }}</h2>
+                    <h2 class="text-[1.75rem] font-bold text-sanctuary/90 uppercase tracking-widest">{{ devise.currency }}</h2>
                     <span v-if="devise.accountingStandardLabel" class="text-xs text-graphite/62">· Détail par compte comptable ({{ devise.accountingStandardLabel }})</span>
                     <span v-else class="text-xs text-graphite/62">· Détail par nature de mouvement</span>
                 </div>
@@ -186,7 +186,7 @@ function changeMonth(event) {
                     détailler aussi pour les entrées").
                 -->
                 <section class="glass-panel rounded-3xl p-6">
-                    <h3 class="mb-4 text-xs font-semibold text-azure uppercase tracking-widest">Répartition</h3>
+                    <h3 class="mb-4 text-2xl font-bold text-azure uppercase tracking-widest">Répartition</h3>
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                         <div>
                             <p class="mb-2 text-xs text-graphite/60">Encaissements / décaissements</p>
@@ -216,7 +216,7 @@ function changeMonth(event) {
                     tout le mois), pas un remplacement.
                 -->
                 <section class="glass-panel rounded-3xl p-6">
-                    <h3 class="mb-4 text-xs font-semibold text-azure uppercase tracking-widest">Journal du mois, jour par jour</h3>
+                    <h3 class="mb-4 text-2xl font-bold text-azure uppercase tracking-widest">Journal du mois, jour par jour</h3>
                     <div v-if="devise.ledger.length === 0" class="text-sm text-graphite/62">Aucun mouvement ce mois-ci.</div>
                     <table v-else class="w-full text-sm">
                         <thead>
@@ -246,7 +246,7 @@ function changeMonth(event) {
                 </section>
 
                 <section class="glass-panel rounded-3xl p-6">
-                    <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Encaissements</h3>
+                    <h3 class="mb-4 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Encaissements</h3>
                     <div v-if="devise.encaissements.length === 0" class="text-sm text-graphite/62">Aucun encaissement ce mois-ci.</div>
                     <table v-else class="w-full text-sm">
                         <tbody>
@@ -260,7 +260,7 @@ function changeMonth(event) {
                 </section>
 
                 <section class="glass-panel rounded-3xl p-6">
-                    <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Décaissements</h3>
+                    <h3 class="mb-4 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Décaissements</h3>
                     <div v-if="devise.decaissements.length === 0" class="text-sm text-graphite/62">Aucun décaissement ce mois-ci.</div>
                     <table v-else class="w-full text-sm">
                         <tbody>

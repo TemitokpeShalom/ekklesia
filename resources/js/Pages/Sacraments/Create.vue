@@ -42,14 +42,14 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Sacrements
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Enregistrer un sacrement</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Enregistrer un sacrement</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Nature du sacrement</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Nature du sacrement</h2>
                     <div class="grid grid-cols-2 gap-3">
                         <label
                             class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition"
@@ -69,7 +69,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">
                         {{ form.type === 'mariage' ? 'Premier conjoint' : 'Membre concerné' }}
                     </h2>
                     <!-- Corrige le 2026-09-12 (retour du ministere) : la personne concernée n'est pas toujours déjà enregistrée sur la plateforme - même mécanisme que le second conjoint ci-dessous (membre OU nom libre). -->
@@ -90,7 +90,7 @@ function submit() {
                 </section>
 
                 <section v-if="form.type === 'mariage'" class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Second conjoint</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Second conjoint</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Si déjà membre enregistré</label>
@@ -107,7 +107,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Quand et où</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Quand et où</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Date</label>
@@ -122,7 +122,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Officiant et remarques</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Officiant et remarques</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Officiant</label>

@@ -71,14 +71,14 @@ function removeMember(teamMember) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Équipes et bénévolat
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">{{ equipe.name }}</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ equipe.name }}</h1>
                 <p v-if="equipe.description" class="text-sm text-graphite/70 mt-2 max-w-2xl">{{ equipe.description }}</p>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto space-y-8">
             <section class="glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
-                <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">
+                <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">
                     Membres de l'équipe ({{ equipe.team_members.length }})
                 </h2>
 
@@ -111,7 +111,7 @@ function removeMember(teamMember) {
             </section>
 
             <form @submit.prevent="addMember" class="space-y-6 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.6s_ease-out_both]">
-                <h2 class="text-xs font-bold text-azure uppercase tracking-widest">Ajouter un membre</h2>
+                <h2 class="text-2xl font-bold text-azure uppercase tracking-widest">Ajouter un membre</h2>
 
                 <!-- Corrige le 2026-09-12 (retour du ministere) : "si elle n'est pas dans la base, qu'on puisse enregistrer directement... que ça crée en même temps dans les membres" - même mécanisme que Parcours de disciple : un nom saisi sans sélection crée une fiche membre minimale, complétable ensuite depuis le module Membres. -->
                 <div>

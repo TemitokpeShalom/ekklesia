@@ -40,6 +40,23 @@ class DashboardController extends Controller
             'canAccessLibrary' => $request->user()->hasPreachingAffectation(),
             'canManageAccess' => $request->user()->can('inviteTo', $orgUnit),
             'canTransform' => $request->user()->can('transform', $orgUnit),
+            // Retour du ministere (2026-09-12, point 03) : creation directe
+            // d'une entite enfant a ce noeud, sans code de rattachement -
+            // ne s'affiche que s'il existe encore un niveau en dessous
+            // (Cellule, rang 6, est le dernier).
+            'canCreateChild' => $orgUnit->level_rank < 6 && $request->user()->can('createChild', $orgUnit),
+            // Point 28/29 (retour du ministere, 2026-09-12 : "il faut
+            // vraiment s'assurer que ca marche", puis "tout est decompte,
+            // pas seulement eglise locale") - affiche des la creation le
+            // nombre d'entites deja rattachees (tous niveaux confondus) et
+            // le plafond du palier en cours, pour que le controle de quota
+            // (Ministry::assertCanCreateOrgUnit) ne soit jamais une
+            // surprise decouverte seulement au moment d'un refus.
+            'subscription' => [
+                'planName' => $orgUnit->ministry->effectivePlan()?->name,
+                'orgUnitsCount' => $orgUnit->ministry->orgUnitsCount(),
+                'orgUnitsLimit' => $orgUnit->ministry->effectivePlan()?->max_org_units,
+            ],
         ]);
     }
 }

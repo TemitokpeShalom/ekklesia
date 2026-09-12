@@ -61,10 +61,16 @@ function formatPrice(price, currency) {
 }
 
 // Correction du 2026-09-10 (point 15) : le palier se lit desormais au
-// nombre d'eglises locales rattachees, plus au nombre de membres - voir
-// la migration 2026_09_10_000011 pour la raison de ce changement.
-function formatChurches(max) {
-  return max ? `Jusqu'à ${max} églises locales` : 'Églises locales illimitées'
+// nombre d'entites rattachees, plus au nombre de membres - voir la
+// migration 2026_09_10_000011 pour la raison de ce premier changement.
+// Correction du 2026-09-12 (point 28/29, retour du ministere : "ce n'est
+// pas seulement eglise locale... tout est decompte en meme temps") -
+// le plafond compte desormais CHAQUE niveau (region, district, eglise
+// locale, cellule...), pas seulement les eglises locales : le libelle
+// doit le dire explicitement, sinon la personne croit pouvoir contourner
+// le plafond en creant uniquement des "districts".
+function formatOrgUnits(max) {
+  return max ? `Jusqu'à ${max} entités rattachées (tous niveaux)` : 'Entités rattachées illimitées'
 }
 
 function formatDate(iso) {
@@ -96,7 +102,7 @@ function formatUsdt(value) {
           <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
           Paramètres
         </p>
-        <h1 class="font-serif text-3xl text-graphite mt-2">Abonnement et facturation</h1>
+        <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Abonnement et facturation</h1>
         <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
           Choisissez l'offre adaptée à la taille de votre ministère. Le changement est appliqué immédiatement.
         </p>
@@ -137,7 +143,7 @@ function formatUsdt(value) {
           :class="plan.id === subscription.plan_id ? 'border-forest/50 ring-1 ring-forest/30' : ''">
           <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">{{ plan.name }}</p>
           <p class="font-serif text-2xl text-graphite mb-1">{{ formatPrice(plan.price_monthly, plan.currency) }}</p>
-          <p class="text-sm text-graphite/65 mb-4">{{ formatChurches(plan.max_local_churches) }}</p>
+          <p class="text-sm text-graphite/65 mb-4">{{ formatOrgUnits(plan.max_org_units) }}</p>
 
           <ul class="space-y-2 text-sm text-graphite/83 mb-6 flex-1">
             <li v-for="(feature, i) in plan.features" :key="i" class="flex items-start gap-2">
@@ -169,7 +175,8 @@ function formatUsdt(value) {
 
             <!-- Correction du 2026-09-10 : palier "sur devis" (price_monthly
             null, ex. National) - pas de paiement en ligne possible, un
-            plafond fixe n'a pas de sens au-delà de 110 églises locales. -->
+            plafond fixe n'a pas de sens au-delà de 110 entités rattachées
+            (tous niveaux confondus, correction du 2026-09-12). -->
             <p v-if="plan.price_monthly === null" class="text-xs text-graphite/68 text-center px-2 py-2.5">
               Contactez l'équipe Oikonema pour activer ce palier.
             </p>
@@ -201,7 +208,7 @@ function formatUsdt(value) {
       </div>
 
       <section v-if="paymentHistory.length > 0" class="glass-panel rounded-3xl p-6 animate-[fadeInUp_0.65s_ease-out_both]">
-        <h3 class="mb-4 text-xs font-semibold text-sanctuary/80 uppercase tracking-widest">Historique des paiements</h3>
+        <h3 class="mb-4 text-2xl font-bold text-sanctuary/80 uppercase tracking-widest">Historique des paiements</h3>
         <table class="w-full text-sm">
           <tbody>
             <tr v-for="entry in paymentHistory" :key="entry.id" class="border-b border-graphite/10 last:border-0">

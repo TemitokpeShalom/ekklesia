@@ -38,7 +38,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Accès et postes
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Inviter un titulaire</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Inviter un titulaire</h1>
             </div>
         </template>
 

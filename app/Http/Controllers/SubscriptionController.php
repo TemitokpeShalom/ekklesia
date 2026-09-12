@@ -38,10 +38,15 @@ class SubscriptionController extends Controller
         // n'a pas pu etre recupere, jamais une valeur inventee.
         $exchangeRates = filled($cryptoWalletAddress) ? new ExchangeRateService : null;
 
+        // Point 28/29 (retour du ministere, 2026-09-12 : "ce n'est pas
+        // seulement eglise locale... tout est decompte en meme temps") -
+        // colonne renommee max_local_churches -> max_org_units (voir
+        // migration 2026_09_12_000008), le plafond couvre desormais TOUS
+        // les niveaux, pas seulement les eglises locales.
         $plans = Plan::orderBy('sort_order')
-            ->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_local_churches', 'features'])
+            ->get(['id', 'code', 'name', 'price_monthly', 'currency', 'max_org_units', 'features'])
             ->map(function (Plan $plan) use ($exchangeRates) {
-                $data = $plan->only(['id', 'code', 'name', 'price_monthly', 'currency', 'max_local_churches', 'features']);
+                $data = $plan->only(['id', 'code', 'name', 'price_monthly', 'currency', 'max_org_units', 'features']);
 
                 $data['usdt_estimate'] = ($exchangeRates && $plan->currency === 'XOF' && (float) $plan->price_monthly > 0)
                     ? $exchangeRates->usdtEstimateForXof((float) $plan->price_monthly)

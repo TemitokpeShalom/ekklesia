@@ -95,6 +95,90 @@ class Ministry extends Model
     }
 
     /**
+     * Le palier a appliquer pour le controle de quota (point 15/28/29) :
+     * celui choisi (plan_id), ou a defaut le palier "Decouverte"
+     * (is_default) - JAMAIS "illimite par defaut". C'est precisement le
+     * bug signale par le ministere le 2026-09-12 ("je suis en plan gratuit
+     * et j'ai plus de 117 eglises, et ca ne dit rien") : un ministere sans
+     * plan_id (jamais passe par le paiement, ou compte de demonstration)
+     * n'avait ete verifie contre AUCUN plafond nulle part dans le code -
+     * ni au moment de generer un code de rattachement, ni au moment de le
+     * consommer, ni (nouveau, point 28) au moment de creer directement une
+     * entite. Ici, l'absence de plan_id retombe sur le palier gratuit par
+     * defaut, jamais sur "pas de limite".
+     */
+    public function effectivePlan(): ?Plan
+    {
+        return $this->plan ?? Plan::where('is_default', true)->first();
+    }
+
+    /**
+     * Nombre d'entites organisationnelles deja rattachees a ce ministere,
+     * TOUS niveaux confondus (continent/pays/region/district/eglise
+     * locale/cellule) - jamais le ministere lui-meme (rang 0, racine du
+     * tenant, jamais "cree" via ce mecanisme).
+     *
+     * Correction du 2026-09-12 (retour du ministere : "ce n'est pas
+     * seulement eglise locale qu'il faut regarder... un noeud peut aussi
+     * etre une eglise... si les gens comprennent que c'est le mot 'eglise
+     * locale' qui decompte, ils vont tout creer en district pour
+     * contourner ca - dès qu'une institution vient etre creee, tout est
+     * decompte") : mesurait auparavant seulement les eglises locales
+     * (RANK_EGLISE_LOCALE) ; compte desormais CHAQUE niveau, pour qu'aucun
+     * choix de niveau ne permette d'echapper au plafond de l'abonnement.
+     */
+    public function orgUnitsCount(): int
+    {
+        return $this->orgUnits()->where('level_rank', '>', OrgUnit::RANK_MINISTERE)->count();
+    }
+
+    /**
+     * Places encore disponibles avant le plafond du palier effectif - null
+     * signifie illimite (palier National, max_org_units null en base).
+     */
+    public function remainingOrgUnitSlots(): ?int
+    {
+        $limit = $this->effectivePlan()?->max_org_units;
+
+        if ($limit === null) {
+            return null;
+        }
+
+        return max(0, $limit - $this->orgUnitsCount());
+    }
+
+    public function canCreateOrgUnit(): bool
+    {
+        $remaining = $this->remainingOrgUnitSlots();
+
+        return $remaining === null || $remaining > 0;
+    }
+
+    /**
+     * A appeler avant toute creation d'une entite, QUEL QUE SOIT SON
+     * NIVEAU (OrgUnitService::createChild et AttachmentCodeService::
+     * consume, point 28/29) - les deux SEULS chemins de creation d'un
+     * OrgUnit dans toute l'application. Lance une exception au message
+     * clair plutot que de laisser la creation silencieusement reussir
+     * au-dela du plafond.
+     */
+    public function assertCanCreateOrgUnit(): void
+    {
+        if ($this->canCreateOrgUnit()) {
+            return;
+        }
+
+        $plan = $this->effectivePlan();
+        $planName = $plan?->name ?? 'actuel';
+        $limit = $plan?->max_org_units;
+
+        throw new \RuntimeException(
+            "Votre abonnement « {$planName} » autorise au maximum {$limit} entité(s) rattachée(s) (tous niveaux confondus : régions, districts, "
+            .'églises locales, cellules...), déjà atteint(es). Passez à une offre supérieure pour rattacher de nouvelles entités.'
+        );
+    }
+
+    /**
      * En-tête officiel du ministère (2026-09-11) : demande explicite du
      * ministère - le nom, le sigle, le n° d'autorisation, l'adresse, les
      * coordonnées et le logo saisis via Settings/MinistryInfo doivent

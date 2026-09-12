@@ -22,6 +22,7 @@ use App\Http\Controllers\HonorificTitlesController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MembersController;
 use App\Http\Controllers\MinistryInfoController;
+use App\Http\Controllers\OrgUnitController;
 use App\Http\Controllers\OrgUnitDocumentsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapportsArchiveController;
@@ -83,6 +84,15 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
 
     Route::get('/org-units/{orgUnit}', [DashboardController::class, 'show'])->name('dashboard');
 
+    // Création directe d'une entité enfant (retour du ministère,
+    // 2026-09-12 : remplace le mécanisme par code de rattachement,
+    // point 03) - depuis le tableau de bord du nœud où l'on se trouve.
+    Route::post('/org-units/{orgUnit}/entites', [OrgUnitController::class, 'store'])->name('org-units.store');
+
+    // Ancien mécanisme par code (point 03) : conservé pour ne rien casser
+    // (codes déjà émis), mais son point d'entrée a été retiré du menu
+    // Gouvernance (voir Dashboard/Index.vue) au profit de la création
+    // directe ci-dessus.
     Route::get('/org-units/{orgUnit}/code-de-rattachement', [AttachmentCodeController::class, 'create'])
         ->name('attachment-codes.create');
     Route::post('/org-units/{orgUnit}/code-de-rattachement', [AttachmentCodeController::class, 'store'])

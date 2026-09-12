@@ -51,14 +51,14 @@ function destroy() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Annonces
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Modifier l'annonce</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Modifier l'annonce</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Contenu</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Contenu</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Titre</label>
@@ -94,7 +94,7 @@ function destroy() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-semibold text-azure uppercase tracking-widest mb-4">Options</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Options</h2>
                     <div class="space-y-4">
                         <label class="flex items-center gap-2 text-sm text-graphite/87">
                             <input v-model="form.important" type="checkbox" class="h-4 w-4 rounded border-graphite/20 bg-graphite/5" />

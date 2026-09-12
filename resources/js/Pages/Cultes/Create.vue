@@ -34,14 +34,14 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Cultes
                 </p>
-                <h1 class="font-serif text-3xl text-graphite mt-2">Nouveau culte</h1>
+                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Nouveau culte</h1>
             </div>
         </template>
 
         <div class="max-w-2xl mx-auto">
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Le message</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Le message</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Thème du message</label>
@@ -56,7 +56,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Quand</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Quand</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Date</label>
@@ -71,7 +71,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Assistance</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Assistance</h2>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Effectif adultes</label>
@@ -85,7 +85,7 @@ function submit() {
                 </section>
 
                 <section class="border-t border-graphite/10 pt-6">
-                    <h2 class="text-xs font-bold text-azure uppercase tracking-widest mb-4">Étude et remarques</h2>
+                    <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Étude et remarques</h2>
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Versets clés étudiés</label>

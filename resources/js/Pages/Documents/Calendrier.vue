@@ -73,12 +73,12 @@ async function copyMessage(member) {
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-xl text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
                 <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour aux documents</Link>
                 <button @click="print"
-                    class="rounded-full bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night px-5 py-2 text-sm font-semibold shadow-md shadow-gold/20">
+                    class="rounded-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white px-5 py-2 text-sm font-semibold shadow-md shadow-azure/20">
                     Imprimer
                 </button>
             </nav>
@@ -95,7 +95,7 @@ async function copyMessage(member) {
                         <img v-if="ministry.logo_url" :src="ministry.logo_url" alt="" class="h-10 w-10 rounded-lg object-contain bg-white p-1 shadow" />
                         <div>
                             <p class="text-[11px] uppercase tracking-widest text-coffee-light">{{ ministry.name }}</p>
-                            <h2 class="font-serif text-2xl text-ink">{{ m.label }} {{ year }}</h2>
+                            <h2 class="font-serif text-5xl font-bold text-ink">{{ m.label }} {{ year }}</h2>
                         </div>
                     </div>
                     <span class="text-sm text-coffee-light text-right">{{ orgUnit.name }}<br /><span class="text-xs">{{ orgUnit.level_label }}</span></span>

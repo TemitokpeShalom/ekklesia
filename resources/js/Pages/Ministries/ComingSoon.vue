@@ -24,7 +24,7 @@ import { Link } from '@inertiajs/vue3'
 
         <div class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
-            <h1 class="font-serif text-2xl text-graphite mb-3">Bientôt disponible</h1>
+            <h1 class="font-serif text-5xl font-bold text-graphite mb-3">Bientôt disponible</h1>
             <p class="text-sm text-graphite/70 mb-8">
                 La création directe d'un nouveau ministère depuis cette page arrive prochainement.
                 En attendant, contactez l'équipe Oikonema pour l'ouverture de votre espace.
