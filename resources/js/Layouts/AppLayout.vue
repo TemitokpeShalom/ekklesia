@@ -9,6 +9,10 @@ const user = computed(() => page.props.auth?.user)
 const userInitial = computed(() => (user.value?.name?.trim()?.charAt(0) || '?').toUpperCase())
 
 const profileMenuOpen = ref(false)
+// Espace technique Oikonema (2026-09-13) : lien affiche uniquement pour les
+// comptes de l'equipe technique (voir HandleInertiaRequests et
+// User::isTechnicalStaff) - invisible pour un compte de ministere ordinaire.
+const isTechnicalStaff = computed(() => user.value?.is_technical_staff)
 
 /**
  * Coquille partagee v4 "Constellation" (2026-09-10).
@@ -132,6 +136,15 @@ defineProps({
                         le profil de l'utilisateur... comment un bon
                         profil"). Ferme au clic exterieur via l'overlay
                         transparent ci-dessous (pas de dependance externe).
+
+                        Lien "Rattachement" retire le 2026-09-13 (retour du
+                        ministere : "on n'utilise plus cette fonction") -
+                        le mecanisme par code reste techniquement present
+                        sur le serveur (voir point 03/AttachmentCodeService)
+                        pour ne pas casser un code deja emis avant ce
+                        changement, mais n'a plus aucun point d'entree dans
+                        le menu, remplace par "Creer une entite rattachee"
+                        dans le menu Gouvernance du tableau de bord.
                     -->
                     <div class="relative">
                         <button type="button" @click="profileMenuOpen = !profileMenuOpen"
@@ -149,8 +162,8 @@ defineProps({
                         <div v-if="profileMenuOpen"
                             class="absolute right-0 mt-2 w-56 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
                             <p class="px-4 py-1.5 text-xs text-graphite/60 truncate">{{ user?.email }}</p>
+                            <Link v-if="isTechnicalStaff" href="/technique" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Espace technique</Link>
                             <Link href="/profil" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Mon profil</Link>
-                            <Link href="/rattachement" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Rattachement</Link>
                             <Link href="/aide" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Aide</Link>
                             <div class="my-1.5 border-t border-graphite/10"></div>
                             <Link href="/deconnexion" method="post" as="button" class="w-full text-left block px-4 py-2 text-sm text-sanctuary hover:bg-sanctuary/5">Se déconnecter</Link>

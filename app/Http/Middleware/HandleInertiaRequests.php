@@ -14,7 +14,15 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user()?->only(['id', 'name', 'email']),
+                // Espace technique Oikonema (2026-09-13) : is_technical_staff
+                // ajoute ici pour que AppLayout.vue puisse afficher le lien
+                // "Espace technique" dans le menu profil sans requete
+                // supplementaire, seulement pour les comptes concernes (voir
+                // User::isTechnicalStaff).
+                'user' => $request->user() ? [
+                    ...$request->user()->only(['id', 'name', 'email']),
+                    'is_technical_staff' => $request->user()->isTechnicalStaff(),
+                ] : null,
             ],
             // Messages ephemeres (code de rattachement emis, lien
             // d'invitation genere...) - lus une seule fois cote Vue.

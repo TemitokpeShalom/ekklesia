@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureTechnicalStaff;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetTenantContext;
 use Illuminate\Foundation\Application;
@@ -15,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'tenant.context' => SetTenantContext::class,
+            // Espace technique Oikonema (2026-09-13, voir EnsureTechnicalStaff) :
+            // reserve un groupe de routes a l'equipe technique de la
+            // plateforme, independamment de tout ministere.
+            'technical.staff' => EnsureTechnicalStaff::class,
         ]);
 
         // Ajoute le 2026-09-09 : par defaut Laravel envoie un visiteur non

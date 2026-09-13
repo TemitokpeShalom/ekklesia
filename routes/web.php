@@ -33,6 +33,7 @@ use App\Http\Controllers\SubscriptionCryptoController;
 use App\Http\Controllers\SubscriptionFedapayController;
 use App\Http\Controllers\TeamMembersController;
 use App\Http\Controllers\TeamsController;
+use App\Http\Controllers\TechniqueController;
 use App\Http\Controllers\TrombinoscopeController;
 use App\Http\Controllers\MinistryRegistrationController;
 use App\Http\Controllers\WelcomeController;
@@ -266,4 +267,16 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     Route::get('/org-units/{orgUnit}/signalements', [SignalementsController::class, 'index'])->name('signalements.index');
     Route::post('/org-units/{orgUnit}/signalements', [SignalementsController::class, 'store'])->name('signalements.store');
     Route::put('/org-units/{orgUnit}/signalements/{signalement}', [SignalementsController::class, 'updateStatus'])->name('signalements.update');
+});
+
+// Espace technique Oikonema (2026-09-13, demande du ministere : "un tableau
+// de bord propre a moi en tant qu'equipe technique") - reserve a l'equipe
+// technique (voir EnsureTechnicalStaff), transversal a tous les ministeres.
+// Volontairement hors du groupe tenant.context ci-dessus : il n'y a pas de
+// ministere "courant" ici.
+Route::middleware(['auth', 'technical.staff'])->prefix('technique')->name('technique.')->group(function () {
+    Route::get('/', [TechniqueController::class, 'index'])->name('index');
+    Route::get('/equipe', [TechniqueController::class, 'equipe'])->name('equipe');
+    Route::post('/equipe', [TechniqueController::class, 'storeStaff'])->name('equipe.store');
+    Route::delete('/equipe/{technicalStaff}', [TechniqueController::class, 'destroyStaff'])->name('equipe.destroy');
 });
