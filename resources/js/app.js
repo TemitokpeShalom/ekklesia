@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import AssistantWidget from './Components/Assistant/AssistantWidget.vue';
 import InstallPrompt from './Components/InstallPrompt.vue';
+import OfflineIndicator from './Components/OfflineIndicator.vue';
 
 createInertiaApp({
     title: (title) => (title ? `${title} · Oikonema` : 'Oikonema'),
@@ -21,7 +22,10 @@ createInertiaApp({
         // principe de montage global, mais SANS se cacher pour une personne
         // non connectee - le cas vise en premier est justement quelqu'un qui
         // suit un lien d'inscription et n'a donc pas encore de compte.
-        createApp({ render: () => h('div', [h(App, props), h(AssistantWidget), h(InstallPrompt)]) })
+        // Indicateur de connexion (2026-09-13, voir OfflineIndicator.vue) :
+        // meme principe de montage global, premiere brique du chantier
+        // hors connexion (proposition ecrite du 13/09).
+        createApp({ render: () => h('div', [h(App, props), h(AssistantWidget), h(InstallPrompt), h(OfflineIndicator)]) })
             .use(plugin)
             .mount(el);
     },

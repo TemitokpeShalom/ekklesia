@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hors connexion · Oikonema</title>
+<style>
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fbfaf7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #2b2f33;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+    .card {
+        max-width: 380px;
+        width: 100%;
+        text-align: center;
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 40px 28px;
+        box-shadow: 0 20px 40px rgba(43, 47, 51, 0.08);
+        border-top: 3px solid #b98a3e;
+    }
+    img {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 6px;
+        box-shadow: 0 0 0 1px rgba(43, 47, 51, 0.08);
+    }
+    h1 {
+        font-size: 19px;
+        margin: 0 0 10px;
+    }
+    p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(43, 47, 51, 0.65);
+        margin: 0 0 24px;
+    }
+    button {
+        background: linear-gradient(to right, #003080, #001f57);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 28px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    button:active {
+        opacity: 0.85;
+    }
+</style>
+</head>
+<body>
+    <!--
+        Page de secours du service worker (2026-09-13, voir sw.js) : servie
+        UNIQUEMENT quand une navigation (chargement/rechargement d'une page)
+        echoue faute de reseau. Volontairement statique et sans aucune
+        donnee du ministere (jamais de risque d'afficher une information
+        perimee ou d'un autre ministere) - premiere brique du hors
+        connexion, avant l'arrivee des donnees locales pour Membres et
+        Cultes dans une prochaine livraison.
+    -->
+    <div class="card">
+        <img src="/images/oikonema-icon.png" alt="Oikonema" />
+        <h1>Pas de connexion pour l'instant</h1>
+        <p>Cette page a besoin du réseau pour s'ouvrir. Reconnectez-vous, puis réessayez.</p>
+        <button onclick="location.reload()">Réessayer</button>
+    </div>
+</body>
+</html>
