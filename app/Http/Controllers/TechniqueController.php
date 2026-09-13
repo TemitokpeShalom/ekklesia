@@ -99,7 +99,7 @@ class TechniqueController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if (! $user) {
-            return back()->with('error', "Aucun compte Oikonema n'existe avec l'adresse {$data['email']}. La personne doit d'abord avoir un compte (dans n'importe quel ministère) avant de rejoindre l'équipe technique.");
+            return back()->with('error', "Aucun compte Oikonema n'existe avec l'adresse {$data['email']}. Si cette adresse est déjà dans TECHNICAL_STAFF_EMAILS (.env), la personne peut créer elle-même son compte technique sur /equipe-technique/creer-mon-compte. Sinon, ajoute d'abord son adresse au .env du serveur.");
         }
 
         if ($user->isTechnicalStaff()) {

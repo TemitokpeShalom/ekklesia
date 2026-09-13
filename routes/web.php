@@ -33,6 +33,7 @@ use App\Http\Controllers\SubscriptionCryptoController;
 use App\Http\Controllers\SubscriptionFedapayController;
 use App\Http\Controllers\TeamMembersController;
 use App\Http\Controllers\TeamsController;
+use App\Http\Controllers\TechnicalAccountController;
 use App\Http\Controllers\TechniqueController;
 use App\Http\Controllers\TrombinoscopeController;
 use App\Http\Controllers\MinistryRegistrationController;
@@ -55,6 +56,14 @@ Route::post('/ministeres/nouveau', [MinistryRegistrationController::class, 'stor
 // Invitation : acceptation ouverte a une personne pas encore connectee.
 Route::get('/invitations/{token}', [InvitationController::class, 'acceptShow'])->name('invitations.accept.show');
 Route::post('/invitations/{token}', [InvitationController::class, 'acceptStore'])->name('invitations.accept.store');
+
+// Creation du compte d'un membre de l'equipe technique Oikonema
+// (2026-09-13, voir TechnicalAccountController) : reservee aux adresses
+// deja autorisees sur le serveur (TECHNICAL_STAFF_EMAILS), forcement hors
+// du groupe auth/tenant.context ci-dessous puisque la personne n'a pas
+// encore de compte - meme raison que /ministeres/nouveau juste au-dessus.
+Route::get('/equipe-technique/creer-mon-compte', [TechnicalAccountController::class, 'create'])->name('technical-account.create');
+Route::post('/equipe-technique/creer-mon-compte', [TechnicalAccountController::class, 'store'])->name('technical-account.store');
 
 // Rattachement d'un nouveau noeud : ouvert a quiconque possede le code (le
 // code lui-meme est la preuve de mandat, point 03) - avec ou sans compte

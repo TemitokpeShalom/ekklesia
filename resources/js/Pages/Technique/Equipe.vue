@@ -77,8 +77,11 @@ function formatDate(iso) {
         </div>
 
         <div v-if="amorcesParEmail.length" class="mt-6 text-sm text-graphite/55">
-            <p class="mb-1">Ces adresses ont aussi accès (réglées directement sur le serveur, pas dans cette liste) :</p>
+            <p class="mb-1">Ces adresses ont accès mais n'ont pas encore de compte (réglées directement sur le serveur) :</p>
             <p>{{ amorcesParEmail.join(', ') }}</p>
+            <p class="mt-1">Chacune peut créer son propre compte sur
+                <a href="/equipe-technique/creer-mon-compte" class="text-azure hover:underline font-medium">/equipe-technique/creer-mon-compte</a>.
+            </p>
         </div>
     </AppLayout>
 </template>

@@ -47,6 +47,14 @@ class LoginController extends Controller
         $firstAffectation = $request->user()->activeAffectations()->with('orgUnit')->first();
 
         if (! $firstAffectation) {
+            // Equipe technique Oikonema (2026-09-13) : ces comptes n'ont, par
+            // construction, jamais d'affectation (voir TechnicalAccountController) -
+            // a ne pas rejeter ici comme un compte de ministere mal configure,
+            // les envoyer directement vers leur propre espace.
+            if ($request->user()->isTechnicalStaff()) {
+                return redirect()->route('technique.index');
+            }
+
             Auth::logout();
             throw ValidationException::withMessages([
                 'email' => "Ce compte n'a aucune affectation active. Contactez votre responsable.",

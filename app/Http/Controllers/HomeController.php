@@ -35,6 +35,15 @@ class HomeController extends Controller
             ?? $request->user()->activeAffectations()->first();
 
         if (! $affectation) {
+            // Equipe technique Oikonema (2026-09-13, meme raison que
+            // LoginController@store) : un compte technique n'a jamais
+            // d'affectation - ce n'est pas une erreur pour lui, juste un
+            // signe qu'il faut le renvoyer vers /technique plutot que vers
+            // le message d'erreur destine a un compte de ministere.
+            if ($request->user()->isTechnicalStaff()) {
+                return redirect()->route('technique.index');
+            }
+
             return redirect()->route('welcome')
                 ->with('error', "Aucune affectation active n'est associée à votre compte. Contactez votre responsable.");
         }
