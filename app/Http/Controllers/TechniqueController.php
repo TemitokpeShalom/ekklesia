@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AssistantPlatformFeedback;
 use App\Models\Ministry;
+use App\Models\Plan;
 use App\Models\TechnicalStaff;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -15,11 +17,19 @@ use Inertia\Response;
  * Espace technique Oikonema (2026-09-13) : reserve a l'equipe technique
  * (voir EnsureTechnicalStaff), transversal a tous les ministeres - jamais
  * le tableau de bord d'UN ministere precis (voir DashboardController pour
- * celui-la). Premiere livraison : vue d'ensemble des abonnements de tous
- * les ministeres, et gestion de l'equipe elle-meme. Le canal de signalement
- * des ministeres vers l'equipe technique (distinct du signalement interne
- * existant, voir SignalementsController) arrivera dans une prochaine
- * livraison.
+ * celui-la).
+ *
+ * Retour du ministere (13/09, apres la premiere livraison) : deux ajouts.
+ * (1) updateSubscription permet de regler a la main le statut d'abonnement
+ * d'un ministere ("honorer" ou "exonerer" quelqu'un sans passer par
+ * FedaPay/crypto) - aucun nouveau statut invente : "exonerer" durablement,
+ * c'est simplement statut actif + echeance laissee vide (Ministry::
+ * subscriptionActive() traite deja une echeance nulle comme illimitee).
+ * (2) signalements()/updateSignalementStatus() exposent enfin, dans cet
+ * espace, les remontees "vers Martin" faites depuis le widget assistant
+ * (AssistantPlatformFeedback) - jusqu'ici visibles UNIQUEMENT via la
+ * commande serveur `php artisan assistant:feedback` (voir
+ * AssistantFeedbackListCommand, laissee en place, mais plus le seul moyen).
  */
 class TechniqueController extends Controller
 {
@@ -43,6 +53,7 @@ class TechniqueController extends Controller
                     'id' => $ministry->id,
                     'name' => $ministry->name,
                     'short_code' => $ministry->short_code,
+                    'plan_id' => $ministry->plan_id,
                     'plan_name' => $ministry->plan?->name,
                     'subscription_status' => $ministry->subscription_status,
                     'on_trial' => $ministry->onTrial(),
@@ -57,13 +68,75 @@ class TechniqueController extends Controller
 
         return Inertia::render('Technique/Dashboard', [
             'ministries' => $ministries,
+            'plans' => Plan::orderBy('sort_order')->get(['id', 'name']),
             'summary' => [
                 'total' => $ministries->count(),
                 'en_essai' => $ministries->where('subscription_status', 'essai')->count(),
                 'actifs' => $ministries->where('subscription_status', 'active')->count(),
                 'expires' => $ministries->where('subscription_status', 'expiree')->count(),
+                'nouveaux_signalements' => AssistantPlatformFeedback::where('status', 'nouveau')->count(),
             ],
         ]);
+    }
+
+    /**
+     * Reglage manuel de l'abonnement d'un ministere (retour du 13/09 :
+     * "il y aura des ministères qu'on va honorer et exonérer de
+     * l'abonnement, par contre d'autres, je ne veux pas les honorer").
+     * Aucune verification de paiement ici, a la difference de
+     * SubscriptionFedapayController/SubscriptionCryptoController : c'est
+     * precisement le point, une decision manuelle de l'equipe technique.
+     */
+    public function updateSubscription(Request $request, Ministry $ministry): RedirectResponse
+    {
+        $data = $request->validate([
+            'plan_id' => ['nullable', 'uuid', 'exists:plans,id'],
+            'subscription_status' => ['required', 'in:essai,active,expiree'],
+            'trial_ends_at' => ['nullable', 'date'],
+            'current_period_ends_at' => ['nullable', 'date'],
+        ]);
+
+        $ministry->update($data);
+
+        return back()->with('success', "Abonnement de {$ministry->name} mis à jour.");
+    }
+
+    /**
+     * Signalements techniques (retour du 13/09) : remontees faites depuis
+     * le widget assistant (bouton "signaler un problème à l'équipe
+     * technique" dans sa fenetre) - table SANS RLS des sa creation (voir la
+     * migration), jusqu'ici uniquement lisible via la commande serveur
+     * `php artisan assistant:feedback`. Cet ecran ne la remplace pas (elle
+     * reste utilisable), il evite juste d'avoir a s'en servir.
+     */
+    public function signalements(): Response
+    {
+        return Inertia::render('Technique/Signalements', [
+            'signalements' => AssistantPlatformFeedback::with(['ministry:id,name', 'user:id,name,email'])
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(fn (AssistantPlatformFeedback $f) => [
+                    'id' => $f->id,
+                    'category' => $f->category,
+                    'message' => $f->message,
+                    'status' => $f->status,
+                    'ministry_name' => $f->ministry?->name,
+                    'user_name' => $f->user?->name,
+                    'user_email' => $f->user?->email,
+                    'created_at' => $f->created_at->toIso8601String(),
+                ]),
+        ]);
+    }
+
+    public function updateSignalementStatus(Request $request, AssistantPlatformFeedback $signalement): RedirectResponse
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:nouveau,lu,traite'],
+        ]);
+
+        $signalement->update($data);
+
+        return back()->with('success', 'Statut mis à jour.');
     }
 
     public function equipe(): Response

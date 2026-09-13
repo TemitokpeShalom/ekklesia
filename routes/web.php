@@ -288,4 +288,7 @@ Route::middleware(['auth', 'technical.staff'])->prefix('technique')->name('techn
     Route::get('/equipe', [TechniqueController::class, 'equipe'])->name('equipe');
     Route::post('/equipe', [TechniqueController::class, 'storeStaff'])->name('equipe.store');
     Route::delete('/equipe/{technicalStaff}', [TechniqueController::class, 'destroyStaff'])->name('equipe.destroy');
+    Route::put('/ministeres/{ministry}/abonnement', [TechniqueController::class, 'updateSubscription'])->name('ministeres.abonnement.update');
+    Route::get('/signalements', [TechniqueController::class, 'signalements'])->name('signalements');
+    Route::put('/signalements/{signalement}', [TechniqueController::class, 'updateSignalementStatus'])->name('signalements.update');
 });

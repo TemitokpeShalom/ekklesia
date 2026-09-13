@@ -1,5 +1,5 @@
 <script setup>
-import { useForm, usePage } from '@inertiajs/vue3'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
@@ -45,7 +45,10 @@ function formatDate(iso) {
                 <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                 Espace technique
             </p>
-            <h1 class="font-serif text-4xl font-bold text-graphite">Équipe technique</h1>
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+                <h1 class="font-serif text-4xl font-bold text-graphite">Équipe technique</h1>
+                <Link href="/technique/signalements" class="text-sm text-azure hover:underline font-medium">Signalements techniques</Link>
+            </div>
         </template>
 
         <p v-if="flashSuccess" class="text-sm text-forest bg-forest/10 border border-forest/30 rounded-xl px-4 py-2.5 mb-6">{{ flashSuccess }}</p>
