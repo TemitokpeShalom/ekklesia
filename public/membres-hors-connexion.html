@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Membres (hors connexion) · Oikonema</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: #fbfaf7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #2b2f33;
+        padding: 24px 16px 64px;
+    }
+    .wrap {
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    .banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #2b2f33;
+        color: #fff;
+        border-radius: 14px;
+        padding: 10px 16px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+    header img {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        box-shadow: 0 0 0 1px rgba(43, 47, 51, 0.08);
+    }
+    h1 {
+        font-size: 21px;
+        margin: 0;
+    }
+    .subtitle {
+        font-size: 13px;
+        color: rgba(43, 47, 51, 0.6);
+        margin-top: 2px;
+    }
+    input[type="search"] {
+        width: 100%;
+        border: 1px solid rgba(43, 47, 51, 0.15);
+        background: rgba(43, 47, 51, 0.04);
+        border-radius: 12px;
+        padding: 11px 14px;
+        font-size: 14px;
+        margin-bottom: 18px;
+        color: #2b2f33;
+    }
+    input[type="search"]:focus {
+        outline: none;
+        border-color: rgba(0, 48, 128, 0.5);
+    }
+    .card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 8px 24px rgba(43, 47, 51, 0.06);
+        border-top: 3px solid #b98a3e;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 10px;
+    }
+    .avatar {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: rgba(43, 47, 51, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(43, 47, 51, 0.7);
+    }
+    .name-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    .name {
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .status {
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 9px;
+        border-radius: 999px;
+    }
+    .status.active {
+        background: rgba(34, 118, 66, 0.12);
+        color: #227642;
+    }
+    .status.inactive {
+        background: rgba(43, 47, 51, 0.08);
+        color: rgba(43, 47, 51, 0.6);
+    }
+    .contacts {
+        margin-top: 3px;
+        font-size: 13px;
+        color: rgba(43, 47, 51, 0.65);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+    }
+    .contacts a {
+        color: #003080;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .contacts a:hover {
+        text-decoration: underline;
+    }
+    .empty {
+        text-align: center;
+        padding: 48px 20px;
+        color: rgba(43, 47, 51, 0.6);
+        font-size: 14px;
+    }
+    .back {
+        display: inline-block;
+        margin-top: 24px;
+        font-size: 13px;
+        color: rgba(43, 47, 51, 0.55);
+        text-decoration: none;
+    }
+    .back:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+<body>
+<!--
+    Deuxieme pierre du chantier hors connexion (2026-09-13) : page STATIQUE,
+    independante du bundle Vue/Inertia, precachee par le service worker
+    (voir sw.js) pour rester joignable meme sans reseau. Elle lit une seule
+    cle localStorage ("oikonema-membres-hors-connexion") ecrite par
+    Members/Index.vue a chaque consultation reussie EN LIGNE de la liste des
+    membres d'une entite - donc forcement une copie deja vue par la personne
+    connectee sur cet appareil, jamais une donnee recuperee ici. Lecture
+    seule : aucune creation/modification n'est possible hors connexion.
+-->
+<div class="wrap">
+    <div class="banner">Hors connexion : vous consultez une liste enregistrée sur cet appareil, elle peut ne plus être à jour.</div>
+
+    <header>
+        <img src="/images/oikonema-icon.png" alt="Oikonema" />
+        <div>
+            <h1>Membres</h1>
+            <p class="subtitle" id="subtitle">Chargement de la liste enregistrée...</p>
+        </div>
+    </header>
+
+    <div id="content"></div>
+
+    <a class="back" href="/">Retour à l'accueil</a>
+</div>
+
+<script>
+(function () {
+    var CACHE_KEY = 'oikonema-membres-hors-connexion';
+    var content = document.getElementById('content');
+    var subtitle = document.getElementById('subtitle');
+    var data = null;
+
+    try {
+        var raw = localStorage.getItem(CACHE_KEY);
+        data = raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        data = null;
+    }
+
+    if (!data || !Array.isArray(data.members)) {
+        subtitle.textContent = "Aucune liste enregistrée pour l'instant";
+        content.innerHTML = '<div class="empty">' +
+            'Consultez la liste des membres d\'une entité pendant que vous êtes en ligne : ' +
+            'elle restera ensuite disponible ici, en lecture seule, même hors connexion.' +
+            '</div>';
+        return;
+    }
+
+    var when = '';
+    try {
+        when = new Date(data.cachedAt).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
+    } catch (e) {
+        when = '';
+    }
+
+    subtitle.textContent = data.orgUnitName
+        ? data.orgUnitName + (when ? ' · enregistrée le ' + when : '')
+        : (when ? 'Enregistrée le ' + when : '');
+
+    function initials(m) {
+        return ((m.first_name || '')[0] || '') + ((m.last_name || '')[0] || '');
+    }
+
+    function telHref(phone) {
+        return 'tel:' + phone.replace(/[^+\d]/g, '');
+    }
+
+    function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.textContent = s == null ? '' : String(s);
+        return div.innerHTML;
+    }
+
+    function render(list) {
+        if (list.length === 0) {
+            content.innerHTML = '<div class="empty">Aucun membre ne correspond.</div>';
+            return;
+        }
+
+        content.innerHTML = list.map(function (m) {
+            var contacts = [];
+            if (m.phone) {
+                contacts.push('<a href="' + telHref(m.phone) + '">' + escapeHtml(m.phone) + '</a>');
+            }
+            if (m.email) {
+                contacts.push('<a href="mailto:' + escapeHtml(m.email) + '">' + escapeHtml(m.email) + '</a>');
+            }
+            if (contacts.length === 0) {
+                contacts.push('<span>Aucun contact renseigné</span>');
+            }
+
+            return '<div class="card">' +
+                '<div class="avatar">' + escapeHtml(initials(m).toUpperCase()) + '</div>' +
+                '<div style="min-width:0;flex:1">' +
+                    '<div class="name-row">' +
+                        '<span class="name">' + escapeHtml(m.first_name) + ' ' + escapeHtml(m.last_name) + '</span>' +
+                        '<span class="status ' + (m.status === 'active' ? 'active' : 'inactive') + '">' +
+                            (m.status === 'active' ? 'Actif' : 'Inactif') +
+                        '</span>' +
+                    '</div>' +
+                    '<div class="contacts">' + contacts.join('') + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    var members = data.members.slice().sort(function (a, b) {
+        return (a.last_name || '').localeCompare(b.last_name || '');
+    });
+
+    var search = document.createElement('input');
+    search.type = 'search';
+    search.placeholder = 'Filtrer par nom ou téléphone...';
+    content.parentNode.insertBefore(search, content);
+
+    search.addEventListener('input', function () {
+        var q = search.value.trim().toLowerCase();
+        if (!q) {
+            render(members);
+            return;
+        }
+        render(members.filter(function (m) {
+            return (
+                (m.first_name || '').toLowerCase().indexOf(q) !== -1 ||
+                (m.last_name || '').toLowerCase().indexOf(q) !== -1 ||
+                (m.phone || '').toLowerCase().indexOf(q) !== -1
+            );
+        }));
+    });
+
+    render(members);
+})();
+</script>
+</body>
+</html>

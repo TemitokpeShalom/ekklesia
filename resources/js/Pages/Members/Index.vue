@@ -1,6 +1,6 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
 /**
@@ -44,6 +44,32 @@ function initials(person) {
 function telHref(phone) {
     return `tel:${phone.replace(/[^+\d]/g, '')}`
 }
+
+// Chantier hors connexion (2026-09-13, deuxieme pierre, voir sw.js et
+// membres-hors-connexion.html) : cette page n'etant jamais rendue avec des
+// donnees reelles autrement qu'en ligne (RLS, voir sw.js), chaque
+// consultation reussie garde ici une copie de la derniere liste vue sur cet
+// appareil - une seule a la fois ("la derniere liste vue en ligne"), meme
+// principe que la page de secours generale. Aucun champ de plus que ceux
+// deja affiches a l'ecran.
+const MEMBRES_OFFLINE_CACHE_KEY = 'oikonema-membres-hors-connexion'
+
+function cacheMembersForOffline() {
+    try {
+        localStorage.setItem(MEMBRES_OFFLINE_CACHE_KEY, JSON.stringify({
+            orgUnitId: props.orgUnit.id,
+            orgUnitName: props.orgUnit.name,
+            cachedAt: new Date().toISOString(),
+            members: props.members,
+        }))
+    } catch (e) {
+        // Stockage indisponible (navigation privee, quota plein...) : tant
+        // pis, la page hors connexion dira juste qu'aucune liste n'est
+        // encore enregistree - jamais une erreur bloquante ici.
+    }
+}
+
+watch(() => props.members, cacheMembersForOffline, { immediate: true })
 </script>
 
 <template>

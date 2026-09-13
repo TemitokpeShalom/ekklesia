@@ -11,9 +11,17 @@
 // d'un autre ministere). Le stockage local propre a Membres et Cultes
 // arrivera dans une prochaine livraison, a part.
 
-const RUNTIME_CACHE = 'oikonema-shell-v1';
+// v2 (2026-09-13) : nouvelle page precachee (membres-hors-connexion.html) -
+// nom de cache change pour forcer son telechargement sur les appareils qui
+// avaient deja installe la version precedente du service worker.
+const RUNTIME_CACHE = 'oikonema-shell-v2';
 const OFFLINE_URL = '/hors-connexion.html';
-const PRECACHE_URLS = [OFFLINE_URL, '/images/oikonema-icon.png'];
+// 2026-09-13 (deuxieme pierre) : membres-hors-connexion.html est une page
+// statique independante (lecture seule, alimentee par localStorage cote
+// Members/Index.vue) - precachee ici pour rester joignable hors connexion,
+// au meme titre que la page de secours generique.
+const MEMBERS_OFFLINE_URL = '/membres-hors-connexion.html';
+const PRECACHE_URLS = [OFFLINE_URL, MEMBERS_OFFLINE_URL, '/images/oikonema-icon.png'];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -30,7 +38,15 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(self.clients.claim());
+    event.waitUntil(
+        caches.keys()
+            .then((keys) => Promise.all(
+                keys
+                    .filter((key) => key.startsWith('oikonema-shell-') && key !== RUNTIME_CACHE)
+                    .map((key) => caches.delete(key))
+            ))
+            .then(() => self.clients.claim())
+    );
 });
 
 self.addEventListener('fetch', (event) => {
@@ -44,13 +60,16 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Navigation (ouverture ou rechargement d'une page) : reseau d'abord,
-    // et seulement si ca echoue, la page de secours statique - jamais de
-    // contenu ou de donnees mises en cache ici, voir l'explication en tete
-    // de fichier.
+    // Navigation (ouverture ou rechargement d'une page) : reseau d'abord ;
+    // si ca echoue, on sert la page demandee elle-meme si elle fait partie
+    // des pages statiques precachees (ex. membres-hors-connexion.html), et
+    // seulement sinon la page de secours generique - jamais de contenu ou
+    // de donnees mises en cache ici, voir l'explication en tete de fichier.
     if (request.mode === 'navigate') {
         event.respondWith(
-            fetch(request).catch(() => caches.match(OFFLINE_URL))
+            fetch(request).catch(() =>
+                caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL))
+            )
         );
         return;
     }
