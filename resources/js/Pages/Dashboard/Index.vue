@@ -277,11 +277,12 @@ const modules = [
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <div class="flex items-center gap-4 mt-2">
+                <!-- Reduit le 2026-09-13 (retour du ministere : encore trop gros) - logo redimensionne dans les memes proportions, garde object-contain (jamais deforme, quel que soit le format de l'image chargee dans Informations du ministere). -->
+                <div class="flex items-center gap-3.5 mt-2">
                     <img v-if="ministry.logo_url" :src="ministry.logo_url" :alt="ministry.name"
-                        class="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white object-contain p-1.5 shadow-glow-gold shrink-0" />
-                    <h1 class="font-serif text-5xl sm:text-6xl font-bold text-graphite truncate">
-                        {{ ministry.name }}<span v-if="ministry.acronym" class="ml-2 font-sans text-2xl text-graphite/50">({{ ministry.acronym }})</span>
+                        class="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-white object-contain p-1 shadow-glow-gold shrink-0" />
+                    <h1 class="font-serif text-4xl sm:text-5xl font-bold text-graphite truncate">
+                        {{ ministry.name }}<span v-if="ministry.acronym" class="ml-2 font-sans text-xl text-graphite/50">({{ ministry.acronym }})</span>
                     </h1>
                 </div>
                 <p v-if="ministryDetailsLine" class="text-sm text-graphite/60 mt-3">{{ ministryDetailsLine }}</p>
@@ -291,7 +292,8 @@ const modules = [
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <h1 class="font-serif text-5xl sm:text-6xl font-bold text-graphite mt-2">{{ orgUnit.name }}</h1>
+                <!-- Reduit le 2026-09-13 (retour du ministere : le nom de l'entite/eglise ici aussi un peu trop gros). -->
+                <h1 class="font-serif text-4xl sm:text-5xl font-bold text-graphite mt-2">{{ orgUnit.name }}</h1>
             </div>
         </template>
 
