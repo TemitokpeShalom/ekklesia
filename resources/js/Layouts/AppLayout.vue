@@ -84,14 +84,25 @@ defineProps({
         -->
         <header class="print:hidden relative z-30 sticky top-0 border-b border-graphite/10 glass-panel">
             <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+                <!--
+                    Corrige le 2026-09-13 (retour du ministere : "on ne
+                    devrait pas avoir le nom du ministere ici... on veut le
+                    logo de la plateforme, a cote une phrase qui decrit son
+                    role/sa mission" - le nom du ministere apparaissait a la
+                    fois ici, dans le grand titre du tableau de bord ET dans
+                    l'en-tete officiel juste en dessous : le meme nom trois
+                    fois sur un seul ecran). Ce bandeau, present sur TOUTES
+                    les pages, redevient l'identite de la plateforme
+                    elle-meme (pas celle du ministere consulte) - le nom du
+                    ministere reste visible en grand sur son propre tableau
+                    de bord (voir Dashboard/Index.vue), a un seul endroit.
+                -->
                 <Link :href="orgUnit ? `/org-units/${orgUnit.id}` : '/'" class="flex items-center gap-3 min-w-0 group">
                     <span class="shrink-0 w-9 h-9 rounded-xl bg-white p-1 shadow-glow-gold flex items-center justify-center group-hover:scale-105 transition-transform duration-300"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-lg" /></span>
-                    <span class="min-w-0" v-if="orgUnit">
-                        <!-- Agrandi le 2026-09-13 (retour du ministere : trop petit pour etre lu confortablement, notamment par des utilisateurs plus ages) - seul cet en-tete du bandeau (niveau + nom), pas les titres des pages. -->
-                        <span class="block text-xs uppercase tracking-widest text-sanctuary/80 font-semibold truncate">{{ orgUnit.level_label }}</span>
-                        <span class="block font-serif text-graphite text-lg leading-tight truncate">{{ orgUnit.name }}</span>
+                    <span class="min-w-0">
+                        <span class="block font-serif text-graphite text-lg leading-tight truncate">Oikonema</span>
+                        <span class="hidden sm:block text-xs text-graphite/55 leading-tight truncate">Plateforme de gestion des ministères et Églises</span>
                     </span>
-                    <span class="font-serif text-graphite text-lg" v-else>Oikonema</span>
                 </Link>
                 <nav class="flex items-center gap-2 shrink-0">
                     <slot name="actions" />

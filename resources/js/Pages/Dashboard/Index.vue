@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useForm, usePage } from '@inertiajs/vue3'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
 
@@ -36,6 +36,21 @@ const props = defineProps({
 })
 
 const governanceMenuOpen = ref(false)
+
+// Retour du ministere (2026-09-13) : ligne de coordonnees affichee sous le
+// grand titre, uniquement au niveau racine (voir template #title) - meme
+// contenu que MinistryLetterhead (registration_number/headquarters_address/
+// phone/email/website), regroupe en une seule ligne discrete plutot qu'en
+// plusieurs paragraphes empiles, puisqu'ici ce n'est plus un en-tete de
+// courrier officiel mais un complement d'information sous un titre.
+const ministryDetailsLine = computed(() => {
+    const parts = []
+    if (props.ministry.registration_number) parts.push(`N° d'autorisation : ${props.ministry.registration_number}`)
+    if (props.ministry.headquarters_address) parts.push(props.ministry.headquarters_address)
+    const contact = [props.ministry.phone, props.ministry.email, props.ministry.website].filter(Boolean).join(' · ')
+    if (contact) parts.push(contact)
+    return parts.join(' · ')
+})
 
 // Creation directe d'une entite enfant a ce noeud (retour du ministere,
 // 2026-09-12, point 03) - remplace le mecanisme par code de rattachement :
@@ -242,7 +257,36 @@ const modules = [
         </template>
 
         <template #title>
-            <div class="animate-[fadeInUp_0.5s_ease-out_both]">
+            <!--
+                Retour du ministere (2026-09-13) : au niveau racine (le
+                ministere lui-meme), le titre affichait "Tableau de bord" +
+                le nom du ministere, puis MinistryLetterhead juste en
+                dessous affichait ENCORE le meme nom - avec en plus le nom
+                deja repete dans le bandeau tout en haut (AppLayout), ca
+                faisait le meme nom trois fois sur un seul ecran. On fusionne
+                ici logo + nom + sigle + coordonnees (avant : uniquement
+                dans MinistryLetterhead) directement dans ce titre, pour la
+                racine seulement. Sur un noeud enfant (district, eglise...),
+                rien ne change : le titre reste le nom propre de ce noeud
+                (utile pour se reperer dans la hierarchie), et
+                MinistryLetterhead en dessous reste affiche puisqu'il montre
+                alors une information differente (le ministere englobant).
+            -->
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]" v-if="orgUnit.level_rank === 0">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
+                    <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
+                    Tableau de bord
+                </p>
+                <div class="flex items-center gap-4 mt-2">
+                    <img v-if="ministry.logo_url" :src="ministry.logo_url" :alt="ministry.name"
+                        class="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white object-contain p-1.5 shadow-glow-gold shrink-0" />
+                    <h1 class="font-serif text-5xl sm:text-6xl font-bold text-graphite truncate">
+                        {{ ministry.name }}<span v-if="ministry.acronym" class="ml-2 font-sans text-2xl text-graphite/50">({{ ministry.acronym }})</span>
+                    </h1>
+                </div>
+                <p v-if="ministryDetailsLine" class="text-sm text-graphite/60 mt-3">{{ ministryDetailsLine }}</p>
+            </div>
+            <div class="animate-[fadeInUp_0.5s_ease-out_both]" v-else>
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
@@ -252,17 +296,29 @@ const modules = [
         </template>
 
         <div class="space-y-14">
-            <MinistryLetterhead :ministry="ministry" />
+            <MinistryLetterhead v-if="orgUnit.level_rank !== 0" :ministry="ministry" />
 
             <section v-if="activeAffectations.length" class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <h2 class="text-2xl font-bold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
-                <!-- Agrandi le 2026-09-13 (retour du ministere : le role et le nom de l'entite ici - ex. "Pasteur · Eglise Centrale" - etaient trop petits pour etre lus confortablement). -->
+                <!--
+                    Retour du ministere (2026-09-13) : "si une personne est
+                    affectee a plusieurs postes/roles a la fois" (ex.
+                    pasteur d'une eglise ET comptable du ministere), chaque
+                    etiquette devient un vrai lien cliquable qui bascule
+                    directement sur le tableau de bord de l'entite/role
+                    concerne - plus besoin de chercher comment "agir en tant
+                    que" cet autre role, un clic suffit. Celle qui
+                    correspond au tableau de bord actuellement affiche est
+                    surlignee (contour azur) pour se reperer.
+                -->
                 <div class="flex flex-wrap gap-2">
-                    <span v-for="a in activeAffectations" :key="a.id"
-                        class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3.5 pr-5 py-2 text-base">
+                    <Link v-for="a in activeAffectations" :key="a.id"
+                        :href="`/org-units/${a.org_unit.id}`"
+                        class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3.5 pr-5 py-2 text-base transition-all duration-200 hover:-translate-y-0.5"
+                        :class="a.org_unit.id === orgUnit.id ? 'ring-1 ring-azure/50 border-azure/40' : 'hover:border-azure/40'">
                         <span class="font-semibold text-sanctuary">{{ a.role.label }}</span>
                         <span class="text-graphite/68">· {{ a.org_unit.name }}</span>
-                    </span>
+                    </Link>
                 </div>
             </section>
 
