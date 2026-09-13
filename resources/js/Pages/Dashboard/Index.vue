@@ -37,21 +37,6 @@ const props = defineProps({
 
 const governanceMenuOpen = ref(false)
 
-// Retour du ministere (2026-09-13) : ligne de coordonnees affichee sous le
-// grand titre, uniquement au niveau racine (voir template #title) - meme
-// contenu que MinistryLetterhead (registration_number/headquarters_address/
-// phone/email/website), regroupe en une seule ligne discrete plutot qu'en
-// plusieurs paragraphes empiles, puisqu'ici ce n'est plus un en-tete de
-// courrier officiel mais un complement d'information sous un titre.
-const ministryDetailsLine = computed(() => {
-    const parts = []
-    if (props.ministry.registration_number) parts.push(`N° d'autorisation : ${props.ministry.registration_number}`)
-    if (props.ministry.headquarters_address) parts.push(props.ministry.headquarters_address)
-    const contact = [props.ministry.phone, props.ministry.email, props.ministry.website].filter(Boolean).join(' · ')
-    if (contact) parts.push(contact)
-    return parts.join(' · ')
-})
-
 // Creation directe d'une entite enfant a ce noeud (retour du ministere,
 // 2026-09-12, point 03) - remplace le mecanisme par code de rattachement :
 // on reste sur cette page, un formulaire s'ouvre, on nomme la nouvelle
@@ -263,29 +248,26 @@ const modules = [
                 le nom du ministere, puis MinistryLetterhead juste en
                 dessous affichait ENCORE le meme nom - avec en plus le nom
                 deja repete dans le bandeau tout en haut (AppLayout), ca
-                faisait le meme nom trois fois sur un seul ecran. On fusionne
-                ici logo + nom + sigle + coordonnees (avant : uniquement
-                dans MinistryLetterhead) directement dans ce titre, pour la
-                racine seulement. Sur un noeud enfant (district, eglise...),
-                rien ne change : le titre reste le nom propre de ce noeud
-                (utile pour se reperer dans la hierarchie), et
-                MinistryLetterhead en dessous reste affiche puisqu'il montre
-                alors une information differente (le ministere englobant).
+                faisait le meme nom trois fois sur un seul ecran, en plus
+                de tailles/alignements incoherents d'un endroit a l'autre.
+                On reutilise ici directement MinistryLetterhead (logo a
+                gauche, nom/sigle/coordonnees centres dans l'espace
+                restant - voir ce composant pour le detail) comme titre de
+                la page, au lieu d'un titre distinct : un seul endroit a
+                maintenir pour cette presentation, partagee avec tous les
+                rapports/documents generes. Sur un noeud enfant (district,
+                eglise...), rien ne change : le titre reste le nom propre
+                de ce noeud (utile pour se reperer dans la hierarchie), et
+                MinistryLetterhead en dessous reste affiche puisqu'il
+                montre alors une information differente (le ministere
+                englobant).
             -->
             <div class="animate-[fadeInUp_0.5s_ease-out_both]" v-if="orgUnit.level_rank === 0">
-                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
+                <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2 mb-3">
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <!-- Reduit le 2026-09-13 (retour du ministere : encore trop gros) - logo redimensionne dans les memes proportions, garde object-contain (jamais deforme, quel que soit le format de l'image chargee dans Informations du ministere). -->
-                <div class="flex items-center gap-3.5 mt-2">
-                    <img v-if="ministry.logo_url" :src="ministry.logo_url" :alt="ministry.name"
-                        class="h-12 w-12 sm:h-14 sm:w-14 rounded-xl bg-white object-contain p-1 shadow-glow-gold shrink-0" />
-                    <h1 class="font-serif text-4xl sm:text-5xl font-bold text-graphite truncate">
-                        {{ ministry.name }}<span v-if="ministry.acronym" class="ml-2 font-sans text-xl text-graphite/50">({{ ministry.acronym }})</span>
-                    </h1>
-                </div>
-                <p v-if="ministryDetailsLine" class="text-sm text-graphite/60 mt-3">{{ ministryDetailsLine }}</p>
+                <MinistryLetterhead :ministry="ministry" />
             </div>
             <div class="animate-[fadeInUp_0.5s_ease-out_both]" v-else>
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold flex items-center gap-2">
