@@ -102,7 +102,7 @@ function unlock() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Fiche d'inventaire consolidée</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Fiche d'inventaire consolidée</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Biens propres de {{ orgUnit.name }} et de tous les niveaux qu'il regroupe, à la date choisie. Choisissez le 31 décembre d'une année pour produire le document de fin d'année à archiver.
                 </p>

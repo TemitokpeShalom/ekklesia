@@ -35,7 +35,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Annonces
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Nouvelle annonce</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Nouvelle annonce</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Publiée depuis {{ orgUnit.name }}, visible par {{ orgUnit.name }} et tout ce qui en dépend.</p>
             </div>
         </template>

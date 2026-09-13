@@ -58,7 +58,7 @@ function goBack() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Mon profil
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">{{ profileUser.name }}</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">{{ profileUser.name }}</h1>
             </div>
         </template>
 
@@ -100,7 +100,7 @@ function goBack() {
 
                 <div class="flex justify-end pt-2">
                     <button type="submit" :disabled="infoForm.processing"
-                        class="bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                        class="bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                         Enregistrer
                     </button>
                 </div>
@@ -132,7 +132,7 @@ function goBack() {
 
                 <div class="flex justify-end pt-2">
                     <button type="submit" :disabled="passwordForm.processing"
-                        class="bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                        class="bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                         Modifier le mot de passe
                     </button>
                 </div>

@@ -95,7 +95,7 @@ async function copyMessage(member) {
                         <img v-if="ministry.logo_url" :src="ministry.logo_url" alt="" class="h-10 w-10 rounded-lg object-contain bg-white p-1 shadow" />
                         <div>
                             <p class="text-[11px] uppercase tracking-widest text-coffee-light">{{ ministry.name }}</p>
-                            <h2 class="font-serif text-5xl font-bold text-ink">{{ m.label }} {{ year }}</h2>
+                            <h2 class="font-serif text-4xl font-bold text-ink">{{ m.label }} {{ year }}</h2>
                         </div>
                     </div>
                     <span class="text-sm text-coffee-light text-right">{{ orgUnit.name }}<br /><span class="text-xs">{{ orgUnit.level_label }}</span></span>
@@ -117,7 +117,7 @@ async function copyMessage(member) {
                         <div v-if="d.birthdays.length" class="mt-1 space-y-1">
                             <div v-for="b in d.birthdays" :key="b.id" class="text-[10px] leading-tight">
                                 <button type="button" @click="toggle(b)"
-                                    class="text-left text-gold-dark font-medium hover:underline print:pointer-events-none">
+                                    class="text-left text-azure font-medium hover:underline print:pointer-events-none">
                                     🎂 {{ b.name }}
                                 </button>
 

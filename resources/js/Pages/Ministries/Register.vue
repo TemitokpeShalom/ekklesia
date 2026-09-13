@@ -58,7 +58,7 @@ function submit() {
             class="relative w-full max-w-lg glass-panel p-8 rounded-3xl shadow-2xl shadow-black/40 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
             <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">Nouveau ministère</p>
-            <h1 class="font-serif text-5xl font-bold text-graphite mb-1">Créer votre espace</h1>
+            <h1 class="font-serif text-4xl font-bold text-graphite mb-1">Créer votre espace</h1>
             <p class="text-sm text-graphite/70 mb-6">Votre ministère est créé immédiatement, avec un essai gratuit de 30 jours.</p>
 
             <p class="text-xs uppercase tracking-widest text-graphite/55 font-semibold mb-3">Informations officielles du ministère</p>
@@ -151,7 +151,7 @@ function submit() {
                 class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/35 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
 
             <button type="submit" :disabled="form.processing"
-                class="w-full mt-6 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                class="w-full mt-6 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                 Créer mon ministère
             </button>
 

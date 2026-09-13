@@ -54,7 +54,7 @@ function moduleSlug(name) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Documentation
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Manuel d'utilisation</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Manuel d'utilisation</h1>
             </div>
         </template>
 
@@ -73,7 +73,7 @@ function moduleSlug(name) {
                     class="flex-1 bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/58 rounded-xl px-3.5 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60"
                 />
                 <button type="submit" :disabled="form.processing"
-                    class="shrink-0 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-60">
+                    class="shrink-0 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-60">
                     Chercher
                 </button>
             </form>

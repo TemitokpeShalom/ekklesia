@@ -95,7 +95,7 @@ function changeMonth(event) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Finances
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2 capitalize">Rapport financier · {{ monthLabel(month) }}</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2 capitalize">Rapport financier · {{ monthLabel(month) }}</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Vue consolidée de ce niveau et de tous ses niveaux descendants. Aucune conversion de change n'existant dans l'application, chaque devise rencontrée est présentée dans son propre bloc, jamais mélangée à une autre.
                 </p>

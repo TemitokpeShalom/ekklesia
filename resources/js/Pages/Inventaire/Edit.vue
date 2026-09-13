@@ -65,7 +65,7 @@ function destroy() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Modifier le bien</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Modifier le bien</h1>
                 <p class="mt-1 font-mono text-xs text-graphite/58">{{ asset.code }}</p>
             </div>
         </template>

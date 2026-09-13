@@ -28,7 +28,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Équipes et bénévolat
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Créer une équipe</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Créer une équipe</h1>
             </div>
         </template>
 

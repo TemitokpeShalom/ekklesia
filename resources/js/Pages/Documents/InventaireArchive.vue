@@ -122,7 +122,7 @@ function print() {
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Fiche d'inventaire</p>
-                    <h2 class="font-serif text-5xl font-bold text-ink mt-1">Exercice {{ year }} — au 31 décembre {{ year }}</h2>
+                    <h2 class="font-serif text-4xl font-bold text-ink mt-1">Exercice {{ year }} — au 31 décembre {{ year }}</h2>
 
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>
                     <p v-if="ancestry.length" class="text-xs text-coffee-light/80 mt-1">

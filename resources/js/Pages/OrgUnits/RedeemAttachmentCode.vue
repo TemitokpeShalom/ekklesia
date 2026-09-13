@@ -48,7 +48,7 @@ function submit() {
             class="relative w-full max-w-md glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both]">
             <span class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-white p-1 shadow-glow-gold mb-5"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-xl" /></span>
             <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-1">Rattachement</p>
-            <h1 class="font-serif text-5xl font-bold text-graphite mb-1">Saisir un code de rattachement</h1>
+            <h1 class="font-serif text-4xl font-bold text-graphite mb-1">Saisir un code de rattachement</h1>
             <p class="text-sm text-graphite/70 mb-7">
                 Le code vous a été transmis par le responsable qui l'a émis. Il crée une seule nouvelle entité,
                 rattachée automatiquement sous la sienne.
@@ -110,7 +110,7 @@ function submit() {
             </p>
 
             <button type="submit" :disabled="form.processing"
-                class="w-full mt-4 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-3 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                class="w-full mt-4 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                 Rattacher cette entité
             </button>
         </form>

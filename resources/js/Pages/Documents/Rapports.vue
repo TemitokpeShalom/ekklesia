@@ -45,7 +45,7 @@ function periodLabel(value) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Documents · Rapports
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Rapports validés</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Rapports validés</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Un mois n'apparaît disponible ici qu'une fois son rapport validé — validez-le d'abord depuis le module Finances ou Activités pour l'archiver.</p>
             </div>
         </template>

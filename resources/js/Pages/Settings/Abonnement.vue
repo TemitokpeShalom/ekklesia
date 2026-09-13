@@ -102,7 +102,7 @@ function formatUsdt(value) {
           <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
           Paramètres
         </p>
-        <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Abonnement et facturation</h1>
+        <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Abonnement et facturation</h1>
         <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
           Choisissez l'offre adaptée à la taille de votre ministère. Le changement est appliqué immédiatement.
         </p>
@@ -163,7 +163,7 @@ function formatUsdt(value) {
           <div v-else class="space-y-2">
             <button v-if="payment.fedapay_available && Number(plan.price_monthly) > 0" type="button"
               @click="payWithFedapay(plan.id)"
-              class="w-full inline-flex items-center justify-center bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2.5 font-semibold shadow-lg shadow-gold/20">
+              class="w-full inline-flex items-center justify-center bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-2.5 font-semibold shadow-lg shadow-azure/20">
               Payer avec FedaPay
             </button>
             <button v-if="payment.crypto_wallet_address && Number(plan.price_monthly) > 0" type="button"
@@ -195,7 +195,7 @@ function formatUsdt(value) {
               <p v-if="cryptoForm.errors.tx_hash" class="text-sm text-rose-600">{{ cryptoForm.errors.tx_hash }}</p>
               <div class="flex items-center gap-2">
                 <button type="button" :disabled="cryptoForm.processing || !cryptoForm.tx_hash" @click="submitCrypto"
-                  class="flex-1 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2 text-sm font-semibold disabled:opacity-60">
+                  class="flex-1 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-2 text-sm font-semibold disabled:opacity-60">
                   Vérifier et activer
                 </button>
                 <button type="button" @click="cryptoOpenFor = null" class="rounded-xl px-3 py-2 text-sm text-graphite/68 hover:text-graphite">

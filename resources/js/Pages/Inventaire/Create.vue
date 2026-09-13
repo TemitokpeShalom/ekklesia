@@ -58,7 +58,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Inventaire des biens
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Nouveau bien</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Nouveau bien</h1>
             </div>
         </template>
 

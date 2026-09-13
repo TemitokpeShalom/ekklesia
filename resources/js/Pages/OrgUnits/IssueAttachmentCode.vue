@@ -46,7 +46,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Rattachement
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Émettre un code de rattachement</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Émettre un code de rattachement</h1>
             </div>
         </template>
 
@@ -56,7 +56,7 @@ function submit() {
                 <p class="rounded-xl border border-graphite/15 bg-graphite/5 px-3.5 py-2.5 text-center text-2xl font-mono tracking-widest text-graphite">{{ plainCode }}</p>
                 <p class="mt-2 text-xs text-graphite/62">Ce code ne peut être utilisé qu'une seule fois et expire après la durée choisie.</p>
                 <a :href="redeemUrl" target="_blank"
-                    class="mt-4 inline-flex w-full items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20">
+                    class="mt-4 inline-flex w-full items-center justify-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20">
                     Ouvrir la page de rattachement (code pré-rempli)
                 </a>
                 <p class="mt-2 text-xs text-graphite/62">Ou transmettez ce lien à la personne concernée, si elle doit le faire elle-même.</p>
@@ -83,7 +83,7 @@ function submit() {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
+                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60"
                     >
                         Générer le code
                     </button>

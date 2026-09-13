@@ -38,7 +38,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Accès et postes
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Inviter un titulaire</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Inviter un titulaire</h1>
             </div>
         </template>
 
@@ -69,7 +69,7 @@ function submit() {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60"
+                        class="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60"
                     >
                         Générer le lien d'invitation
                     </button>

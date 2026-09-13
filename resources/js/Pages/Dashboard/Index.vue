@@ -247,7 +247,7 @@ const modules = [
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Tableau de bord
                 </p>
-                <h1 class="font-serif text-6xl sm:text-7xl font-bold text-graphite mt-2">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-5xl sm:text-6xl font-bold text-graphite mt-2">{{ orgUnit.name }}</h1>
             </div>
         </template>
 
@@ -256,9 +256,10 @@ const modules = [
 
             <section v-if="activeAffectations.length" class="animate-[fadeInUp_0.5s_ease-out_both]">
                 <h2 class="text-2xl font-bold text-graphite/62 uppercase tracking-widest mb-3">Mes affectations actives</h2>
+                <!-- Agrandi le 2026-09-13 (retour du ministere : le role et le nom de l'entite ici - ex. "Pasteur · Eglise Centrale" - etaient trop petits pour etre lus confortablement). -->
                 <div class="flex flex-wrap gap-2">
                     <span v-for="a in activeAffectations" :key="a.id"
-                        class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3 pr-4 py-1.5 text-sm">
+                        class="inline-flex items-center gap-1.5 glass-panel-light rounded-full pl-3.5 pr-5 py-2 text-base">
                         <span class="font-semibold text-sanctuary">{{ a.role.label }}</span>
                         <span class="text-graphite/68">· {{ a.org_unit.name }}</span>
                     </span>
@@ -266,7 +267,7 @@ const modules = [
             </section>
 
             <section>
-                <h2 class="font-serif text-5xl font-bold text-graphite mb-1">Modules</h2>
+                <h2 class="font-serif text-4xl font-bold text-graphite mb-1">Modules</h2>
                 <p class="text-sm text-graphite/70 mb-6">Tout ce qui se gère au quotidien pour {{ orgUnit.name }}.</p>
                 <!--
                     Corrige le 2026-09-12 (retour du ministere : "l'espace
@@ -312,7 +313,7 @@ const modules = [
             </section>
 
             <section>
-                <h2 class="font-serif text-5xl font-bold text-graphite mb-1">
+                <h2 class="font-serif text-4xl font-bold text-graphite mb-1">
                     {{ children.length ? 'Entités directement rattachées' : "Aucune entité rattachée pour l'instant" }}
                 </h2>
                 <p v-if="children.length" class="text-sm text-graphite/70 mb-6">Cliquer pour ouvrir son propre tableau de bord.</p>
@@ -327,7 +328,7 @@ const modules = [
                 <div v-if="createdOrgUnitId" class="glass-panel rounded-2xl p-5 border-forest/40 mb-6 animate-[fadeInUp_0.4s_ease-out_both]">
                     <p class="text-sm font-medium text-forest mb-3">« {{ createdOrgUnitName }} » a été créée et rattachée ici. Vous pouvez maintenant en inviter le/la titulaire :</p>
                     <a :href="`/org-units/${createdOrgUnitId}/inviter`"
-                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-4 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20">
+                        class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-4 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20">
                         Inviter le/la titulaire de « {{ createdOrgUnitName }} »
                     </a>
                 </div>
@@ -367,7 +368,7 @@ const modules = [
                     </p>
                     <div class="flex items-center gap-3 pt-2">
                         <button type="submit" :disabled="createForm.processing"
-                            class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                            class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                             Créer et rattacher ici
                         </button>
                         <button type="button" @click="showCreateForm = false; createForm.reset()"

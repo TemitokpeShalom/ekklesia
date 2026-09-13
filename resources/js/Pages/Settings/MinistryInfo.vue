@@ -57,7 +57,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Paramètres
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Informations du ministère</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Informations du ministère</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">
                     Identité officielle du ministère (comme sur un dossier de reconnaissance de culte) : sigle, siège, coordonnées, numéro d'autorisation.
                 </p>
@@ -127,7 +127,7 @@ function submit() {
                 <p v-if="form.errors.logo" class="mt-1 text-sm text-rose-600">{{ form.errors.logo }}</p>
 
                 <button type="submit" :disabled="form.processing"
-                    class="w-full mt-6 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl py-2.5 font-semibold shadow-lg shadow-gold/20 disabled:opacity-60">
+                    class="w-full mt-6 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-2.5 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                     Enregistrer
                 </button>
             </form>

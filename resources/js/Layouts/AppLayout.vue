@@ -87,8 +87,9 @@ defineProps({
                 <Link :href="orgUnit ? `/org-units/${orgUnit.id}` : '/'" class="flex items-center gap-3 min-w-0 group">
                     <span class="shrink-0 w-9 h-9 rounded-xl bg-white p-1 shadow-glow-gold flex items-center justify-center group-hover:scale-105 transition-transform duration-300"><img src="/images/oikonema-icon.png" alt="OIKONEMA" class="w-full h-full object-contain rounded-lg" /></span>
                     <span class="min-w-0" v-if="orgUnit">
-                        <span class="block text-[10.5px] uppercase tracking-widest text-sanctuary/80 font-semibold truncate">{{ orgUnit.level_label }}</span>
-                        <span class="block font-serif text-graphite text-[15px] leading-tight truncate">{{ orgUnit.name }}</span>
+                        <!-- Agrandi le 2026-09-13 (retour du ministere : trop petit pour etre lu confortablement, notamment par des utilisateurs plus ages) - seul cet en-tete du bandeau (niveau + nom), pas les titres des pages. -->
+                        <span class="block text-xs uppercase tracking-widest text-sanctuary/80 font-semibold truncate">{{ orgUnit.level_label }}</span>
+                        <span class="block font-serif text-graphite text-lg leading-tight truncate">{{ orgUnit.name }}</span>
                     </span>
                     <span class="font-serif text-graphite text-lg" v-else>Oikonema</span>
                 </Link>

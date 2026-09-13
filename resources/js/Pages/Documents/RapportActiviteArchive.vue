@@ -71,7 +71,7 @@ const attendanceSeries = computed(() => [
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Rapport d'activités</p>
-                    <h2 class="font-serif text-5xl font-bold text-ink mt-1 capitalize">{{ monthLabel }}</h2>
+                    <h2 class="font-serif text-4xl font-bold text-ink mt-1 capitalize">{{ monthLabel }}</h2>
 
                     <!-- Eglise concernee et sa lignee hierarchique complete, juste apres l'entete, comme demande. -->
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>

@@ -68,7 +68,7 @@ function submit() {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Finances
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Nouveau mouvement</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Nouveau mouvement</h1>
             </div>
         </template>
 

@@ -65,7 +65,7 @@ function dateLabel(value) {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Documents · Archives
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Archives de {{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Archives de {{ orgUnit.name }}</h1>
                 <p class="text-sm text-graphite/70 mt-2 max-w-2xl">Statuts, actes, courriers, tout document propre à cette entité. Stockage privé : seules les personnes ayant accès à ce niveau peuvent les consulter.</p>
             </div>
         </template>

@@ -45,7 +45,7 @@ function confirmRevoke(affectationId) {
                     <span class="inline-block w-6 h-px bg-gold-soft/60"></span>
                     Accès et postes
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Titulaires actuels</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Titulaires actuels</h1>
             </div>
         </template>
 
@@ -53,7 +53,7 @@ function confirmRevoke(affectationId) {
             <div class="flex justify-end animate-[fadeInUp_0.5s_ease-out_both]">
                 <Link
                     :href="`/org-units/${orgUnit.id}/inviter`"
-                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-gold to-gold-dark hover:shadow-glow-gold transition-all duration-300 text-night rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-gold/20"
+                    class="inline-flex items-center gap-1.5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl px-5 py-2.5 text-sm font-semibold shadow-lg shadow-azure/20"
                 >
                     Inviter un titulaire
                 </Link>

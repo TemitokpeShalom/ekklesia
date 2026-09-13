@@ -51,7 +51,7 @@ function destroy() {
                     <span class="inline-block w-6 h-px bg-azure/40"></span>
                     Annonces
                 </p>
-                <h1 class="font-serif text-6xl font-bold text-graphite mt-2">Modifier l'annonce</h1>
+                <h1 class="font-serif text-5xl font-bold text-graphite mt-2">Modifier l'annonce</h1>
             </div>
         </template>
 
