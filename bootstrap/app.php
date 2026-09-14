@@ -6,6 +6,9 @@ use App\Http\Middleware\SetTenantContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -56,5 +59,28 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Page d'erreur habillee (2026-09-14, retour du ministere : "un
+        // ecran noir... ca fait peur, on croit qu'il y a un probleme dans
+        // la plateforme") - remplace la page Symfony brute par la page
+        // Inertia Error.vue, a l'identite de la plateforme, pour les
+        // erreurs HTTP les plus frequentes rencontrees par un utilisateur
+        // (droits insuffisants, page introuvable, trop de tentatives,
+        // erreur serveur). 419 (session/jeton CSRF expire) traite a part :
+        // on revient simplement sur la page precedente avec un message
+        // poli, plutot qu'un ecran d'erreur a part entiere.
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            $status = $response->getStatusCode();
+
+            if ($status === 419) {
+                return back()->with('error', 'Votre session a expiré, probablement après un long moment sans activité. Merci de réessayer.');
+            }
+
+            if (in_array($status, [403, 404, 429, 500, 503], true)) {
+                return Inertia::render('Error', ['status' => $status])
+                    ->toResponse($request)
+                    ->setStatusCode($status);
+            }
+
+            return $response;
+        });
     })->create();
