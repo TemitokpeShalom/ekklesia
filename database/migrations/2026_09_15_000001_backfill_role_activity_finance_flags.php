@@ -2,7 +2,9 @@
 
 use App\Models\Role;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Corrige le 2026-09-15 (retour du ministere : apres la migration du
@@ -18,11 +20,28 @@ use Illuminate\Support\Facades\DB;
  * `php artisan migrate` suffit desormais, plus besoin de retenir une
  * commande a part) - les memes valeurs que RoleSeeder (garde en place, sans
  * changement, pour les nouvelles installations).
+ *
+ * Corrige a nouveau le 2026-09-15 (tentative precedente : echec en base
+ * chez le user - "column can_manage_activities of relation roles does not
+ * exist" - preuve que la migration du 2026-09-14 n'avait en realite jamais
+ * ete appliquee sur son serveur, malgre le fichier bien present) : cette
+ * migration cree desormais elle-meme les deux colonnes si elles manquent
+ * encore, avant d'y ecrire les valeurs - un simple `php artisan migrate`
+ * suffit donc a corriger la situation quel que soit l'etat de depart.
  */
 return new class extends Migration
 {
     public function up(): void
     {
+        Schema::table('roles', function (Blueprint $table) {
+            if (! Schema::hasColumn('roles', 'can_manage_activities')) {
+                $table->boolean('can_manage_activities')->default(false)->after('can_manage_users');
+            }
+            if (! Schema::hasColumn('roles', 'can_manage_finances')) {
+                $table->boolean('can_manage_finances')->default(false)->after('can_manage_activities');
+            }
+        });
+
         $values = [
             Role::PASTEUR => [true, true],
             Role::PASTEUR_ADJOINT => [true, true],
