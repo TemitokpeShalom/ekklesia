@@ -13,6 +13,13 @@ import { computed } from 'vue'
  * mais avec la meme identite visuelle (fond clair, lisere vin -> or) que le
  * reste de la plateforme, pour ne jamais donner l'impression d'un site en
  * panne.
+ *
+ * Corrige le 2026-09-15 (retour du ministere : le fond noir avait bien
+ * disparu, mais un code technique restait affiche - "un code erreur 400
+ * quelque chose... je ne vais meme pas garder le chiffre en tete" - alors
+ * qu'un message simple et poli suffit) : le code HTTP (status) sert
+ * uniquement en interne a choisir le bon texte ci-dessous, il n'apparait
+ * plus nulle part a l'ecran.
  */
 const props = defineProps({
     status: { type: Number, required: true },
@@ -22,7 +29,7 @@ const MESSAGES = {
     403: {
         title: 'Action non autorisée',
         message:
-            "Vous n'avez pas les droits nécessaires pour effectuer cette action ici. Ce module est peut-être réservé à une autre fonction de votre église (par exemple le pasteur, le secrétaire général ou le trésorier). Si vous pensez qu'il s'agit d'une erreur, contactez le responsable de votre ministère.",
+            "Vous n'avez pas l'autorisation de faire cette action. Si vous pensez qu'il s'agit d'une erreur, contactez le responsable de votre ministère.",
     },
     404: {
         title: 'Page introuvable',
@@ -63,8 +70,7 @@ const content = computed(() => MESSAGES[props.status] ?? MESSAGES[500])
                     </svg>
                 </span>
 
-                <p class="mt-5 text-xs uppercase tracking-widest text-graphite/50 font-semibold">Erreur {{ status }}</p>
-                <h1 class="mt-2 font-serif text-2xl font-bold text-graphite">{{ content.title }}</h1>
+                <h1 class="mt-5 font-serif text-2xl font-bold text-graphite">{{ content.title }}</h1>
                 <p class="mt-3 text-sm text-graphite/65 leading-relaxed">{{ content.message }}</p>
 
                 <a
