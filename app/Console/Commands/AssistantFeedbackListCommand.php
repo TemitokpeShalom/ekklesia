@@ -50,7 +50,7 @@ class AssistantFeedbackListCommand extends Command
             $rows->map(fn ($f) => [
                 $f->id,
                 $f->created_at->format('Y-m-d H:i'),
-                $f->ministry?->name ?? '—',
+                $f->ministry?->name ?? '(aucun)',
                 $f->status,
                 \Illuminate\Support\Str::limit($f->message, 80),
             ])
