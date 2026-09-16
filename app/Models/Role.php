@@ -25,12 +25,17 @@ class Role extends Model
     public const COMPTABLE_ADJOINT = 'comptable_adjoint';
     public const ADMIN_TECHNIQUE = 'admin_technique';
 
-    protected $fillable = ['code', 'label', 'is_deputy', 'default_permissions', 'can_manage_users', 'can_preach'];
+    protected $fillable = [
+        'code', 'label', 'is_deputy', 'default_permissions',
+        'can_manage_users', 'can_preach', 'can_manage_activities', 'can_manage_finances',
+    ];
 
     protected $casts = [
         'default_permissions' => 'array',
         'is_deputy' => 'boolean',
         'can_manage_users' => 'boolean',
         'can_preach' => 'boolean',
+        'can_manage_activities' => 'boolean',
+        'can_manage_finances' => 'boolean',
     ];
 }

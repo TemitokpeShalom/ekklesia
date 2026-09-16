@@ -47,78 +47,84 @@ class OrgUnitPolicy
     }
 
     /**
-     * Gestion des membres (fideles) : meme regle que l'invitation d'un
-     * titulaire de role - il faut un role habilite a gerer des personnes
-     * (can_manage_users), sur ce noeud ou un de ses ancetres.
+     * Gestion des membres (fideles) : corrige le 2026-09-14 (retour du
+     * ministere : le secretaire general, charge en pratique des fiches de
+     * membres et des cultes, n'y avait aucun acces) - decouple desormais de
+     * can_manage_users (reserve aux comptes/a la structure) au profit de
+     * can_manage_activities ("les activites de l'eglise"), sur ce noeud ou
+     * un de ses ancetres.
      */
     public function manageMembers(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
      * Gestion des cultes (services) : meme regle que la gestion des
-     * membres - il faut un role habilite a gerer des personnes
-     * (can_manage_users), sur ce noeud ou un de ses ancetres.
+     * membres (can_manage_activities, voir 2026-09-14 ci-dessus), sur ce
+     * noeud ou un de ses ancetres.
      */
     public function manageCultes(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
      * Gestion des sacrements individuels (baptemes, mariages, point 08) :
-     * meme regle que la gestion des membres et des cultes - il faut un role
-     * habilite a gerer des personnes (can_manage_users), sur ce noeud ou
+     * meme regle que la gestion des membres et des cultes
+     * (can_manage_activities, voir 2026-09-14 ci-dessus), sur ce noeud ou
      * un de ses ancetres.
      */
     public function manageSacrements(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
      * Gestion du parcours de disciple (etapes de croissance spirituelle,
-     * point 08) : meme regle que la gestion des membres et des cultes - il
-     * faut un role habilite a gerer des personnes (can_manage_users), sur
-     * ce noeud ou un de ses ancetres.
+     * point 08) : meme regle que la gestion des membres et des cultes
+     * (can_manage_activities, voir 2026-09-14 ci-dessus), sur ce noeud ou
+     * un de ses ancetres.
      */
     public function manageDiscipleship(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
      * Gestion des equipes et du benevolat (point 08), y compris
      * l'affectation des membres a une equipe : meme regle que la gestion
-     * des membres et des cultes - il faut un role habilite a gerer des
-     * personnes (can_manage_users), sur ce noeud ou un de ses ancetres.
+     * des membres et des cultes (can_manage_activities, voir 2026-09-14
+     * ci-dessus), sur ce noeud ou un de ses ancetres.
      */
     public function manageTeams(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
-     * Gestion des finances (mouvements et rapport d'activites) : meme
-     * regle que la gestion des membres et des cultes - il faut un role
-     * habilite a gerer des personnes (can_manage_users), sur ce noeud ou
-     * un de ses ancetres.
+     * Gestion des finances (mouvements, rapport, inventaire des biens,
+     * norme comptable) : corrige le 2026-09-14 (retour du ministere,
+     * demande explicite "que le tresorier puisse renseigner tout ce qui
+     * est lie aux finances") - controlee desormais par can_manage_finances,
+     * un indicateur distinct de can_manage_activities (le tresorier ne
+     * gere pas les membres/cultes, et reciproquement), sur ce noeud ou un
+     * de ses ancetres.
      */
     public function manageFinances(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_finances');
     }
     /**
      * Publication des annonces (point 07) : meme regle que les autres
-     * modules de gestion - il faut un role habilite a gerer des personnes
-     * (can_manage_users), sur ce noeud ou un de ses ancetres. La
-     * visibilite en lecture, elle, ne passe pas par cette policy : elle
-     * suit la regle symetrique de point 06 (voir AnnouncementsController::index).
+     * modules de gestion (can_manage_activities, voir 2026-09-14
+     * ci-dessus), sur ce noeud ou un de ses ancetres. La visibilite en
+     * lecture, elle, ne passe pas par cette policy : elle suit la regle
+     * symetrique de point 06 (voir AnnouncementsController::index).
      */
     public function manageAnnouncements(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     /**
@@ -150,13 +156,13 @@ class OrgUnitPolicy
     /**
      * Archives de documents propres a une entite (chantier "module
      * Documents", 2026-09-12) : meme regle que les autres modules de
-     * gestion - il faut un role habilite a gerer des personnes
-     * (can_manage_users), sur ce noeud ou un de ses ancetres. La lecture
-     * (liste, telechargement) suit view(), plus permissive.
+     * gestion (can_manage_activities, voir 2026-09-14 ci-dessus), sur ce
+     * noeud ou un de ses ancetres. La lecture (liste, telechargement) suit
+     * view(), plus permissive.
      */
     public function manageDocuments(User $user, OrgUnit $orgUnit): bool
     {
-        return $this->hasManagingAffectationOverDescendantsOrSelf($user, $orgUnit);
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_activities');
     }
 
     private function hasAffectationOverridingDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
@@ -169,10 +175,31 @@ class OrgUnitPolicy
             ->exists();
     }
 
+    /**
+     * Operations structurelles/de compte (inviter, creer une entite
+     * enfant, transformer la structure, traiter un signalement) : restent
+     * reservees a can_manage_users (Pasteur + administrateur technique),
+     * inchange depuis le 2026-09-14 - volontairement distinct de
+     * can_manage_activities/can_manage_finances ci-dessous, plus sensible.
+     */
     private function hasManagingAffectationOverDescendantsOrSelf(User $user, OrgUnit $orgUnit): bool
     {
+        return $this->hasAffectationWithFlagOverDescendantsOrSelf($user, $orgUnit, 'can_manage_users');
+    }
+
+    /**
+     * Corrige le 2026-09-14 : generalisation de l'ancienne
+     * hasManagingAffectationOverDescendantsOrSelf (qui ne testait QUE
+     * can_manage_users) pour accepter n'importe quel indicateur booleen de
+     * la table roles - permet de separer can_manage_activities ("les
+     * activites de l'eglise", demande pour le secretaire) de
+     * can_manage_finances (demande pour le tresorier/comptable) sans
+     * dupliquer cette requete trois fois.
+     */
+    private function hasAffectationWithFlagOverDescendantsOrSelf(User $user, OrgUnit $orgUnit, string $roleFlag): bool
+    {
         return $user->activeAffectations()
-            ->whereHas('role', fn ($q) => $q->where('can_manage_users', true))
+            ->whereHas('role', fn ($q) => $q->where($roleFlag, true))
             ->whereHas(
                 'orgUnit',
                 fn ($q) => $q->whereRaw('org_units.path @> ?::ltree OR org_units.id = ?', [$orgUnit->path, $orgUnit->id])
