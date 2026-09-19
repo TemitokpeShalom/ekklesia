@@ -1,10 +1,20 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { queueMembre } from '@/offlineMembresQueue'
 
 /**
  * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
  * partagee AppLayout, sans aucun changement fonctionnel.
+ *
+ * Chantier "hors connexion", quatrieme pierre (2026-09-19) : meme principe
+ * que Cultes/Create.vue (voir ce fichier et offlineMembresQueue.js pour le
+ * raisonnement) - hors connexion, le membre est garde sur l'appareil au
+ * lieu d'afficher une erreur. Difference avec les cultes : les deux champs
+ * photo sont desactives hors connexion (voir offlineMembresQueue.js pour
+ * pourquoi), avec une note expliquant qu'elles pourront etre ajoutees plus
+ * tard depuis la fiche du membre.
  */
 const props = defineProps({
     orgUnit: Object,
@@ -25,6 +35,23 @@ const form = useForm({
     spouse_photo: null,
 })
 
+const savedOffline = ref(false)
+const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
+
+function updateOfflineState() {
+    isOffline.value = typeof navigator !== 'undefined' ? !navigator.onLine : false
+}
+
+onMounted(() => {
+    window.addEventListener('online', updateOfflineState)
+    window.addEventListener('offline', updateOfflineState)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('online', updateOfflineState)
+    window.removeEventListener('offline', updateOfflineState)
+})
+
 function onPhotoChange(event) {
     form.photo = event.target.files[0] ?? null
 }
@@ -34,6 +61,17 @@ function onSpousePhotoChange(event) {
 }
 
 function submit() {
+    savedOffline.value = false
+
+    if (isOffline.value) {
+        const { photo, spouse_photo, ...donneesSansPhoto } = form.data()
+        queueMembre(props.orgUnit.id, donneesSansPhoto)
+        form.reset()
+        savedOffline.value = true
+
+        return
+    }
+
     form.post(`/org-units/${props.orgUnit.id}/membres`)
 }
 </script>
@@ -51,6 +89,16 @@ function submit() {
         </template>
 
         <div class="max-w-2xl mx-auto">
+            <div
+                v-if="savedOffline"
+                class="mb-4 rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-graphite/87 flex items-start gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 flex-shrink-0 text-gold">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+                <span>Membre enregistré sur cet appareil (pas de connexion pour le moment). Il sera envoyé automatiquement vers la plateforme dès que la connexion revient, sans rien faire de plus.</span>
+            </div>
+
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]" enctype="multipart/form-data">
                 <section>
                     <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Identité</h2>
@@ -122,8 +170,9 @@ function submit() {
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Photo (optionnel)</label>
-                            <input type="file" accept="image/*" @change="onPhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20" />
-                            <p class="mt-1 text-xs text-graphite/58">Image, 5 Mo maximum.</p>
+                            <input type="file" accept="image/*" :disabled="isOffline" @change="onPhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20 disabled:opacity-50" />
+                            <p class="mt-1 text-xs text-graphite/58" v-if="!isOffline">Image, 5 Mo maximum.</p>
+                            <p class="mt-1 text-xs text-gold" v-else>Pas disponible hors connexion, tu pourras l'ajouter plus tard en modifiant la fiche.</p>
                             <p v-if="form.errors.photo" class="mt-1 text-sm text-rose-600">{{ form.errors.photo }}</p>
                         </div>
                         <div>
@@ -133,8 +182,9 @@ function submit() {
                         </div>
                         <div>
                             <label class="mb-1 block text-sm font-medium text-graphite/87">Photo du conjoint (optionnel)</label>
-                            <input type="file" accept="image/*" @change="onSpousePhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20" />
-                            <p class="mt-1 text-xs text-graphite/58">Image, 5 Mo maximum.</p>
+                            <input type="file" accept="image/*" :disabled="isOffline" @change="onSpousePhotoChange" class="block w-full text-sm text-graphite/73 file:mr-3 file:rounded-lg file:border-0 file:bg-graphite/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-graphite/87 hover:file:bg-graphite/20 disabled:opacity-50" />
+                            <p class="mt-1 text-xs text-graphite/58" v-if="!isOffline">Image, 5 Mo maximum.</p>
+                            <p class="mt-1 text-xs text-gold" v-else>Pas disponible hors connexion, tu pourras l'ajouter plus tard en modifiant la fiche.</p>
                             <p v-if="form.errors.spouse_photo" class="mt-1 text-sm text-rose-600">{{ form.errors.spouse_photo }}</p>
                         </div>
                     </div>

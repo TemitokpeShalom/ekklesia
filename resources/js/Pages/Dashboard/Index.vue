@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import MinistryLetterhead from '@/Components/MinistryLetterhead.vue'
+import DashboardInstallButton from '@/Components/DashboardInstallButton.vue'
 
 /**
  * v4 "Constellation" (2026-09-10) : demande du ministere de revoir
@@ -174,6 +175,14 @@ const modules = [
 <template>
     <AppLayout :org-unit="orgUnit" :back-href="orgUnit.parent_id ? `/org-units/${orgUnit.parent_id}` : null" back-label="Retour">
         <template #actions>
+            <!--
+                Chantier "application telechargeable" (2026-09-19) : bouton
+                toujours visible ici (pas seulement pour la gouvernance), a
+                cote du menu Gouvernance quand il existe - voir
+                DashboardInstallButton.vue.
+            -->
+            <DashboardInstallButton />
+
             <div v-if="canManageAccess || canTransform" class="relative">
                 <button type="button" @click="governanceMenuOpen = !governanceMenuOpen"
                     class="flex items-center gap-1.5 text-sm text-graphite/70 hover:text-graphite bg-graphite/5 hover:bg-graphite/10 border border-graphite/10 rounded-full px-4 py-2 transition-colors">

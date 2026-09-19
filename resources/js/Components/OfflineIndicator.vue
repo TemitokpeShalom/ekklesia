@@ -1,6 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { countQueuedCultes, syncQueuedCultes } from '@/offlineCultesQueue'
+import { countQueuedMembres, syncQueuedMembres } from '@/offlineMembresQueue'
+import { countQueuedSacrements, syncQueuedSacrements } from '@/offlineSacramentsQueue'
+import { countQueuedParcours, syncQueuedParcours } from '@/offlineDiscipleshipQueue'
+import { countQueuedMembresEquipe, syncQueuedMembresEquipe } from '@/offlineTeamsQueue'
+import { countQueuedMouvements, syncQueuedMouvements } from '@/offlineFinancesQueue'
 
 /**
  * Indicateur de connexion (2026-09-13) : premiere brique visible du
@@ -16,16 +21,57 @@ import { countQueuedCultes, syncQueuedCultes } from '@/offlineCultesQueue'
  *
  * Troisieme pierre (2026-09-19) : des cultes saisis hors connexion peuvent
  * s'accumuler sur cet appareil (voir Cultes/Create.vue et
- * offlineCultesQueue.js) - ce composant affiche desormais combien sont en
- * attente, meme reseau revenu (pour rassurer : "c'est bien pris en compte,
- * ca part tout seul"), et declenche lui-meme l'envoi des que la connexion
- * revient, sans aucune action a faire.
+ * offlineCultesQueue.js) - ce composant affiche combien sont en attente,
+ * meme reseau revenu (pour rassurer : "c'est bien pris en compte, ca part
+ * tout seul"), et declenche lui-meme l'envoi des que la connexion revient,
+ * sans aucune action a faire.
+ *
+ * Quatrieme pierre (meme jour) : meme chose pour les membres
+ * (offlineMembresQueue.js). Generalise ici en une petite liste de
+ * "modules" plutot que de dupliquer toute la logique une deuxieme fois -
+ * chaque futur module hors connexion (sacrements, parcours de disciple...)
+ * n'aura qu'une ligne a ajouter a MODULES, sans toucher au reste de ce
+ * fichier.
+ *
+ * Cinquieme pierre (2026-09-19) : meme chose pour les sacrements
+ * (offlineSacramentsQueue.js), une simple ligne ajoutee a MODULES.
+ *
+ * Sixieme pierre (2026-09-19) : meme chose pour le parcours de disciple
+ * (offlineDiscipleshipQueue.js).
+ *
+ * Septieme pierre (2026-09-19) : meme chose pour l'ajout d'un benevole a
+ * une equipe (offlineTeamsQueue.js) - pas la creation de l'equipe
+ * elle-meme, action rare qui n'a pas besoin de fonctionner hors connexion.
+ *
+ * Huitieme et derniere pierre de la liste annoncee (2026-09-19) : meme
+ * chose pour les mouvements financiers (offlineFinancesQueue.js). Tous les
+ * modules prevus par la feuille de route "hors connexion" sont desormais
+ * couverts.
  */
+const MODULES = [
+    { cle: 'cultes', singulier: 'culte', pluriel: 'cultes', compter: countQueuedCultes, envoyer: syncQueuedCultes },
+    { cle: 'membres', singulier: 'membre', pluriel: 'membres', compter: countQueuedMembres, envoyer: syncQueuedMembres },
+    { cle: 'sacrements', singulier: 'sacrement', pluriel: 'sacrements', compter: countQueuedSacrements, envoyer: syncQueuedSacrements },
+    { cle: 'parcours', singulier: 'étape de parcours', pluriel: 'étapes de parcours', compter: countQueuedParcours, envoyer: syncQueuedParcours },
+    { cle: 'equipes', singulier: 'ajout à une équipe', pluriel: 'ajouts à une équipe', compter: countQueuedMembresEquipe, envoyer: syncQueuedMembresEquipe },
+    { cle: 'finances', singulier: 'mouvement financier', pluriel: 'mouvements financiers', compter: countQueuedMouvements, envoyer: syncQueuedMouvements },
+]
+
 const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 const hasCachedMembers = ref(false)
-const cultesEnAttente = ref(0)
+const enAttenteParModule = ref(MODULES.map(() => 0))
 const synchronisationEnCours = ref(false)
 const derniereSyncReussie = ref(false)
+
+const totalEnAttente = computed(() => enAttenteParModule.value.reduce((total, n) => total + n, 0))
+
+const detailEnAttente = computed(() =>
+    MODULES
+        .map((module, i) => ({ module, n: enAttenteParModule.value[i] }))
+        .filter(({ n }) => n > 0)
+        .map(({ module, n }) => `${n} ${n > 1 ? module.pluriel : module.singulier}`)
+        .join(', ')
+)
 
 function refreshCachedMembersFlag() {
     try {
@@ -35,23 +81,28 @@ function refreshCachedMembersFlag() {
     }
 }
 
-function refreshQueueCount() {
-    cultesEnAttente.value = countQueuedCultes()
+function refreshQueueCounts() {
+    enAttenteParModule.value = MODULES.map((module) => module.compter())
 }
 
 async function lancerSynchronisation() {
-    if (synchronisationEnCours.value || countQueuedCultes() === 0) {
+    if (synchronisationEnCours.value || totalEnAttente.value === 0) {
         return
     }
 
     synchronisationEnCours.value = true
     derniereSyncReussie.value = false
 
-    const { envoyes, restants } = await syncQueuedCultes()
+    let totalEnvoyes = 0
 
-    cultesEnAttente.value = restants
+    for (let i = 0; i < MODULES.length; i += 1) {
+        const { envoyes, restants } = await MODULES[i].envoyer()
+        enAttenteParModule.value[i] = restants
+        totalEnvoyes += envoyes
+    }
+
     synchronisationEnCours.value = false
-    derniereSyncReussie.value = envoyes > 0 && restants === 0
+    derniereSyncReussie.value = totalEnvoyes > 0 && totalEnAttente.value === 0
 
     if (derniereSyncReussie.value) {
         setTimeout(() => {
@@ -62,7 +113,7 @@ async function lancerSynchronisation() {
 
 function update() {
     isOffline.value = !navigator.onLine
-    refreshQueueCount()
+    refreshQueueCounts()
 
     if (isOffline.value) {
         refreshCachedMembersFlag()
@@ -74,7 +125,7 @@ function update() {
 onMounted(() => {
     window.addEventListener('online', update)
     window.addEventListener('offline', update)
-    refreshQueueCount()
+    refreshQueueCounts()
 
     if (isOffline.value) {
         refreshCachedMembersFlag()
@@ -100,8 +151,8 @@ onUnmounted(() => {
     >
         <div v-if="isOffline" class="fixed top-0 inset-x-0 z-[70] bg-graphite text-white text-sm text-center py-2 px-4">
             <span>Hors connexion. Certaines actions ne fonctionneront pas tant que la connexion n'est pas rétablie.</span>
-            <span v-if="cultesEnAttente > 0">
-                {{ ' ' }}{{ cultesEnAttente }} culte{{ cultesEnAttente > 1 ? 's' : '' }} en attente, envoi automatique au retour du réseau.
+            <span v-if="totalEnAttente > 0">
+                {{ ' ' }}{{ detailEnAttente }} en attente, envoi automatique au retour du réseau.
             </span>
             <a
                 v-if="hasCachedMembers"
@@ -112,16 +163,16 @@ onUnmounted(() => {
             </a>
         </div>
         <div
-            v-else-if="synchronisationEnCours || cultesEnAttente > 0"
+            v-else-if="synchronisationEnCours || totalEnAttente > 0"
             class="fixed top-0 inset-x-0 z-[70] bg-azure text-white text-sm text-center py-2 px-4"
         >
-            Envoi des cultes enregistrés hors connexion en cours...
+            Envoi des éléments enregistrés hors connexion en cours...
         </div>
         <div
             v-else-if="derniereSyncReussie"
             class="fixed top-0 inset-x-0 z-[70] bg-emerald-600 text-white text-sm text-center py-2 px-4"
         >
-            Les cultes enregistrés hors connexion ont bien été envoyés à la plateforme.
+            Les éléments enregistrés hors connexion ont bien été envoyés à la plateforme.
         </div>
     </transition>
 </template>

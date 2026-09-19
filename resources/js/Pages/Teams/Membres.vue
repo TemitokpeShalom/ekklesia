@@ -1,7 +1,8 @@
 <script setup>
 import { useForm, router, Link } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { queueMembreEquipe } from '@/offlineTeamsQueue'
 
 /**
  * Equipes et benevolat (point 08) : composition d'une equipe (ajout/retrait
@@ -11,6 +12,12 @@ import AppLayout from '@/Layouts/AppLayout.vue'
  * liste - "je ne veux pas dire qu'on va supprimer le menu modifier... mais
  * pour enregistrer un membre, quand on clique sur n'importe où sur la
  * ligne... ça affiche en même temps la page pour enregistrer un membre".
+ *
+ * Chantier "hors connexion", septieme pierre (2026-09-19) : c'est l'ajout
+ * d'un benevole a une equipe (pas la creation de l'equipe elle-meme, action
+ * rare) qui a besoin de fonctionner sans reseau pendant un culte - voir
+ * offlineTeamsQueue.js. Le retrait d'un membre reste, lui, reserve a une
+ * connexion active (action plus rare et moins urgente pendant un culte).
  */
 const props = defineProps({
     orgUnit: Object,
@@ -23,6 +30,23 @@ const addForm = useForm({
     new_member_name: '',
     role_in_team: '',
     joined_at: '',
+})
+
+const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
+const savedOffline = ref(false)
+
+function updateOnlineStatus() {
+    isOffline.value = !navigator.onLine
+}
+
+onMounted(() => {
+    window.addEventListener('online', updateOnlineStatus)
+    window.addEventListener('offline', updateOnlineStatus)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('online', updateOnlineStatus)
+    window.removeEventListener('offline', updateOnlineStatus)
 })
 
 const availableMembers = computed(() => {
@@ -40,6 +64,16 @@ function formatDate(value) {
 }
 
 function addMember() {
+    savedOffline.value = false
+
+    if (isOffline.value) {
+        queueMembreEquipe(props.orgUnit.id, props.equipe.id, { ...addForm.data() })
+        addForm.reset()
+        savedOffline.value = true
+
+        return
+    }
+
     addForm.post(`/org-units/${props.orgUnit.id}/equipes/${props.equipe.id}/membres`, {
         preserveScroll: true,
         onSuccess: () => addForm.reset(),
@@ -109,6 +143,16 @@ function removeMember(teamMember) {
                     </div>
                 </div>
             </section>
+
+            <div
+                v-if="savedOffline"
+                class="rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-graphite/87 flex items-start gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 flex-shrink-0 text-gold">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+                <span>Ajout enregistré sur cet appareil (pas de connexion pour le moment). Il sera envoyé automatiquement vers la plateforme dès que la connexion revient, sans rien faire de plus.</span>
+            </div>
 
             <form @submit.prevent="addMember" class="space-y-6 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.6s_ease-out_both]">
                 <h2 class="text-2xl font-bold text-azure uppercase tracking-widest">Ajouter un membre</h2>
