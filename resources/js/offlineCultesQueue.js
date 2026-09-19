@@ -73,6 +73,15 @@ export async function syncQueuedCultes() {
     let envoyes = 0;
 
     for (const item of [...queue]) {
+        // Limite de temps volontaire (2026-09-19, retour du ministere : un
+        // envoi reste bloque sur "en cours" sans jamais avertir quand le
+        // reseau est instable juste apres une reconnexion). Sans elle, un
+        // fetch() peut attendre indefiniment sans jamais echouer ni reussir.
+        // Passe la limite, on abandonne cet envoi proprement (l'element
+        // reste dans la file, rien n'est perdu) au lieu de bloquer l'appli.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
         try {
             const response = await fetch(`/org-units/${item.orgUnitId}/cultes`, {
                 method: 'POST',
@@ -83,6 +92,7 @@ export async function syncQueuedCultes() {
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify(item.data),
+                signal: controller.signal,
             });
 
             if (!response.ok) {
@@ -94,6 +104,8 @@ export async function syncQueuedCultes() {
             envoyes += 1;
         } catch (e) {
             break;
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 

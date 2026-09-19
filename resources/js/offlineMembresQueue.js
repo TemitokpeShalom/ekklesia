@@ -68,6 +68,12 @@ export async function syncQueuedMembres() {
     let envoyes = 0;
 
     for (const item of [...queue]) {
+        // Limite de temps volontaire (2026-09-19, voir offlineCultesQueue.js
+        // pour le raisonnement complet) : sans elle, un envoi peut rester
+        // bloque indefiniment sur un reseau instable, sans jamais avertir.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
         try {
             const response = await fetch(`/org-units/${item.orgUnitId}/membres`, {
                 method: 'POST',
@@ -78,6 +84,7 @@ export async function syncQueuedMembres() {
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify(item.data),
+                signal: controller.signal,
             });
 
             if (!response.ok) {
@@ -89,6 +96,8 @@ export async function syncQueuedMembres() {
             envoyes += 1;
         } catch (e) {
             break;
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 
