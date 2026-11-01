@@ -227,3 +227,34 @@ body {
         background-color: #ffffff;
     }
 }
+
+/* Formulaires et titres de section (2026-11-01) : les intertitres des
+   formulaires ("LE MESSAGE", "QUAND"...) etaient en grandes majuscules tres
+   espacees et dominaient la page. Ils deviennent de petits intertitres nets.
+   Champs de saisie : fond blanc, fine bordure, contour bleu marine au clic
+   (au lieu du gris plein et du halo dore). */
+.app-shell :is(h2, h3).text-2xl.uppercase,
+.app-shell :is(h2, h3).text-xl.uppercase {
+    font-size: 0.8125rem;
+    line-height: 1.2rem;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+}
+.app-shell .tracking-widest {
+    letter-spacing: 0.08em;
+}
+
+.app-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']) {
+    background-color: #ffffff;
+    border-color: rgba(32, 36, 44, 0.18);
+}
+.app-shell :is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='file']):not([type='range']):focus {
+    border-color: #0a4aa0;
+    box-shadow: 0 0 0 3px rgba(0, 48, 128, 0.14);
+    outline: none;
+}
+
+/* Cartes de l'espace de travail : coins un peu moins ronds, plus sobres. */
+.app-shell .glass-panel.rounded-3xl {
+    border-radius: 1.25rem;
+}

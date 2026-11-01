@@ -1,6 +1,8 @@
 <script setup>
+import { ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { queueAnnonce } from '@/offlineAnnoncesQueue'
 
 /**
  * v3 "Vitrail" (2026-09-09) : migration de ce module vers la coquille
@@ -22,7 +24,32 @@ function onFileChange(event) {
     form.attachment = event.target.files[0] ?? null
 }
 
+const savedOffline = ref(false)
+const offlineAttachmentError = ref(false)
+
+// Hors connexion (2026-11-01) : l'annonce (texte seul) est gardee sur
+// l'appareil puis publiee automatiquement au retour du reseau. Une piece
+// jointe ne peut pas etre gardee de facon fiable : on le dit clairement au
+// lieu de l'ignorer en silence.
 function submit() {
+    savedOffline.value = false
+    offlineAttachmentError.value = false
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        if (form.attachment) {
+            offlineAttachmentError.value = true
+
+            return
+        }
+
+        const { attachment, ...texte } = form.data()
+        queueAnnonce(props.orgUnit.id, texte)
+        form.reset()
+        savedOffline.value = true
+
+        return
+    }
+
     form.post(`/org-units/${props.orgUnit.id}/annonces`)
 }
 </script>
@@ -41,6 +68,13 @@ function submit() {
         </template>
 
         <div class="max-w-2xl mx-auto">
+            <div v-if="savedOffline" class="mb-4 rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-graphite/87 flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 flex-shrink-0 text-gold">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+                <span>Annonce enregistrée sur cet appareil (pas de connexion pour le moment). Elle sera publiée automatiquement dès que la connexion revient, sans rien faire de plus.</span>
+            </div>
+            <p v-if="offlineAttachmentError" class="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">Une pièce jointe ne peut pas être enregistrée sans connexion. Retirez le fichier pour publier le texte seul dès maintenant, ou attendez le retour du réseau pour tout envoyer ensemble.</p>
             <form @submit.prevent="submit" class="space-y-8 glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
                 <section>
                     <h2 class="text-2xl font-bold text-azure uppercase tracking-widest mb-4">Contenu</h2>

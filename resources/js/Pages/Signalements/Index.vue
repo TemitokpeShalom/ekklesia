@@ -2,6 +2,7 @@
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { queueSignalement } from '@/offlineSignalementsQueue'
 
 /**
  * Canal de signalement (point 17). Meme logique que la premiere version
@@ -23,7 +24,21 @@ const form = useForm({
   is_anonymous: false,
 })
 
+const savedOffline = ref(false)
+
+// Hors connexion (2026-11-01) : le signalement est garde sur l'appareil puis
+// envoye automatiquement au retour du reseau (offlineSignalementsQueue.js).
 function submit() {
+  savedOffline.value = false
+
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    queueSignalement(props.orgUnit.id, { ...form.data() })
+    form.reset()
+    savedOffline.value = true
+
+    return
+  }
+
   form.post(`/org-units/${props.orgUnit.id}/signalements`, {
     onSuccess: () => form.reset(),
   })
@@ -84,6 +99,12 @@ function formatDate(iso) {
     </template>
 
     <div class="max-w-2xl mx-auto space-y-10">
+            <div v-if="savedOffline" class="mb-4 rounded-2xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-graphite/87 flex items-start gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5 flex-shrink-0 text-gold">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                </svg>
+                <span>Signalement enregistré sur cet appareil (pas de connexion pour le moment). Il sera envoyé automatiquement dès que la connexion revient, sans rien faire de plus.</span>
+            </div>
       <form @submit.prevent="submit" class="glass-panel rounded-3xl p-6 md:p-7 animate-[fadeInUp_0.55s_ease-out_both]">
         <div class="mb-4">
           <label class="block text-xs font-semibold text-azure uppercase tracking-wide mb-1.5">Catégorie</label>

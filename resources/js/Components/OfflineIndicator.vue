@@ -6,6 +6,9 @@ import { countQueuedSacrements, syncQueuedSacrements } from '@/offlineSacraments
 import { countQueuedParcours, syncQueuedParcours } from '@/offlineDiscipleshipQueue'
 import { countQueuedMembresEquipe, syncQueuedMembresEquipe } from '@/offlineTeamsQueue'
 import { countQueuedMouvements, syncQueuedMouvements } from '@/offlineFinancesQueue'
+import { countQueuedBiens, countRefusedBiens, clearRefusedBiens, syncQueuedBiens } from '@/offlineInventaireQueue'
+import { countQueuedAnnonces, countRefusedAnnonces, clearRefusedAnnonces, syncQueuedAnnonces } from '@/offlineAnnoncesQueue'
+import { countQueuedSignalements, countRefusedSignalements, clearRefusedSignalements, syncQueuedSignalements } from '@/offlineSignalementsQueue'
 
 /**
  * Indicateur de connexion (2026-09-13) : premiere brique visible du
@@ -47,6 +50,12 @@ import { countQueuedMouvements, syncQueuedMouvements } from '@/offlineFinancesQu
  * chose pour les mouvements financiers (offlineFinancesQueue.js). Tous les
  * modules prevus par la feuille de route "hors connexion" sont desormais
  * couverts.
+ *
+ * Neuvieme a onzieme pierres (2026-11-01) : inventaire, annonces (sans piece
+ * jointe) et signalements, via offlineQueueFactory.js. Ces trois files
+ * mettent de cote un element refuse definitivement par le serveur au lieu de
+ * bloquer les suivants : le bandeau ambre ci-dessous le signale, pour qu'il
+ * soit ressaisi.
  */
 const MODULES = [
     { cle: 'cultes', singulier: 'culte', pluriel: 'cultes', compter: countQueuedCultes, envoyer: syncQueuedCultes },
@@ -55,12 +64,16 @@ const MODULES = [
     { cle: 'parcours', singulier: 'étape de parcours', pluriel: 'étapes de parcours', compter: countQueuedParcours, envoyer: syncQueuedParcours },
     { cle: 'equipes', singulier: 'ajout à une équipe', pluriel: 'ajouts à une équipe', compter: countQueuedMembresEquipe, envoyer: syncQueuedMembresEquipe },
     { cle: 'finances', singulier: 'mouvement financier', pluriel: 'mouvements financiers', compter: countQueuedMouvements, envoyer: syncQueuedMouvements },
+    { cle: 'inventaire', singulier: 'bien', pluriel: 'biens', compter: countQueuedBiens, envoyer: syncQueuedBiens, refuses: countRefusedBiens, viderRefuses: clearRefusedBiens },
+    { cle: 'annonces', singulier: 'annonce', pluriel: 'annonces', compter: countQueuedAnnonces, envoyer: syncQueuedAnnonces, refuses: countRefusedAnnonces, viderRefuses: clearRefusedAnnonces },
+    { cle: 'signalements', singulier: 'signalement', pluriel: 'signalements', compter: countQueuedSignalements, envoyer: syncQueuedSignalements, refuses: countRefusedSignalements, viderRefuses: clearRefusedSignalements },
 ]
 
 const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 const hasCachedMembers = ref(false)
 const enAttenteParModule = ref(MODULES.map(() => 0))
 const synchronisationEnCours = ref(false)
+const totalRefuses = ref(0)
 const derniereSyncReussie = ref(false)
 
 const totalEnAttente = computed(() => enAttenteParModule.value.reduce((total, n) => total + n, 0))
@@ -83,6 +96,12 @@ function refreshCachedMembersFlag() {
 
 function refreshQueueCounts() {
     enAttenteParModule.value = MODULES.map((module) => module.compter())
+    totalRefuses.value = MODULES.reduce((total, module) => total + (module.refuses ? module.refuses() : 0), 0)
+}
+
+function fermerRefuses() {
+    MODULES.forEach((module) => module.viderRefuses && module.viderRefuses())
+    totalRefuses.value = 0
 }
 
 async function lancerSynchronisation() {
@@ -102,6 +121,7 @@ async function lancerSynchronisation() {
     }
 
     synchronisationEnCours.value = false
+    refreshQueueCounts()
     derniereSyncReussie.value = totalEnvoyes > 0 && totalEnAttente.value === 0
 
     if (derniereSyncReussie.value) {
@@ -167,6 +187,13 @@ onUnmounted(() => {
             class="fixed top-0 inset-x-0 z-[70] bg-azure text-white text-sm text-center py-2 px-4"
         >
             Envoi des éléments enregistrés hors connexion en cours...
+        </div>
+        <div
+            v-else-if="totalRefuses > 0"
+            class="fixed top-0 inset-x-0 z-[70] bg-amber-500 text-white text-sm text-center py-2 px-4"
+        >
+            {{ totalRefuses }} élément{{ totalRefuses > 1 ? 's' : '' }} enregistré{{ totalRefuses > 1 ? 's' : '' }} hors connexion {{ totalRefuses > 1 ? 'ont été refusés' : 'a été refusé' }} par la plateforme (information incomplète ou droits insuffisants). Merci de {{ totalRefuses > 1 ? 'les' : 'le' }} ressaisir.
+            <button type="button" class="ml-2 font-semibold underline underline-offset-2" @click="fermerRefuses">Compris</button>
         </div>
         <div
             v-else-if="derniereSyncReussie"
