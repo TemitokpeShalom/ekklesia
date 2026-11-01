@@ -62,11 +62,24 @@ class Member extends Model
 
     /**
      * L'etape la plus recente atteinte par ce membre, calculee directement
-     * en base (latestOfMany) plutot que par un champ duplique : la source
-     * de verite reste toujours le journal complet dans discipleshipStages().
+     * en base plutot que par un champ duplique : la source de verite reste
+     * toujours le journal complet dans discipleshipStages().
+     *
+     * Corrige le 2026-11-01 : latestOfMany('reached_at') ajoutait en interne
+     * un MAX(id) pour departager les egalites, or l'id est un UUID et
+     * PostgreSQL n'a pas de fonction max(uuid) -> erreur 500 sur tout l'ecran
+     * Parcours de disciple. On departage donc nous-memes, sans agregat sur
+     * l'UUID : date la plus recente, puis created_at, puis id (simple tri).
      */
     public function latestDiscipleshipStage(): HasOne
     {
-        return $this->hasOne(DiscipleshipStage::class)->latestOfMany('reached_at');
+        return $this->hasOne(DiscipleshipStage::class)->whereRaw(
+            'discipleship_stages.id = (
+                select ds.id from discipleship_stages ds
+                where ds.member_id = discipleship_stages.member_id
+                order by ds.reached_at desc, ds.created_at desc, ds.id desc
+                limit 1
+            )'
+        );
     }
 }
