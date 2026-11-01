@@ -54,16 +54,17 @@ const templates = [
             </div>
         </template>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 animate-[fadeInUp_0.55s_ease-out_both]">
-            <a v-for="t in templates" :key="t.key" :href="t.href(orgUnit.id)"
-                class="group glass-panel rounded-3xl p-6 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300">
-                <span :class="t.badge" class="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <!-- 2026-11-01 : grille compacte d'icones (classes .fn-* de app.css) ; la
+             description reste lisible au survol/appui (title). -->
+        <div class="fn-grid animate-[fadeInUp_0.55s_ease-out_both]">
+            <a v-for="t in templates" :key="t.key" :href="t.href(orgUnit.id)" :title="t.desc"
+                class="fn-tile group">
+                <span :class="t.badge" class="fn-ico bg-gradient-to-br">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" :d="t.icon" />
                     </svg>
                 </span>
-                <p class="font-semibold text-graphite text-[15px]">{{ t.label }}</p>
-                <p class="text-xs text-graphite/65 mt-1">{{ t.desc }}</p>
+                <span class="fn-lib text-graphite">{{ t.label }}</span>
             </a>
         </div>
     </AppLayout>
