@@ -31,7 +31,21 @@ import { computed } from 'vue'
  */
 const props = defineProps({
     ministry: { type: Object, required: true },
+    // Version compacte (2026-11-01) pour le tableau de bord : carte
+    // blanche, logo reduit, texte aligne a gauche. Par defaut false : les
+    // rapports et documents imprimes gardent l'en-tete officiel centre.
+    compact: { type: Boolean, default: false },
 })
+
+const initials = computed(() => (
+    (props.ministry.acronym || props.ministry.name || '?').trim().slice(0, 2).toUpperCase()
+))
+
+const detailsLine = computed(() => [
+    props.ministry.registration_number ? `N° d'autorisation : ${props.ministry.registration_number}` : null,
+    props.ministry.headquarters_address,
+    [props.ministry.phone, props.ministry.email, props.ministry.website].filter(Boolean).join(' · ') || null,
+].filter(Boolean).join(' · '))
 
 const contactLine = computed(() => (
     [props.ministry.phone, props.ministry.email, props.ministry.website].filter(Boolean).join(' · ')
@@ -39,7 +53,19 @@ const contactLine = computed(() => (
 </script>
 
 <template>
-    <div class="flex items-center gap-4 pb-6 mb-8 border-b border-graphite/10 animate-[fadeInUp_0.45s_ease-out_both]">
+    <div v-if="compact" class="flex items-center gap-3.5 rounded-2xl bg-white border border-graphite/10 shadow-card p-4 animate-[fadeInUp_0.45s_ease-out_both]">
+        <img v-if="ministry.logo_url" :src="ministry.logo_url" :alt="ministry.name"
+            class="h-14 w-14 rounded-xl bg-white object-contain p-1 border border-graphite/10 shrink-0" />
+        <span v-else class="h-14 w-14 rounded-xl bg-gradient-to-br from-sanctuary to-sanctuary-dark text-white font-serif text-lg flex items-center justify-center shrink-0">{{ initials }}</span>
+        <div class="min-w-0">
+            <p class="font-serif text-lg sm:text-xl leading-snug text-graphite">
+                {{ ministry.name }}
+                <span v-if="ministry.acronym" class="ml-1 font-sans text-sm text-graphite/55">({{ ministry.acronym }})</span>
+            </p>
+            <p v-if="detailsLine" class="mt-0.5 text-xs text-graphite/60 leading-relaxed">{{ detailsLine }}</p>
+        </div>
+    </div>
+    <div v-else class="flex items-center gap-4 pb-6 mb-8 border-b border-graphite/10 animate-[fadeInUp_0.45s_ease-out_both]">
         <img
             v-if="ministry.logo_url"
             :src="ministry.logo_url"

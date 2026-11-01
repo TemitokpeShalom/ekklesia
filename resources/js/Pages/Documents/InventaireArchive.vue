@@ -87,7 +87,7 @@ function formatAmount(value) {
 }
 
 function formatDate(value) {
-    if (!value) return '—'
+    if (!value) return '-'
     return new Date(value).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
@@ -122,7 +122,7 @@ function print() {
 
                 <div class="text-center mb-8">
                     <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold">Fiche d'inventaire</p>
-                    <h2 class="font-serif text-4xl font-bold text-ink mt-1">Exercice {{ year }} — au 31 décembre {{ year }}</h2>
+                    <h2 class="font-serif text-4xl font-bold text-ink mt-1">Exercice {{ year }}, au 31 décembre {{ year }}</h2>
 
                     <p class="text-sm text-coffee-light mt-3">{{ orgUnit.name }} <span class="text-xs">({{ orgUnit.level_label }})</span></p>
                     <p v-if="ancestry.length" class="text-xs text-coffee-light/80 mt-1">
@@ -168,7 +168,7 @@ function print() {
                                 <td class="py-1.5 pr-2 text-coffee-light whitespace-nowrap">{{ formatDate(item.acquisition_date) }}</td>
                                 <td class="py-1.5 pr-2 text-coffee-light">{{ conditionLabel(item.condition) }}</td>
                                 <td class="py-1.5 pr-2 font-mono text-[11px] text-coffee-light">{{ item.code }}</td>
-                                <td class="py-1.5 pr-2 text-coffee-light">{{ item.observation || '—' }}</td>
+                                <td class="py-1.5 pr-2 text-coffee-light">{{ item.observation || '-' }}</td>
                                 <td class="py-1.5 text-right font-medium text-ink whitespace-nowrap">{{ formatAmount(item.acquisition_value) }}</td>
                             </tr>
                         </tbody>

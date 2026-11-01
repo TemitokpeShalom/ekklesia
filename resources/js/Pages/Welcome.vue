@@ -73,7 +73,7 @@ const atouts = [
             <div class="mx-auto w-full max-w-md glass-panel p-8 rounded-3xl shadow-xl shadow-graphite/10 border-t-2 border-t-gold/70 animate-[fadeInUp_0.6s_ease-out_both] text-center">
                 <img src="/images/oikonema-logo.png" alt="OIKONEMA" class="w-40 sm:w-44 mx-auto mb-3 rounded-2xl bg-white p-2 shadow-glow-gold" />
                 <p class="text-xs uppercase tracking-widest text-sanctuary/80 font-semibold mb-5">Bienvenue</p>
-                <p class="text-sm text-graphite/70 mb-8 -mt-2">Administrer tout ce qui vous est confié — membres, finances, vie pastorale, patrimoine — en un seul endroit.</p>
+                <p class="text-sm text-graphite/70 mb-8 -mt-2">Administrer tout ce qui vous est confié (membres, finances, vie pastorale, patrimoine) en un seul endroit.</p>
 
                 <!-- Corrige le 2026-09-12 : bouton de commande principal passe de l'or au bleu marine du logo (voir tailwind.config.js, couleur "azure") -- demande explicite du ministere. -->
                 <div class="space-y-3">

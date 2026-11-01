@@ -84,8 +84,8 @@ const attendanceSeries = computed(() => [
                 <section class="border-t border-coffee/10 pt-6 mb-6">
                     <h3 class="mb-3 text-2xl font-bold text-azure uppercase tracking-widest">Baptêmes et nouveaux convertis</h3>
                     <div class="grid grid-cols-2 gap-4 text-sm">
-                        <p><span class="text-coffee-light">Baptêmes : </span><span class="font-medium text-ink">{{ report.baptisms_count ?? '—' }}</span></p>
-                        <p><span class="text-coffee-light">Nouveaux convertis : </span><span class="font-medium text-ink">{{ report.new_converts_count ?? '—' }}</span></p>
+                        <p><span class="text-coffee-light">Baptêmes : </span><span class="font-medium text-ink">{{ report.baptisms_count ?? '-' }}</span></p>
+                        <p><span class="text-coffee-light">Nouveaux convertis : </span><span class="font-medium text-ink">{{ report.new_converts_count ?? '-' }}</span></p>
                     </div>
                 </section>
 
@@ -110,8 +110,8 @@ const attendanceSeries = computed(() => [
                             <tr v-for="culte in cultes" :key="culte.id" class="border-b border-coffee/10 last:border-0">
                                 <td class="py-2 text-coffee-light whitespace-nowrap">{{ dateLabel(culte.service_date) }}</td>
                                 <td class="py-2 text-ink">{{ culte.title }}</td>
-                                <td class="py-2 text-right text-ink">{{ culte.attendance_adults ?? '—' }}</td>
-                                <td class="py-2 text-right text-ink">{{ culte.attendance_children ?? '—' }}</td>
+                                <td class="py-2 text-right text-ink">{{ culte.attendance_adults ?? '-' }}</td>
+                                <td class="py-2 text-right text-ink">{{ culte.attendance_children ?? '-' }}</td>
                             </tr>
                         </tbody>
                     </table>

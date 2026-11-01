@@ -170,7 +170,7 @@ body {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
 }
 
 /* Telephone (largeur 640 px ou moins) : 4 colonnes, aucun defilement
@@ -182,5 +182,48 @@ body {
     }
     .fn-tile .fn-lib {
         font-size: 11.5px;
+    }
+}
+
+/* Presentation allegee de l'ecran de travail (2026-11-01) :
+   retour du ministere, titres et textes trop gros, ecran trop charge.
+   Les regles ci-dessous s'appliquent a tout l'espace de travail (.app-shell)
+   sans toucher aux ecrans publics (connexion, accueil) ni a l'impression.
+   Fond gris tres clair, cartes blanches : les cartes ressortent sans lourdeur. */
+.app-shell {
+    background-color: #f6f7f9;
+}
+
+/* Titres de page et de section : gabarit unique, plus petit. */
+.app-shell :is(h1, h2, h3).text-6xl,
+.app-shell :is(h1, h2, h3).text-5xl {
+    font-size: 1.75rem;
+    line-height: 2.1rem;
+}
+.app-shell :is(h1, h2, h3).text-4xl {
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+}
+.app-shell :is(h1, h2, h3).text-3xl {
+    font-size: 1.2rem;
+    line-height: 1.6rem;
+}
+@media (max-width: 640px) {
+    .app-shell :is(h1, h2, h3).text-6xl,
+    .app-shell :is(h1, h2, h3).text-5xl {
+        font-size: 1.5rem;
+        line-height: 1.85rem;
+    }
+}
+
+/* Petits traits decoratifs devant les etiquettes de page : retires. */
+.app-shell span.inline-block.w-6.h-px {
+    display: none;
+}
+
+/* A l'impression, rapports et documents gardent un fond blanc. */
+@media print {
+    .app-shell {
+        background-color: #ffffff;
     }
 }

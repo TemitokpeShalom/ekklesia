@@ -122,7 +122,7 @@ function changeMonth(event) {
                     Validé et archivé le {{ validatedLabel(validation.validated_at) }}<span v-if="validation.validator_name"> par {{ validation.validator_name }}</span>.
                     <a :href="`/org-units/${orgUnit.id}/documents/rapports/finance/${month}`" class="underline font-medium">Voir dans les archives</a>
                 </div>
-                <div v-else class="text-sm text-graphite/60">Rapport non validé — pas encore archivé dans Documents › Rapports.</div>
+                <div v-else class="text-sm text-graphite/60">Rapport non validé, pas encore archivé dans Documents › Rapports.</div>
 
                 <input
                     type="month"

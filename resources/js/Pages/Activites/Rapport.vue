@@ -127,7 +127,7 @@ function submit() {
                     Validé et archivé le {{ validatedLabel(report.validated_at) }}<span v-if="report.validator_name"> par {{ report.validator_name }}</span>.
                     <a :href="`/org-units/${orgUnit.id}/documents/rapports/activite/${month}`" class="underline font-medium">Voir dans les archives</a>
                 </div>
-                <div v-else class="text-sm text-graphite/60">Rapport non validé — pas encore archivé dans Documents › Rapports.</div>
+                <div v-else class="text-sm text-graphite/60">Rapport non validé, pas encore archivé dans Documents › Rapports.</div>
 
                 <input
                     type="month"
@@ -194,8 +194,8 @@ function submit() {
                         <tr v-for="culte in cultes" :key="culte.id" class="border-b border-graphite/10 last:border-0">
                             <td class="py-2 text-graphite/70 whitespace-nowrap">{{ dateLabel(culte.service_date) }}</td>
                             <td class="py-2 text-graphite/87">{{ culte.title }}</td>
-                            <td class="py-2 text-right text-graphite">{{ culte.attendance_adults ?? '—' }}</td>
-                            <td class="py-2 text-right text-graphite">{{ culte.attendance_children ?? '—' }}</td>
+                            <td class="py-2 text-right text-graphite">{{ culte.attendance_adults ?? '-' }}</td>
+                            <td class="py-2 text-right text-graphite">{{ culte.attendance_children ?? '-' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -213,7 +213,7 @@ function submit() {
                                     <span class="font-semibold">{{ baptismsAuto }}</span>
                                     <span class="text-xs text-graphite/50">calculé automatiquement</span>
                                 </div>
-                                <p class="mt-1 text-xs text-graphite/55">Nombre de baptêmes enregistrés ce mois dans le module Sacrements — jamais ressaisi ici, juste le chiffre, pas les noms.</p>
+                                <p class="mt-1 text-xs text-graphite/55">Nombre de baptêmes enregistrés ce mois dans le module Sacrements, jamais ressaisi ici : juste le chiffre, pas les noms.</p>
                             </div>
                             <div>
                                 <label class="mb-1 block text-sm font-medium text-graphite/87">Nouveaux convertis</label>

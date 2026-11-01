@@ -125,7 +125,7 @@ function unlock() {
                     Validée et archivée le {{ validatedLabel(validation.validated_at) }}<span v-if="validation.validator_name"> par {{ validation.validator_name }}</span>.
                     <a :href="`/org-units/${orgUnit.id}/documents/rapports/inventaire/${year}`" class="underline font-medium">Voir dans les archives</a>
                 </div>
-                <div v-else class="text-sm text-graphite/60">Fiche {{ year }} non validée — pas encore archivée dans Documents › Rapports.</div>
+                <div v-else class="text-sm text-graphite/60">Fiche {{ year }} non validée, pas encore archivée dans Documents › Rapports.</div>
 
                 <input
                     type="date"
@@ -184,7 +184,7 @@ function unlock() {
                                 <td class="py-2 pr-3 text-graphite/65">{{ provenanceLabel(item.provenance) }}</td>
                                 <td class="py-2 pr-3 text-graphite/65">{{ formatDate(item.acquisition_date) }}</td>
                                 <td class="py-2 pr-3 text-graphite/65">{{ conditionLabel(item.condition) }}</td>
-                                <td class="py-2 pr-3 text-graphite/58">{{ item.observation || '—' }}</td>
+                                <td class="py-2 pr-3 text-graphite/58">{{ item.observation || '-' }}</td>
                                 <td class="py-2 text-right font-medium text-graphite">{{ formatAmount(item.acquisition_value) }}</td>
                             </tr>
                         </tbody>

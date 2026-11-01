@@ -54,7 +54,7 @@ const arcs = computed(() => {
                 />
             </g>
             <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="fill-graphite" font-size="13" font-weight="600">
-                {{ total > 0 ? '100%' : '—' }}
+                {{ total > 0 ? '100%' : '-' }}
             </text>
         </svg>
 

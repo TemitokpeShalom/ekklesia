@@ -36,13 +36,12 @@ async function onClick() {
         <button
             type="button"
             @click="onClick"
-            class="flex items-center gap-1.5 text-sm text-graphite bg-gold/15 hover:bg-gold/25 border border-gold/40 rounded-full px-4 py-2 transition-colors"
+            class="flex items-center justify-center gap-1.5 h-9 w-9 sm:w-auto text-sm text-azure bg-white hover:bg-azure/5 border border-azure/30 rounded-full sm:px-4 transition-colors" title="Installer l'application" aria-label="Installer l'application"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v13m0 0-4-4m4 4 4-4M5 19h14" />
             </svg>
-            <span class="hidden sm:inline">Installer l'application</span>
-            <span class="sm:hidden">Installer</span>
+            <span class="hidden sm:inline">Installer</span>
         </button>
 
         <transition
