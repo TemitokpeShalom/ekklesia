@@ -331,25 +331,27 @@ const modules = [
                     fois avec le ministere) : changement de gabarit, pas de
                     refonte.
                 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    <template v-for="(m, i) in modules" :key="m.key">
+                <!--
+                    2026-11-01 : grille compacte d'icones (petites icones
+                    carrees + libelle dessous, classes .fn-* de app.css),
+                    comme sur la plateforme CFL. La description n'est plus
+                    affichee en grand : elle reste lisible au survol/appui
+                    (attribut title).
+                -->
+                <div class="fn-grid">
+                    <template v-for="m in modules" :key="m.key">
                         <a v-if="!m.requiresLibrary || canAccessLibrary"
                             :href="`/org-units/${orgUnit.id}/${m.path}`"
-                            :class="m.glow"
-                            class="group relative glass-panel rounded-3xl p-5 hover:border-graphite/20 hover:-translate-y-1 transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_both]"
-                            :style="{ animationDelay: `${i * 60}ms` }">
-                            <span :class="m.badge" class="inline-flex items-center justify-center w-10 h-10 rounded-2xl mb-3 bg-gradient-to-br text-white shadow-md group-hover:scale-110 transition-transform duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            :title="m.desc"
+                            class="fn-tile group">
+                            <span :class="m.badge" class="fn-ico bg-gradient-to-br">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                     <circle v-if="m.circle" cx="12" cy="12" r="8.5" stroke-linecap="round" stroke-linejoin="round" />
                                     <path stroke-linecap="round" stroke-linejoin="round" :d="m.icon" />
                                     <path v-if="m.icon2" stroke-linecap="round" stroke-linejoin="round" :d="m.icon2" />
                                 </svg>
                             </span>
-                            <p class="font-semibold text-graphite text-base">{{ m.label }}</p>
-                            <p class="text-[13px] text-graphite/70 mt-1">{{ m.desc }}</p>
-                            <svg class="absolute top-5 right-5 w-4 h-4 text-graphite/62 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
+                            <span class="fn-lib text-graphite">{{ m.label }}</span>
                         </a>
                     </template>
                 </div>
