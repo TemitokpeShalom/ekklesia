@@ -65,6 +65,15 @@ function moduleSlug(name) {
                 depuis le lien "Aide" de chaque écran concerné.
             </p>
 
+            <a href="/aide/manuel" class="mb-8 print:hidden flex items-center gap-4 rounded-3xl bg-gradient-to-r from-azure to-azure-dark text-white p-5 shadow-sm hover:shadow-glow-azure transition-all">
+                <span class="text-3xl" aria-hidden="true">📖</span>
+                <span class="flex-1">
+                    <span class="block font-serif text-xl font-bold">Manuel illustré, écran par écran</span>
+                    <span class="block text-sm text-white/80">Images, repères numérotés et explications pas à pas. Téléchargeable en PDF.</span>
+                </span>
+                <span class="text-sm font-semibold">Ouvrir →</span>
+            </a>
+
             <form @submit.prevent="search" class="mb-8 print:hidden flex gap-2">
                 <input
                     v-model="form.q"

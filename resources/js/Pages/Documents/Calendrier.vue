@@ -69,14 +69,14 @@ async function copyMessage(member) {
 </script>
 
 <template>
-    <div class="min-h-screen bg-night print:bg-white">
+    <div class="min-h-screen bg-[#f6f7f9] print:bg-white">
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-graphite">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
-                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour aux documents</Link>
+                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-graphite/65 hover:text-graphite transition">Retour aux documents</Link>
                 <button @click="print"
                     class="rounded-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white px-5 py-2 text-sm font-semibold shadow-md shadow-azure/20">
                     Imprimer
@@ -85,7 +85,7 @@ async function copyMessage(member) {
         </header>
 
         <main class="max-w-4xl mx-auto px-6 py-10 print:max-w-none print:px-0 print:py-0 space-y-6 print:space-y-0">
-            <p class="text-sm text-white/50 print:hidden">Calendrier annuel · {{ orgUnit.name }} · {{ year }}</p>
+            <p class="text-sm text-graphite/55 print:hidden">Calendrier annuel · {{ orgUnit.name }} · {{ year }}</p>
 
             <section v-for="(m, i) in months" :key="m.number"
                 class="bg-white border border-coffee/10 rounded-3xl print:rounded-none print:border-0 p-8 print:min-h-screen print:flex print:flex-col"

@@ -52,6 +52,15 @@ class HelpController extends Controller
         ]);
     }
 
+    /**
+     * Manuel illustre : le contenu vit dans resources/js/manuel.js et les
+     * images dans public/manuel (aucune donnee de ministere, aucune base).
+     */
+    public function manuel(): Response
+    {
+        return Inertia::render('Aide/Manuel');
+    }
+
     public function show(string $slug): Response
     {
         $article = HelpArticle::where('slug', $slug)->firstOrFail();

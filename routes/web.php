@@ -130,6 +130,9 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // ("Aide" et "Assistant") pour le meme contenu - fusionnes le
     // 2026-09-09 (voir HelpController).
     Route::get('/aide', [HelpController::class, 'index'])->name('help.index');
+    // Manuel illustre (images + PDF) : declare AVANT /aide/{slug}, sinon
+    // "manuel" serait lu comme un slug d'article.
+    Route::get('/aide/manuel', [HelpController::class, 'manuel'])->name('help.manuel');
     Route::get('/aide/{slug}', [HelpController::class, 'show'])->name('help.show');
 
     // "Mon profil" (v4 "Constellation", 2026-09-10, voir ProfileController) :

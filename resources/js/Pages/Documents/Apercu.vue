@@ -21,7 +21,7 @@ function print() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-night print:bg-white">
+    <div class="min-h-screen bg-[#f6f7f9] print:bg-white">
         <!--
             v3 "Vitrail" (2026-09-09) : seule cette barre de navigation (masquee
             a l'impression) reprend l'habillage sombre commun. Le contenu
@@ -31,10 +31,10 @@ function print() {
         <header class="border-b border-white/10 glass-panel px-6 py-5 flex items-center justify-between print:hidden">
             <div>
                 <p class="text-xs uppercase tracking-widest text-gold-soft/80 font-semibold">{{ orgUnit.level_label }}</p>
-                <h1 class="font-serif text-[2.5rem] font-bold text-white">{{ orgUnit.name }}</h1>
+                <h1 class="font-serif text-[2.5rem] font-bold text-graphite">{{ orgUnit.name }}</h1>
             </div>
             <nav class="flex items-center gap-4 text-sm">
-                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-white/60 hover:text-white transition">Retour aux documents</Link>
+                <Link :href="`/org-units/${orgUnit.id}/documents`" class="text-graphite/65 hover:text-graphite transition">Retour aux documents</Link>
                 <button @click="print"
                     class="rounded-full bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white px-5 py-2 text-sm font-semibold shadow-md shadow-azure/20">
                     Imprimer
@@ -43,7 +43,7 @@ function print() {
         </header>
 
         <main class="max-w-3xl mx-auto px-6 py-10 print:max-w-none print:px-0 print:py-0">
-            <p class="text-sm text-white/50 mb-6 print:hidden">Affiche · {{ orgUnit.name }}</p>
+            <p class="text-sm text-graphite/55 mb-6 print:hidden">Affiche · {{ orgUnit.name }}</p>
 
             <!-- Affiche : une page unique, identite de l'entite. -->
             <section class="relative overflow-hidden rounded-3xl print:rounded-none bg-gradient-to-br from-sanctuary-dark via-sanctuary to-coffee-dark text-white px-10 py-14 print:min-h-screen flex flex-col items-center text-center">
