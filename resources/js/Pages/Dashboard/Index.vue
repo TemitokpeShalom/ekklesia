@@ -241,7 +241,7 @@ const moduleGroups = computed(() =>
                         @click="governanceMenuOpen = false" class="fixed inset-0 z-10 cursor-default"></button>
 
                     <div v-if="governanceMenuOpen"
-                        class="absolute right-0 mt-2 w-80 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
+                        class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-[min(20rem,calc(100vw-2rem))] z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
                         <template v-if="canManageAccess">
                             <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Gestion des accès</p>
                             <a :href="`/org-units/${orgUnit.id}/acces`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
