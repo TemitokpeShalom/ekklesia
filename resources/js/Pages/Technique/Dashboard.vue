@@ -2,6 +2,7 @@
 import { Link, useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import TechniqueNav from '@/Components/TechniqueNav.vue'
 
 /**
  * Tableau de bord technique Oikonema (2026-09-13, complete le meme jour) :
@@ -83,18 +84,14 @@ function save(m) {
                 Espace technique
             </p>
             <div class="flex items-center justify-between gap-4 flex-wrap">
-                <h1 class="font-serif text-4xl font-bold text-graphite">Tous les ministères</h1>
-                <nav class="flex items-center gap-5 text-sm font-medium">
-                    <Link href="/technique/signalements" class="text-azure hover:underline">
-                        Signalements techniques
-                        <span v-if="summary.nouveaux_signalements" class="inline-flex items-center justify-center ml-1 min-w-[1.25rem] h-5 px-1.5 rounded-full bg-sanctuary text-white text-xs">{{ summary.nouveaux_signalements }}</span>
-                    </Link>
-                    <Link href="/technique/equipe" class="text-azure hover:underline">Équipe technique</Link>
-                </nav>
+                <h1 class="font-serif text-3xl font-bold text-graphite">Espace technique</h1>
             </div>
         </template>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
+        <TechniqueNav :summary="summary" class="mb-8" />
+
+        <h2 class="font-serif text-xl font-semibold text-graphite mb-3">Tous les ministères</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <div class="glass-panel-light rounded-2xl px-5 py-4">
                 <p class="text-2xl font-serif text-graphite">{{ summary.total }}</p>
                 <p class="text-sm text-graphite/60">Ministères au total</p>
@@ -129,7 +126,7 @@ function save(m) {
                     <template v-for="m in ministries" :key="m.id">
                         <tr>
                             <td class="px-4 py-3">
-                                <p class="text-graphite font-medium">{{ m.name }}</p>
+                                <Link :href="`/technique/ministeres/${m.id}`" class="text-graphite font-medium hover:text-azure hover:underline">{{ m.name }}</Link>
                                 <p v-if="m.short_code" class="text-graphite/50 text-xs">{{ m.short_code }}</p>
                             </td>
                             <td class="px-4 py-3 text-graphite/80">{{ m.plan_name || 'Découverte' }}</td>

@@ -39,6 +39,10 @@ use App\Http\Controllers\TrombinoscopeController;
 use App\Http\Controllers\MinistryRegistrationController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\LegalController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\TechniqueMessagerieController;
+use App\Http\Controllers\TechniqueMinistereController;
+use App\Http\Controllers\TechniqueReglagesController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique (2026-09-09, voir WelcomeController) : c'est
@@ -141,6 +145,13 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
     // Inertia ici, uniquement des appels fetch en arriere-plan. Voir
     // AssistantController pour le detail de l'isolation par utilisateur
     // (en plus de la RLS par ministere, deja active par tenant.context).
+    // Messagerie directe avec l'equipe technique (2026-11-02).
+    Route::prefix('assistance')->name('support.')->group(function () {
+        Route::get('/equipe', [SupportController::class, 'show'])->name('show');
+        Route::post('/equipe', [SupportController::class, 'store'])->name('store');
+        Route::get('/equipe/non-lus', [SupportController::class, 'unread'])->name('unread');
+    });
+
     Route::prefix('assistant')->name('assistant.')->group(function () {
         Route::get('/conversation', [AssistantController::class, 'show'])->name('show');
         Route::post('/conversation/nouvelle', [AssistantController::class, 'startNew'])->name('new');
@@ -294,4 +305,13 @@ Route::middleware(['auth', 'technical.staff'])->prefix('technique')->name('techn
     Route::put('/ministeres/{ministry}/abonnement', [TechniqueController::class, 'updateSubscription'])->name('ministeres.abonnement.update');
     Route::get('/signalements', [TechniqueController::class, 'signalements'])->name('signalements');
     Route::put('/signalements/{signalement}', [TechniqueController::class, 'updateSignalementStatus'])->name('signalements.update');
+    Route::get('/messagerie', [TechniqueMessagerieController::class, 'index'])->name('messagerie');
+    Route::post('/messagerie/{thread}', [TechniqueMessagerieController::class, 'reply'])->name('messagerie.reply');
+    Route::put('/messagerie/{thread}/statut', [TechniqueMessagerieController::class, 'status'])->name('messagerie.status');
+    Route::delete('/messagerie/{thread}', [TechniqueMessagerieController::class, 'destroy'])->name('messagerie.destroy');
+    Route::get('/reglages', [TechniqueReglagesController::class, 'show'])->name('reglages');
+    Route::post('/reglages', [TechniqueReglagesController::class, 'update'])->name('reglages.update');
+    Route::post('/reglages/tester-assistant', [TechniqueReglagesController::class, 'testAssistant'])->name('reglages.test');
+    Route::get('/ministeres/{ministry}', [TechniqueMinistereController::class, 'show'])->name('ministeres.show');
+    Route::post('/utilisateurs/{user}/mot-de-passe', [TechniqueMinistereController::class, 'resetPassword'])->name('utilisateurs.password');
 });

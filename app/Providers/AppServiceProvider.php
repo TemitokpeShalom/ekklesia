@@ -18,5 +18,8 @@ class AppServiceProvider extends ServiceProvider
     {
         // Droits en cascade par sous-arbre (point 05) - voir OrgUnitPolicy.
         Gate::policy(OrgUnit::class, OrgUnitPolicy::class);
+
+        // Reglages saisis depuis l'espace technique : priment sur le .env.
+        \App\Models\PlatformSetting::applyToConfig();
     }
 }

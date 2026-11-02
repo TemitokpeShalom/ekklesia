@@ -268,3 +268,37 @@ body {
 .app-shell .glass-panel.rounded-3xl {
     border-radius: 1.25rem;
 }
+
+/* Ecran large (2026-11-02) : les familles de modules deviennent des cartes
+   cote a cote, centrees, au lieu d'une colonne collee a gauche. Les icones
+   gardent exactement la meme taille. */
+.fn-group-titre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: rgba(32, 36, 44, .6);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(32, 36, 44, .08);
+}
+.fn-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+.fn-groups { display: grid; gap: 24px; }
+@media (min-width: 820px) {
+    .fn-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .fn-group {
+        background: #f8f9fb;
+        border: 1px solid rgba(32, 36, 44, .07);
+        border-radius: 18px;
+        padding: 16px 16px 20px;
+    }
+    .fn-group .fn-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        justify-items: center;
+        gap: 18px 6px;
+    }
+    .fn-group .fn-lib { max-width: 100%; }
+}

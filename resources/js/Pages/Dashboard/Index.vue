@@ -177,10 +177,10 @@ const modules = [
 // memes liens, memes droits (la Bibliotheque reste reservee a ceux qui y ont
 // acces) : seul le regroupement visuel change. Un groupe vide n'est pas affiche.
 const MODULE_GROUPS = [
-    { key: 'personnes', label: 'Personnes' },
-    { key: 'eglise', label: "Vie de l'église" },
-    { key: 'gestion', label: 'Gestion' },
-    { key: 'documents', label: 'Documents et ressources' },
+    { key: 'personnes', label: 'Personnes', color: '#2f7d5b' },
+    { key: 'eglise', label: "Vie de l'église", color: '#8a1c3c' },
+    { key: 'gestion', label: 'Gestion', color: '#c8921a' },
+    { key: 'documents', label: 'Documents et ressources', color: '#4a5fa8' },
 ]
 const moduleGroups = computed(() =>
     MODULE_GROUPS
@@ -202,72 +202,6 @@ const moduleGroups = computed(() =>
                 DashboardInstallButton.vue.
             -->
             <DashboardInstallButton />
-
-            <div v-if="canManageAccess || canTransform" class="relative">
-                <button type="button" @click="governanceMenuOpen = !governanceMenuOpen"
-                    class="flex items-center justify-center gap-1.5 h-9 w-9 sm:w-auto text-sm text-graphite/75 hover:text-graphite bg-white hover:bg-graphite/5 border border-graphite/15 rounded-full sm:px-4 transition-colors" title="Gouvernance" aria-label="Gouvernance">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.96 11.96 0 013.598 6 11.96 11.96 0 001.5 12.253c0 4.798 3.036 9.036 7.65 10.632a11.96 11.96 0 004.7 0C18.464 21.29 21.5 17.05 21.5 12.253 21.5 9.68 20.807 7.284 19.5 5.25a11.96 11.96 0 01-8.5-.036z" /></svg>
-                    <span class="hidden sm:inline">Gouvernance</span>
-                    <svg class="hidden sm:block w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                </button>
-
-                <button v-if="governanceMenuOpen" type="button" tabindex="-1" aria-hidden="true"
-                    @click="governanceMenuOpen = false" class="fixed inset-0 z-10 cursor-default"></button>
-
-                <div v-if="governanceMenuOpen"
-                    class="absolute right-0 mt-2 w-80 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
-                    <template v-if="canManageAccess">
-                        <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Gestion des accès</p>
-                        <a :href="`/org-units/${orgUnit.id}/acces`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                            <p class="text-sm font-medium text-graphite">Gérer les accès</p>
-                            <p class="text-xs text-graphite/60">Lister, révoquer, réaffecter</p>
-                        </a>
-                        <a :href="`/org-units/${orgUnit.id}/inviter`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                            <p class="text-sm font-medium text-graphite">Inviter un titulaire</p>
-                            <p class="text-xs text-graphite/60">Un nouveau responsable</p>
-                        </a>
-                        <!--
-                            Corrige le 2026-09-12 (retour du ministere : "il
-                            faut le laisser dans le menu deroulant de gerer la
-                            gouvernance... pas ramener ca comme un module
-                            affiche en meme temps") : remplace l'ancien "Code
-                            de rattachement" ICI MEME, au meme endroit dans ce
-                            menu - pas de bouton permanent affiche ailleurs sur
-                            la page. Un clic ferme le menu et ouvre le
-                            formulaire (toujours sur ce meme tableau de bord,
-                            juste plus bas, section "Entites rattachees") -
-                            plus aucun code a generer ni a transmettre.
-                        -->
-                        <a v-if="canCreateChild" href="#" @click.prevent="showCreateForm = true; governanceMenuOpen = false"
-                            class="block px-4 py-2 hover:bg-graphite/5">
-                            <p class="text-sm font-medium text-graphite">Créer une entité rattachée</p>
-                            <p class="text-xs text-graphite/60">Directement à ce nœud, sans code</p>
-                        </a>
-                        <template v-if="orgUnit.level_rank === 0">
-                            <a :href="`/org-units/${orgUnit.id}/informations-ministere`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                                <p class="text-sm font-medium text-graphite">Informations du ministère</p>
-                                <p class="text-xs text-graphite/60">Sigle, siège, coordonnées, n° d'autorisation, logo</p>
-                            </a>
-                            <a :href="`/org-units/${orgUnit.id}/titres-honorifiques`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                                <p class="text-sm font-medium text-graphite">Titres honorifiques</p>
-                                <p class="text-xs text-graphite/60">Liste utilisée sur les fiches membres</p>
-                            </a>
-                            <a :href="`/org-units/${orgUnit.id}/abonnement`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                                <p class="text-sm font-medium text-graphite">Abonnement</p>
-                                <p class="text-xs text-graphite/60">Offre, essai, facturation</p>
-                            </a>
-                        </template>
-                    </template>
-                    <template v-if="canTransform">
-                        <div v-if="canManageAccess" class="my-1.5 border-t border-graphite/10"></div>
-                        <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Structure organisationnelle</p>
-                        <a :href="`/org-units/${orgUnit.id}/transformation`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
-                            <p class="text-sm font-medium text-graphite">Transformer cette entité</p>
-                            <p class="text-xs text-graphite/60">Renommer, promouvoir, rattacher</p>
-                        </a>
-                    </template>
-                </div>
-            </div>
         </template>
 
         <template #title>
@@ -290,10 +224,77 @@ const moduleGroups = computed(() =>
         <div class="space-y-6">
             <MinistryLetterhead v-if="orgUnit.level_rank !== 0" :ministry="ministry" compact />
 
-            <!-- Selecteur de role : voir AffectationSwitcher.vue. -->
-            <AffectationSwitcher v-if="activeAffectations.length"
-                :affectations="activeAffectations" :current-org-unit-id="orgUnit.id"
-                class="animate-[fadeInUp_0.5s_ease-out_both]" />
+            <!-- Barre d'outils (2026-11-02) : role exerce a gauche, gestion et acces a droite, sur la meme ligne. -->
+            <div class="flex flex-wrap items-center gap-3">
+                <AffectationSwitcher v-if="activeAffectations.length"
+                    :affectations="activeAffectations" :current-org-unit-id="orgUnit.id"
+                    class="animate-[fadeInUp_0.5s_ease-out_both]" />
+                <div v-if="canManageAccess || canTransform" class="relative sm:ml-auto">
+                    <button type="button" @click="governanceMenuOpen = !governanceMenuOpen"
+                        class="flex items-center justify-center gap-2 h-11 px-4 text-sm font-semibold text-azure bg-azure/10 hover:bg-azure/15 border border-azure/25 rounded-2xl transition-colors" title="Gouvernance" aria-label="Gouvernance">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.96 11.96 0 013.598 6 11.96 11.96 0 001.5 12.253c0 4.798 3.036 9.036 7.65 10.632a11.96 11.96 0 004.7 0C18.464 21.29 21.5 17.05 21.5 12.253 21.5 9.68 20.807 7.284 19.5 5.25a11.96 11.96 0 01-8.5-.036z" /></svg>
+                        <span>Gestion et accès</span>
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    <button v-if="governanceMenuOpen" type="button" tabindex="-1" aria-hidden="true"
+                        @click="governanceMenuOpen = false" class="fixed inset-0 z-10 cursor-default"></button>
+
+                    <div v-if="governanceMenuOpen"
+                        class="absolute right-0 mt-2 w-80 z-20 rounded-2xl border border-graphite/10 bg-white shadow-card-hover py-2 animate-[fadeInUp_0.15s_ease-out_both]">
+                        <template v-if="canManageAccess">
+                            <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Gestion des accès</p>
+                            <a :href="`/org-units/${orgUnit.id}/acces`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Gérer les accès</p>
+                                <p class="text-xs text-graphite/60">Lister, révoquer, réaffecter</p>
+                            </a>
+                            <a :href="`/org-units/${orgUnit.id}/inviter`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Inviter un titulaire</p>
+                                <p class="text-xs text-graphite/60">Un nouveau responsable</p>
+                            </a>
+                            <!--
+                                Corrige le 2026-09-12 (retour du ministere : "il
+                                faut le laisser dans le menu deroulant de gerer la
+                                gouvernance... pas ramener ca comme un module
+                                affiche en meme temps") : remplace l'ancien "Code
+                                de rattachement" ICI MEME, au meme endroit dans ce
+                                menu - pas de bouton permanent affiche ailleurs sur
+                                la page. Un clic ferme le menu et ouvre le
+                                formulaire (toujours sur ce meme tableau de bord,
+                                juste plus bas, section "Entites rattachees") -
+                                plus aucun code a generer ni a transmettre.
+                            -->
+                            <a v-if="canCreateChild" href="#" @click.prevent="showCreateForm = true; governanceMenuOpen = false"
+                                class="block px-4 py-2 hover:bg-graphite/5">
+                                <p class="text-sm font-medium text-graphite">Créer une entité rattachée</p>
+                                <p class="text-xs text-graphite/60">Directement à ce nœud, sans code</p>
+                            </a>
+                            <template v-if="orgUnit.level_rank === 0">
+                                <a :href="`/org-units/${orgUnit.id}/informations-ministere`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                    <p class="text-sm font-medium text-graphite">Informations du ministère</p>
+                                    <p class="text-xs text-graphite/60">Sigle, siège, coordonnées, n° d'autorisation, logo</p>
+                                </a>
+                                <a :href="`/org-units/${orgUnit.id}/titres-honorifiques`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                    <p class="text-sm font-medium text-graphite">Titres honorifiques</p>
+                                    <p class="text-xs text-graphite/60">Liste utilisée sur les fiches membres</p>
+                                </a>
+                                <a :href="`/org-units/${orgUnit.id}/abonnement`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                    <p class="text-sm font-medium text-graphite">Abonnement</p>
+                                    <p class="text-xs text-graphite/60">Offre, essai, facturation</p>
+                                </a>
+                            </template>
+                        </template>
+                        <template v-if="canTransform">
+                            <div v-if="canManageAccess" class="my-1.5 border-t border-graphite/10"></div>
+                            <p class="px-4 pt-1.5 pb-1.5 text-[11px] uppercase tracking-widest text-graphite/60 font-semibold">Structure organisationnelle</p>
+                            <a :href="`/org-units/${orgUnit.id}/transformation`" class="block px-4 py-2 hover:bg-graphite/5" @click="governanceMenuOpen = false">
+                                <p class="text-sm font-medium text-graphite">Transformer cette entité</p>
+                                <p class="text-xs text-graphite/60">Renommer, promouvoir, rattacher</p>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+            </div>
 
             <section class="rounded-2xl bg-white border border-graphite/10 shadow-card p-4 sm:p-6">
                 <div class="mb-5">
@@ -306,9 +307,9 @@ const moduleGroups = computed(() =>
                     app.css), regroupee par famille. La description reste
                     lisible au survol/appui (attribut title).
                 -->
-                <div class="space-y-6">
-                    <div v-for="g in moduleGroups" :key="g.key">
-                        <p class="text-[11px] uppercase tracking-wide text-graphite/55 font-semibold mb-3 pb-2 border-b border-graphite/10">{{ g.label }}</p>
+                <div class="fn-groups">
+                    <div v-for="g in moduleGroups" :key="g.key" class="fn-group">
+                        <p class="fn-group-titre"><span class="fn-dot" :style="{ background: g.color }"></span>{{ g.label }}</p>
                         <div class="fn-grid">
                             <a v-for="m in g.items" :key="m.key"
                                 :href="`/org-units/${orgUnit.id}/${m.path}`"

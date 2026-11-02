@@ -75,6 +75,7 @@ class TechniqueController extends Controller
                 'actifs' => $ministries->where('subscription_status', 'active')->count(),
                 'expires' => $ministries->where('subscription_status', 'expiree')->count(),
                 'nouveaux_signalements' => AssistantPlatformFeedback::where('status', 'nouveau')->count(),
+                'messages_non_lus' => \App\Models\SupportThread::where('unread_by_staff', true)->count(),
             ],
         ]);
     }
