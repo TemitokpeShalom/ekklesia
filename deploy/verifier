@@ -1,0 +1,28 @@
+#!/bin/bash
+# Controle de sante : commande courte  verifier
+APP=/var/www/ekklesia
+cd "$APP" || exit 1
+ok() { echo "  [OK] $1"; }
+ko() { echo "  [A CORRIGER] $1"; }
+getenv() { grep -E "^$1=" "$APP/.env" | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'" ; }
+echo "Verification de Oikonema"
+[ "$(getenv APP_ENV)" = "production" ] && ok "APP_ENV=production" || ko "APP_ENV doit valoir production"
+[ "$(getenv APP_DEBUG)" = "false" ] && ok "APP_DEBUG=false" || ko "APP_DEBUG doit valoir false (sinon les erreurs s'affichent au public)"
+case "$(getenv APP_URL)" in https://*) ok "APP_URL en https";; *) ko "APP_URL doit commencer par https://";; esac
+[ -n "$(getenv APP_KEY)" ] && ok "APP_KEY presente" || ko "APP_KEY manquante"
+php artisan migrate:status 2>/dev/null | grep -q Pending && ko "Des migrations ne sont pas appliquees (lancez maj)" || ok "Base a jour"
+[ -f public/build/manifest.json ] && ok "Affichage construit" || ko "Lancez maj (npm run build manquant)"
+[ -L public/storage ] && ok "Lien des fichiers (storage) present" || ko "Lancez : php artisan storage:link"
+DERNIER=$(ls -t /var/backups/oikonema/base/base_*.sql.gz 2>/dev/null | head -1)
+if [ -n "$DERNIER" ] && [ -n "$(find "$DERNIER" -mtime -2)" ]; then ok "Sauvegarde recente : $DERNIER"; else ko "Aucune sauvegarde recente (lancez sauvegarde)"; fi
+[ -f /etc/cron.d/oikonema ] && ok "Sauvegarde automatique programmee" || ko "Lancez : bash deploy/installer"
+[ -n "$(getenv MAIL_HOST)" ] && [ "$(getenv MAIL_MAILER)" != "log" ] && ok "Envoi de courriels configure" || ko "Courriels non configures (MAIL_*) : les messages ne partent pas"
+[ -n "$(getenv FEDAPAY_SECRET_KEY)" ] && ok "FedaPay: cles presentes ($(getenv FEDAPAY_ENVIRONMENT))" || ko "FedaPay non active (lancez paiement)"
+[ -n "$(getenv CRYPTO_WALLET_ADDRESS)" ] && ok "Crypto: adresse de reception presente" || ko "Crypto non active (lancez paiement)"
+[ -n "$(getenv ANTHROPIC_API_KEY)" ] && ok "Assistant Frere David: cle presente" || ko "Assistant sans cle (ANTHROPIC_API_KEY)"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' "$(getenv APP_URL)/bienvenue")
+[ "$CODE" = "200" ] && ok "Page d'accueil repond (200)" || ko "Page d'accueil: code $CODE"
+CODE=$(curl -s -o /dev/null -w '%{http_code}' "$(getenv APP_URL)/conditions-utilisation")
+[ "$CODE" = "200" ] && ok "Conditions d'utilisation en ligne" || ko "Conditions d'utilisation: code $CODE"
+df -h / | awk 'NR==2{print "  Disque utilise : "$5}'
+echo "Fin."

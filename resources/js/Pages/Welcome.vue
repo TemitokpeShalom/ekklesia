@@ -91,6 +91,11 @@ const atouts = [
                     Vous avez reçu un code de rattachement ?
                     <a href="/rattachement" class="text-sanctuary hover:underline font-medium">Rejoindre votre église</a>
                 </p>
+                <p class="text-center text-xs text-graphite/50 mt-4">
+                    <a href="/conditions-utilisation" class="hover:underline">Conditions d'utilisation</a>
+                    <span class="mx-1.5">·</span>
+                    <a href="/confidentialite" class="hover:underline">Confidentialité</a>
+                </p>
             </div>
 
             <!-- Vitrine des modules (2026-09-10) : demande explicite du ministere,

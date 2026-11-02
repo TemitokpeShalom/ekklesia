@@ -25,6 +25,7 @@ const form = useForm({
     account_phone: '',
     account_password: '',
     account_password_confirmation: '',
+    accept_terms: false,
 })
 
 const logoPreview = ref(null)
@@ -150,8 +151,19 @@ function submit() {
             <input id="account_password_confirmation" v-model="form.account_password_confirmation" type="password" required minlength="8"
                 class="w-full bg-graphite/5 border border-graphite/15 text-graphite placeholder-graphite/35 rounded-xl px-3.5 py-2.5 mb-1 transition focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold/60" />
 
+            <label class="flex items-start gap-2.5 mt-6 text-sm text-graphite/80 leading-snug">
+                <input v-model="form.accept_terms" type="checkbox" required class="mt-0.5 h-4 w-4 rounded border-graphite/30 text-azure focus:ring-azure/40" />
+                <span>
+                    J'ai lu et j'accepte les
+                    <a href="/conditions-utilisation" target="_blank" class="text-sanctuary underline font-medium">conditions d'utilisation</a>
+                    et la
+                    <a href="/confidentialite" target="_blank" class="text-sanctuary underline font-medium">politique de confidentialité</a>.
+                </span>
+            </label>
+            <p v-if="form.errors.accept_terms" class="mt-1 text-sm text-rose-600">{{ form.errors.accept_terms }}</p>
+
             <button type="submit" :disabled="form.processing"
-                class="w-full mt-6 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
+                class="w-full mt-5 bg-gradient-to-r from-azure to-azure-dark hover:shadow-glow-azure transition-all duration-300 text-white rounded-xl py-3 font-semibold shadow-lg shadow-azure/20 disabled:opacity-60">
                 Créer mon ministère
             </button>
 

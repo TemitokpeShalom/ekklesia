@@ -1,0 +1,43 @@
+#!/bin/bash
+# Sauvegarde de la base et des fichiers. Lancee chaque nuit par le serveur,
+# ou a la main avec la commande : sauvegarde
+APP=/var/www/ekklesia
+DEST=/var/backups/oikonema
+mkdir -p "$DEST/base" "$DEST/fichiers" "$DEST/mensuel"
+chmod 700 "$DEST"
+cd "$APP" || exit 1
+getenv() { grep -E "^$1=" "$APP/.env" | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'" ; }
+DB=$(getenv DB_DATABASE); DB=${DB:-ekklesia}
+HOST=$(getenv DB_HOST)
+if [ -n "$HOST" ] && [ "$HOST" != "127.0.0.1" ] && [ "$HOST" != "localhost" ]; then
+  echo "ATTENTION : la base n'est pas sur ce serveur ($HOST). Sauvegarde de la base ignoree."
+  BASE_DISTANTE=1
+fi
+DATE=$(date +%Y-%m-%d_%H%M)
+ERREUR=0
+if [ -z "$BASE_DISTANTE" ]; then
+  FICHIER="$DEST/base/base_$DATE.sql.gz"
+  # pg_dump doit tourner en super-utilisateur : la base applique l'isolation
+  # par ministere (RLS) meme au proprietaire, qui verrait des tables vides.
+  if sudo -u postgres pg_dump "$DB" 2>"$DEST/erreur.log" | gzip > "$FICHIER" && gunzip -t "$FICHIER" 2>/dev/null; then
+    TAILLE=$(stat -c %s "$FICHIER")
+    if [ "$TAILLE" -lt 2000 ]; then echo "ECHEC : sauvegarde de la base trop petite ($TAILLE octets)."; ERREUR=1; else echo "Base sauvegardee : $FICHIER ($TAILLE octets)"; fi
+  else
+    echo "ECHEC de la sauvegarde de la base. Voir $DEST/erreur.log"; ERREUR=1; rm -f "$FICHIER"
+  fi
+  chmod 600 "$DEST"/base/* 2>/dev/null
+  if [ "$(date +%d)" = "01" ] && [ -f "$FICHIER" ]; then cp "$FICHIER" "$DEST/mensuel/"; fi
+fi
+if [ -d "$APP/storage/app/public" ]; then
+  F2="$DEST/fichiers/fichiers_$DATE.tar.gz"
+  if tar -czf "$F2" -C "$APP/storage/app" public 2>/dev/null; then echo "Fichiers sauvegardes : $F2"; else echo "ECHEC sauvegarde des fichiers"; ERREUR=1; fi
+  chmod 600 "$DEST"/fichiers/* 2>/dev/null
+fi
+cp "$APP/.env" "$DEST/env_$(date +%Y-%m-%d).copie" 2>/dev/null && chmod 600 "$DEST"/env_*.copie
+# Menage : 14 jours de bases, 7 jours de fichiers, 6 mois de copies mensuelles.
+find "$DEST/base" -name 'base_*.sql.gz' -mtime +14 -delete
+find "$DEST/fichiers" -name 'fichiers_*.tar.gz' -mtime +7 -delete
+find "$DEST/mensuel" -name 'base_*.sql.gz' -mtime +190 -delete
+find "$DEST" -maxdepth 1 -name 'env_*.copie' -mtime +14 -delete
+if [ "$ERREUR" = "0" ]; then echo "Sauvegarde terminee, tout est bon."; else echo "Sauvegarde terminee AVEC ERREUR."; fi
+exit $ERREUR

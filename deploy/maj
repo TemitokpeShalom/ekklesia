@@ -1,0 +1,19 @@
+#!/bin/bash
+# Mise a jour complete de la plateforme : commande courte  maj
+APP=/var/www/ekklesia
+cd "$APP" || exit 1
+echo "1/6 Sauvegarde avant mise a jour..."
+bash "$APP/deploy/sauvegarde" || { echo "La sauvegarde a echoue : mise a jour annulee par prudence."; exit 1; }
+echo "2/6 Recuperation du code..."
+git pull || { echo "git pull a echoue."; exit 1; }
+echo "3/6 Mise a jour de la base..."
+php artisan migrate --force || { echo "La migration a echoue. Envoyez-moi ce message."; exit 1; }
+echo "4/6 Construction de l'affichage (1 a 2 minutes)..."
+npm run build || { echo "npm run build a echoue."; exit 1; }
+echo "5/6 Nettoyage des caches..."
+php artisan view:clear; php artisan cache:clear; php artisan config:clear; php artisan route:clear
+php artisan storage:link 2>/dev/null
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null
+echo "6/6 Rechargement du serveur web..."
+for s in php8.3-fpm php8.2-fpm php8.4-fpm; do systemctl reload $s 2>/dev/null; done
+echo "Mise a jour terminee. Ouvrez le site et faites Ctrl+F5 (ou fermez/rouvrez l'application sur le telephone)."

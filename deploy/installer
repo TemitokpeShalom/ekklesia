@@ -1,0 +1,16 @@
+#!/bin/bash
+# A lancer UNE SEULE FOIS :  bash deploy/installer
+APP=/var/www/ekklesia
+cd "$APP" || exit 1
+for n in maj sauvegarde verifier paiement; do
+  printf '#!/bin/bash\nexec bash %s/deploy/%s "$@"\n' "$APP" "$n" > /usr/local/bin/$n
+  chmod +x /usr/local/bin/$n
+done
+echo "Commandes courtes installees : maj, sauvegarde, verifier, paiement"
+mkdir -p /var/backups/oikonema; chmod 700 /var/backups/oikonema
+printf '30 2 * * * root bash %s/deploy/sauvegarde >> /var/log/oikonema-sauvegarde.log 2>&1\n' "$APP" > /etc/cron.d/oikonema
+chmod 644 /etc/cron.d/oikonema
+echo "Sauvegarde automatique programmee chaque nuit a 02h30."
+echo "Premiere sauvegarde maintenant..."
+bash "$APP/deploy/sauvegarde"
+echo "Installation terminee. Tapez  verifier  pour le controle general."

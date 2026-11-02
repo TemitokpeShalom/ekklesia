@@ -1,0 +1,35 @@
+GUIDE OIKONEMA : COMMANDES COURTES
+
+UNE SEULE FOIS (apres avoir mis les fichiers sur GitHub) :
+  cd /var/www/ekklesia
+  git pull
+  php artisan migrate --force
+  npm run build
+  bash deploy/installer
+
+ENSUITE, LES COMMANDES SONT DES MOTS SIMPLES :
+  maj         mise a jour complete (sauvegarde, git pull, migration, build, caches)
+  sauvegarde  sauvegarde immediate de la base et des fichiers
+  verifier    controle general, dit ce qui reste a corriger
+  paiement    saisie guidee des cles FedaPay, de l'adresse crypto et du contact
+
+SAUVEGARDES : /var/backups/oikonema (base 14 jours, fichiers 7 jours, copie mensuelle 6 mois).
+Automatique chaque nuit a 02h30. Activez aussi "Backups" dans la console Hetzner Cloud
+(copie hors du serveur, environ 20 pour cent du prix du serveur).
+
+RESTAURER LA BASE (en cas de catastrophe) :
+  ls /var/backups/oikonema/base
+  sauvegarde
+  sudo -u postgres dropdb ekklesia
+  sudo -u postgres createdb ekklesia
+  gunzip -c /var/backups/oikonema/base/NOMDUFICHIER | sudo -u postgres psql ekklesia
+(NOMDUFICHIER = le nom vu avec la premiere commande. Contactez-moi avant si vous hesitez.)
+
+PAIEMENT FEDAPAY :
+  1. Compte sur fedapay.com, mode Sandbox d'abord. Menu Developpeurs > Cles API : cle publique pk_ et cle secrete sk_.
+  2. Menu Webhooks > Ajouter : URL  https://monministere.duckdns.org/webhooks/fedapay
+     Evenement : transaction.approved. FedaPay donne un secret wh_.
+  3. Sur le serveur : paiement   (collez chaque valeur une par une, mode sandbox)
+  4. Faites un paiement de test depuis Abonnement. Quand tout marche, relancez paiement
+     avec les cles LIVE et le mode live.
+PAIEMENT CRYPTO : adresse publique 0x... de votre portefeuille BNB Smart Chain (jamais la phrase secrete).

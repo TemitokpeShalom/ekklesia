@@ -7,6 +7,11 @@
 // Voir User::isTechnicalStaff(). Plusieurs adresses possibles, separees par
 // des virgules.
 return [
+    // Version des conditions d'utilisation et de la politique de confidentialite.
+    // A changer quand les textes changent : l'acceptation est enregistree avec elle.
+    'terms_version' => '2026-11-01',
+    // Adresse de contact publique (CONTACT_EMAIL dans le .env).
+    'contact_email' => env('CONTACT_EMAIL'),
     'technical_staff_emails' => array_values(array_filter(array_map(
         'trim',
         explode(',', (string) env('TECHNICAL_STAFF_EMAILS', ''))

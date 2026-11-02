@@ -1,0 +1,31 @@
+#!/bin/bash
+# Saisie guidee des cles de paiement. Chaque valeur se colle une par une.
+APP=/var/www/ekklesia
+cd "$APP" || exit 1
+set_env() {
+  local K="$1" V="$2"
+  grep -v "^$K=" .env > .env.tmp
+  printf '%s=%s\n' "$K" "$V" >> .env.tmp
+  cat .env.tmp > .env; rm -f .env.tmp
+}
+ask() {
+  local K="$1" T="$2" V
+  echo; echo "$T"
+  echo "(Entree vide = ne rien changer)"
+  read -r -p "> " V
+  V=$(echo "$V" | tr -d ' \r\n"')
+  [ -n "$V" ] && set_env "$K" "$V" && echo "Enregistre."
+}
+cp .env ".env.avant-paiement"
+echo "=== FedaPay ==="
+echo "Mode sandbox = essais sans argent reel. Mode live = vrais paiements."
+read -r -p "Mode (tapez sandbox ou live) : " M
+[ "$M" = "sandbox" ] || [ "$M" = "live" ] && set_env FEDAPAY_ENVIRONMENT "$M" && echo "Mode: $M"
+ask FEDAPAY_PUBLIC_KEY "Collez la cle PUBLIQUE FedaPay (commence par pk_)"
+ask FEDAPAY_SECRET_KEY "Collez la cle SECRETE FedaPay (commence par sk_)"
+ask FEDAPAY_WEBHOOK_SECRET "Collez le secret du webhook FedaPay (commence par wh_)"
+echo; echo "=== Crypto (USDT sur BNB Smart Chain) ==="
+ask CRYPTO_WALLET_ADDRESS "Collez votre adresse de reception (commence par 0x, ADRESSE PUBLIQUE seulement, jamais de phrase secrete)"
+ask CONTACT_EMAIL "Adresse e-mail de contact affichee dans les conditions et la confidentialite (ex: contact@votredomaine)"
+php artisan config:clear
+echo; echo "Termine. Tapez  verifier  pour controler."

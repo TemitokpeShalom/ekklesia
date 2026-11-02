@@ -38,11 +38,14 @@ use App\Http\Controllers\TechniqueController;
 use App\Http\Controllers\TrombinoscopeController;
 use App\Http\Controllers\MinistryRegistrationController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\LegalController;
 use Illuminate\Support\Facades\Route;
 
 // Page d'accueil publique (2026-09-09, voir WelcomeController) : c'est
 // desormais elle, et non plus /connexion, que redirectGuestsTo
 // (bootstrap/app.php) presente a un visiteur non connecte.
+Route::get('/conditions-utilisation', [LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/confidentialite', [LegalController::class, 'privacy'])->name('legal.privacy');
 Route::get('/bienvenue', [WelcomeController::class, 'index'])->name('welcome');
 
 // Creation libre-service d'un nouveau ministere (tenant), sans validation

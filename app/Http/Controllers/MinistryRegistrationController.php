@@ -58,6 +58,9 @@ class MinistryRegistrationController extends Controller
             'account_email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'account_phone' => ['nullable', 'string', 'max:255'],
             'account_password' => ['required', 'string', 'min:8', 'confirmed'],
+            'accept_terms' => ['accepted'],
+        ], [
+            'accept_terms.accepted' => "Veuillez accepter les conditions d'utilisation et la politique de confidentialité.",
         ]);
 
         // Meme convention que MembersController/AnnouncementsController :
@@ -85,6 +88,11 @@ class MinistryRegistrationController extends Controller
                 'password' => $validated['account_password'],
             ]
         );
+
+        $user->forceFill([
+            'terms_accepted_at' => now(),
+            'terms_version' => config('oikonema.terms_version'),
+        ])->save();
 
         auth()->login($user);
         $request->session()->regenerate();
