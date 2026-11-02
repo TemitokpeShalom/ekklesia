@@ -1,6 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
+import { effacerDonneesHorsConnexion } from '@/offlineCache'
 
 const page = usePage()
 const flashSuccess = computed(() => page.props.flash?.success)
@@ -167,7 +168,7 @@ defineProps({
                             <Link href="/profil" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Mon profil</Link>
                             <Link href="/aide" class="block px-4 py-2 text-sm text-graphite/80 hover:bg-graphite/5" @click="profileMenuOpen = false">Aide</Link>
                             <div class="my-1.5 border-t border-graphite/10"></div>
-                            <Link href="/deconnexion" method="post" as="button" class="w-full text-left block px-4 py-2 text-sm text-sanctuary hover:bg-sanctuary/5">Se déconnecter</Link>
+                            <Link href="/deconnexion" method="post" as="button" class="w-full text-left block px-4 py-2 text-sm text-sanctuary hover:bg-sanctuary/5" @click="effacerDonneesHorsConnexion()">Se déconnecter</Link>
                         </div>
                     </div>
                 </nav>

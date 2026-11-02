@@ -1,5 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+import {
+    enregistrerServiceWorker,
+    effacerSiAutreUtilisateur,
+    preparerEntite,
+    preparerFichiersApplication,
+    rafraichirJetonCsrf,
+    orgUnitDepuisAdresse,
+} from '@/offlineCache'
 import { countQueuedCultes, syncQueuedCultes } from '@/offlineCultesQueue'
 import { countQueuedMembres, syncQueuedMembres } from '@/offlineMembresQueue'
 import { countQueuedSacrements, syncQueuedSacrements } from '@/offlineSacramentsQueue'
@@ -57,6 +66,33 @@ import { countQueuedSignalements, countRefusedSignalements, clearRefusedSignalem
  * bloquer les suivants : le bandeau ambre ci-dessous le signale, pour qu'il
  * soit ressaisi.
  */
+const page = usePage()
+
+/**
+ * Pages disponibles hors connexion (2026-11-01, voir offlineCache.js et
+ * public/sw.js) : a chaque ouverture ou changement de page connecte, on
+ * s'assure que le service worker est actif, que les pages gardees sont bien
+ * celles de la personne connectee, puis que les pages de l'entite consultee
+ * (et les fichiers de l'application) sont preparees pour le mode hors
+ * connexion. Tout se fait en arriere-plan, sans rien changer a l'ecran.
+ */
+async function preparerModeHorsConnexion() {
+    const utilisateur = page.props.auth && page.props.auth.user
+
+    if (!utilisateur) {
+        return
+    }
+
+    await enregistrerServiceWorker()
+    await effacerSiAutreUtilisateur(utilisateur.id)
+
+    const orgUnitId = orgUnitDepuisAdresse()
+
+    if (navigator.onLine) {
+        preparerFichiersApplication().then(() => orgUnitId && preparerEntite(orgUnitId))
+    }
+}
+
 const MODULES = [
     { cle: 'cultes', singulier: 'culte', pluriel: 'cultes', compter: countQueuedCultes, envoyer: syncQueuedCultes },
     { cle: 'membres', singulier: 'membre', pluriel: 'membres', compter: countQueuedMembres, envoyer: syncQueuedMembres },
@@ -112,6 +148,10 @@ async function lancerSynchronisation() {
     synchronisationEnCours.value = true
     derniereSyncReussie.value = false
 
+    // Une page ouverte depuis la memoire de l'appareil peut porter un jeton de
+    // securite ancien : on en prend un neuf avant d'envoyer quoi que ce soit.
+    await rafraichirJetonCsrf()
+
     let totalEnvoyes = 0
 
     for (let i = 0; i < MODULES.length; i += 1) {
@@ -139,13 +179,21 @@ function update() {
         refreshCachedMembersFlag()
     } else {
         lancerSynchronisation()
+        preparerModeHorsConnexion()
     }
+}
+
+function surChangementDePage() {
+    refreshQueueCounts()
+    preparerModeHorsConnexion()
 }
 
 onMounted(() => {
     window.addEventListener('online', update)
     window.addEventListener('offline', update)
+    document.addEventListener('inertia:navigate', surChangementDePage)
     refreshQueueCounts()
+    preparerModeHorsConnexion()
 
     if (isOffline.value) {
         refreshCachedMembersFlag()
@@ -157,6 +205,7 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('online', update)
     window.removeEventListener('offline', update)
+    document.removeEventListener('inertia:navigate', surChangementDePage)
 })
 </script>
 
@@ -170,7 +219,7 @@ onUnmounted(() => {
         leave-to-class="opacity-0"
     >
         <div v-if="isOffline" class="fixed top-0 inset-x-0 z-[70] bg-graphite text-white text-sm text-center py-2 px-4">
-            <span>Hors connexion. Certaines actions ne fonctionneront pas tant que la connexion n'est pas rétablie.</span>
+            <span>Hors connexion. Les pages déjà enregistrées sur cet appareil restent disponibles et vos saisies partiront au retour du réseau. Certaines actions (modifier une fiche, joindre un fichier) attendent la connexion.</span>
             <span v-if="totalEnAttente > 0">
                 {{ ' ' }}{{ detailEnAttente }} en attente, envoi automatique au retour du réseau.
             </span>
